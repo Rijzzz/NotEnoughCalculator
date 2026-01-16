@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "notenoughcalculator",
+  "version": "${version}",
+  "name": "Not Enough Calculator",
+  "description": "A NEU-style calculator, inside REI's search bar.",
+  "authors": [
+    "Rijz & Laze"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/notenoughcalculator",
+    "issues": "https://discord.com/users/1303959182201982989"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "com.rijz.notenoughcalculator.NotEnoughCalculator"
+    ],
+    "client": [
+      "com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient"
+    ],
+    "rei_client": [
+      "com.rijz.notenoughcalculator.client.CalculatorREIPlugin"
+    ]
+  },
+  "mixins": [
+    "notenoughcalculator.mixins.json",
+    {
+      "config": "notenoughcalculator.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric-api": "*",
+    "minecraft": ">=1.21.4 <=1.21.6",
+    "roughlyenoughitems": ">=18.0.795"
+  },
+  "suggests": {
+    "another-mod": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/notenoughcalculator",
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator",
+        "modmenu.discord": "https://discord.com/users/1303959182201982989"
+      }
+    }
+  }
+}

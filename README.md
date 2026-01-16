@@ -373,7 +373,7 @@ You can also reach me on Discord: [rijz.gg](https://discord.com/users/1303959182
 
 ## Credits
 
-Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
+Special thanks to **[(NEU) NotEnoughUpdated](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
 
 ---
 

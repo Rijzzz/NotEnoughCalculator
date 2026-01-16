@@ -349,7 +349,10 @@ $items * $price = 50,000,000 (total cost)
 ## Support
 
 **Need help or found a bug?**  
-DM me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
+
+Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
+
+You can also reach me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
 
 ### Common Issues
 
@@ -362,7 +365,7 @@ DM me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
 
 ## Why This Mod?
 
-[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdated) is one of the most popular Hypixel Skyblock mods, and its calculator feature was incredibly useful. However, NEU isn't available for newer Minecraft versions, leaving players without this essential tool.
+[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) is one of the most popular Hypixel Skyblock mods, and its calculator feature was incredibly useful. However, NEU isn't available for newer Minecraft versions, leaving players without this essential tool.
 
 **Not Enough Calculator** solves this problem by bringing NEU-style calculator functionality to [Roughly Enough Items (REI)](https://modrinth.com/mod/rei), which works on newer Minecraft versions.
 
@@ -370,7 +373,7 @@ DM me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
 
 ## Credits
 
-Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughupdated)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
+Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
 
 ---
 

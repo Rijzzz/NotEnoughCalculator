@@ -231,7 +231,7 @@ ans + 100 = 400                   (chain calculations)
 
 ### Basic Commands
 - `/calc <expression>` - Calculate in chat
-- `/calchist` - View calculation history (shows last 10)
+- `/calchist` - View calculation history (shows last 15)
 - `/calcclear` - Clear calculation history
 
 ### Variable Commands
@@ -263,7 +263,6 @@ ans + 100 = 400                   (chain calculations)
 ### Available Settings
 ```json
 {
-  "maxHistorySize": 100,
   "decimalPrecision": 10,
   "showUnitSuggestions": true,
   "enableHistoryNavigation": true,
@@ -274,7 +273,6 @@ ans + 100 = 400                   (chain calculations)
 
 ### Settings Explained
 
-- **maxHistorySize** (Default: 100) - How many calculations to remember
 - **decimalPrecision** (Default: 10) - Number of decimal places
 - **showUnitSuggestions** (Default: true) - Show unit hints like "(50m)" in commands
 - **enableHistoryNavigation** (Default: true) - Enable Ctrl+Z/Y shortcuts

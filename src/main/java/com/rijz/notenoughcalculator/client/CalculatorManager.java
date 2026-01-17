@@ -32,6 +32,9 @@ public class CalculatorManager {
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
 
+    // Pattern to detect trailing operators (incomplete expressions)
+    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%]\\s*$");
+
     // Common Minecraft items to avoid false positives when users search for items
     private static final Pattern MINECRAFT_ITEM = Pattern.compile("(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed).*");
 
@@ -85,6 +88,40 @@ public class CalculatorManager {
         return false;
     }
 
+    // NEW: Check if expression is complete and ready to evaluate
+    private boolean isExpressionComplete(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return false;
+        }
+
+        String trimmed = input.trim();
+
+        // Don't evaluate if it ends with an operator (incomplete)
+        if (TRAILING_OPERATOR.matcher(trimmed).matches()) {
+            return false;
+        }
+
+        // Check for balanced parentheses
+        int parenCount = 0;
+        for (char c : trimmed.toCharArray()) {
+            if (c == '(') parenCount++;
+            if (c == ')') parenCount--;
+            if (parenCount < 0) return false; // More closing than opening
+        }
+
+        // Unbalanced parentheses = incomplete
+        if (parenCount != 0) {
+            return false;
+        }
+
+        // Check for incomplete function calls (function name without closing paren)
+        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round)\\s*\\([^)]*$")) {
+            return false;
+        }
+
+        return true;
+    }
+
     // Process search bar input and calculate if needed
     public String formatSearchBar(String input) {
         String cleanInput = ResultFormatter.cleanInput(input);
@@ -94,9 +131,15 @@ public class CalculatorManager {
             historyIndex = -1;
             lastSearchInput = cleanInput;
 
-            // Only try to calculate if it actually looks like a calculation
+            // Only try to calculate if it looks like a calculation AND is complete
             if (looksLikeCalculation(cleanInput)) {
-                calculateForDisplay(cleanInput);
+                if (isExpressionComplete(cleanInput)) {
+                    calculateForDisplay(cleanInput);
+                } else {
+                    // Incomplete expression - clear results but don't show errors
+                    lastFormattedResult = null;
+                    lastErrorMessage = null;
+                }
             } else {
                 // Clear old results when switching to non-calculation searches
                 lastFormattedResult = null;
@@ -108,6 +151,7 @@ public class CalculatorManager {
     }
 
     // Calculate and store the result quietly - errors don't show visually
+    // Uses evaluateQuiet() to avoid polluting history with incomplete expressions
     private void calculateForDisplay(String input) {
         if (input == null || input.trim().isEmpty()) {
             lastFormattedResult = null;
@@ -116,7 +160,7 @@ public class CalculatorManager {
         }
 
         try {
-            BigDecimal result = evaluator.evaluate(input);
+            BigDecimal result = evaluator.evaluateQuiet(input);
             lastFormattedResult = ResultFormatter.formatWithCommas(result);
             lastErrorMessage = null;
         } catch (ExpressionEvaluator.EvalException e) {

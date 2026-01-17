@@ -9,6 +9,7 @@
   "notenoughcalculator.command.calchelp.description": "Show calculator help",
   "notenoughcalculator.command.calcconfig.description": "View current configuration",
 
+  "notenoughcalculator.error.unfinished_expression": "Incomplete expression",
   "notenoughcalculator.error.invalid_expression": "Invalid expression",
   "notenoughcalculator.error.division_by_zero": "Division by zero",
   "notenoughcalculator.error.modulo_by_zero": "Modulo by zero",

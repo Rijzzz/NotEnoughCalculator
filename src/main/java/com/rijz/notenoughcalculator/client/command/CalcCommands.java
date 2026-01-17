@@ -12,8 +12,13 @@ import net.minecraft.text.Text;
 import java.math.BigDecimal;
 import java.util.List;
 
-// Handles all calculator commands with a detailed help system
+/**
+ * Command handlers for calculator chat commands.
+ */
 public class CalcCommands {
+
+    // Hardcoded: show max 10 history entries at once
+    private static final int MAX_HISTORY_DISPLAY = 15;
 
     private static Text t(String key, Object... args) {
         return Text.translatable(key, args);
@@ -51,7 +56,6 @@ public class CalcCommands {
     }
 
     public static int executeHistory(CommandContext<FabricClientCommandSource> ctx) {
-        CalculatorConfig config = CalculatorConfig.getInstance();
         List<String> history = NotEnoughCalculatorClient.getCalculatorManager().getHistory();
 
         if (history.isEmpty()) {
@@ -60,7 +64,8 @@ public class CalcCommands {
             send(ctx, "notenoughcalculator.history.title");
             sendEmpty(ctx);
 
-            int maxDisplay = Math.min(config.maxHistorySize, 10);
+            // Show last 10 entries max (hardcoded)
+            int maxDisplay = Math.min(MAX_HISTORY_DISPLAY, history.size());
             for (int i = Math.max(0, history.size() - maxDisplay); i < history.size(); i++) {
                 sendLiteral(ctx, "§7" + (i + 1) + ". §f" + history.get(i));
             }
@@ -422,7 +427,7 @@ public class CalcCommands {
 
         send(ctx, "notenoughcalculator.config.calculation_settings");
         send(ctx, "notenoughcalculator.config.decimal_precision", config.decimalPrecision);
-        send(ctx, "notenoughcalculator.config.max_history", config.maxHistorySize);
+        // Removed max_history line since it's now hardcoded at 15
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.config.features");

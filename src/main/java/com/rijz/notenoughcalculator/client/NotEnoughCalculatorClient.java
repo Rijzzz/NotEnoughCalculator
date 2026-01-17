@@ -20,6 +20,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
     // Track whether player is in a world for session-based history management
     private static boolean wasInWorld = false;
     private static boolean shouldRender = false;
+    private static boolean wasREIVisible = false; // Track REI visibility state
 
     @Override
     public void onInitializeClient() {
@@ -68,8 +70,19 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             // Update tracking state
             wasInWorld = isInWorld;
 
+            // Check if REI overlay state changed
+            boolean isREIVisibleNow = isREIVisible();
+
+            // If REI just closed (was visible, now not visible), commit any pending calculation
+            if (wasREIVisible && !isREIVisibleNow) {
+                LOGGER.debug("REI overlay closed - committing pending calculation");
+                calcManager.commitPendingCalculationPublic();
+            }
+
+            wasREIVisible = isREIVisibleNow;
+
             // Only render calculator when in-game with REI open
-            shouldRender = isInWorld && isREIVisible();
+            shouldRender = isInWorld && isREIVisibleNow;
         });
     }
 
@@ -79,8 +92,11 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             // Draw calculator results over the REI search bar
             ScreenEvents.afterRender(screen).register(this::renderCalculatorOverlay);
 
-            // Listen for Ctrl+Z and Ctrl+Y to navigate history
-            ScreenKeyboardEvents.afterKeyPress(screen).register(this::handleKeyboardShortcuts);
+            // Listen for Ctrl+Z and Ctrl+Y to navigate history (and intercept Enter)
+            // Use beforeKeyPress to be able to cancel the event
+            ScreenKeyboardEvents.allowKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
+                return handleKeyboardShortcutsWithCancel(screen1, key, scancode, modifiers);
+            });
         });
     }
 
@@ -260,26 +276,49 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         }
     }
 
-    // Listen for Ctrl+Z and Ctrl+Y to navigate through calculation history
-    private void handleKeyboardShortcuts(Screen screen, int key, int scancode, int modifiers) {
+    // Listen for key presses and cancel Enter if it's a calculation
+    private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         // Make sure we're actually on the right screen and in-game
         if (mc.currentScreen != screen || mc.world == null || mc.player == null) {
-            return;
+            return true; // Allow the key press
         }
 
         if (isNonGameplayScreen(screen)) {
-            return;
+            return true; // Allow the key press
         }
 
         try {
-            if (REIRuntime.getInstance().isOverlayVisible()) {
-                calcManager.handleKeyPress(key, modifiers);
+            REIRuntime runtime = REIRuntime.getInstance();
+            if (runtime != null && runtime.isOverlayVisible()) {
+                TextField searchField = runtime.getSearchTextField();
+                if (searchField != null) {
+                    String searchText = searchField.getText();
+                    boolean isCalculation = calcManager.looksLikeCalculation(searchText);
+                    boolean hasResult = calcManager.hasResult();
+
+                    // If Enter is pressed on a calculation, commit it and prevent REI from closing
+                    if (key == GLFW.GLFW_KEY_ENTER && isCalculation && hasResult) {
+                        calcManager.commitPendingCalculationPublic();
+                        // Clear the search field so user can type a new calculation
+                        searchField.setText("");
+                        LOGGER.debug("Enter pressed on calculation - committed and cleared");
+                        return false; // Cancel the Enter key - prevents REI from closing
+                    }
+                }
+
+                // Handle Ctrl+Z and Ctrl+Y (these don't need to be cancelled)
+                boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
+                if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlPressed) {
+                    calcManager.handleKeyPress(key, modifiers);
+                }
             }
         } catch (Exception e) {
-            // Silently ignore if REI isn't available
+            LOGGER.debug("Error handling keyboard shortcut: {}", e.getMessage());
         }
+
+        return true; // Allow the key press by default
     }
 
     // Register all our chat commands

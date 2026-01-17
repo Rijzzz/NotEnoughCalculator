@@ -19,7 +19,9 @@ public class ExpressionEvaluator {
 
     public ExpressionEvaluator() {
         CalculatorConfig config = CalculatorConfig.getInstance();
-        this.mc = new MathContext(config.decimalPrecision, RoundingMode.HALF_UP);
+        // Use much higher precision to avoid rounding errors with large numbers
+        // This is ONLY used for division to prevent infinite decimals
+        this.mc = new MathContext(Math.max(config.decimalPrecision, 50), RoundingMode.HALF_UP);
         this.variables = new HashMap<>();
         this.history = new ArrayList<>();
         this.lastAnswer = BigDecimal.ZERO;
@@ -81,7 +83,23 @@ public class ExpressionEvaluator {
             new HashSet<>(Arrays.asList("sqrt", "abs", "floor", "ceil", "round"))
     );
 
-    // Main entry point: evaluate a math expression
+    // NEW: Evaluate without adding to history (for inline display)
+    public BigDecimal evaluateQuiet(String expr) throws EvalException {
+        if (expr == null || expr.trim().isEmpty()) {
+            throw new EvalException(tr("notenoughcalculator.error.empty_expression"), 0);
+        }
+
+        // Break expression into tokens and parse them
+        List<Token> tokens = tokenize(expr);
+        BigDecimal result = parseExpression(tokens, 0).value;
+
+        // Update lastAnswer but DON'T add to history
+        lastAnswer = result;
+
+        return result;
+    }
+
+    // Main entry point: evaluate a math expression (adds to history)
     public BigDecimal evaluate(String expr) throws EvalException {
         if (expr == null || expr.trim().isEmpty()) {
             throw new EvalException(tr("notenoughcalculator.error.empty_expression"), 0);
@@ -91,12 +109,16 @@ public class ExpressionEvaluator {
         List<Token> tokens = tokenize(expr);
         BigDecimal result = parseExpression(tokens, 0).value;
 
-        // Remember this result for 'ans' variable
+        // Remember this result for 'ans' variable AND add to history
         lastAnswer = result;
         CalculatorConfig config = CalculatorConfig.getInstance();
-        history.add(expr);
-        if (history.size() > config.maxHistorySize) {
-            history.remove(0);
+
+        // Only add to history if it's different from the last entry
+        if (history.isEmpty() || !history.get(history.size() - 1).equals(expr)) {
+            history.add(expr);
+            if (history.size() > config.maxHistorySize) {
+                history.remove(0);
+            }
         }
 
         return result;
@@ -233,6 +255,7 @@ public class ExpressionEvaluator {
     }
 
     // Handle addition and subtraction (lowest precedence)
+    // CRITICAL: NO MathContext here - use unlimited precision!
     private ParseResult parseAddSub(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseMulDiv(tokens, pos);
 
@@ -243,12 +266,20 @@ public class ExpressionEvaluator {
             }
 
             String op = tok.value;
+
+            // Check if there's a right operand - if not, expression is incomplete
+            if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+            }
+
             ParseResult right = parseMulDiv(tokens, left.nextPos + 1);
 
+            // Use unlimited precision for addition/subtraction
+            // This prevents losing small numbers when adding to large numbers
             if (op.equals("+")) {
-                left = new ParseResult(left.value.add(right.value, mc), right.nextPos);
+                left = new ParseResult(left.value.add(right.value), right.nextPos);
             } else {
-                left = new ParseResult(left.value.subtract(right.value, mc), right.nextPos);
+                left = new ParseResult(left.value.subtract(right.value), right.nextPos);
             }
         }
 
@@ -256,6 +287,7 @@ public class ExpressionEvaluator {
     }
 
     // Handle multiplication, division, and modulo (higher precedence than +/-)
+    // CRITICAL: NO MathContext for multiplication - use unlimited precision!
     private ParseResult parseMulDiv(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parsePower(tokens, pos);
 
@@ -266,20 +298,29 @@ public class ExpressionEvaluator {
             }
 
             String op = tok.value;
+
+            // Check if there's a right operand - if not, expression is incomplete
+            if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+            }
+
             ParseResult right = parsePower(tokens, left.nextPos + 1);
 
             if (op.equals("*")) {
-                left = new ParseResult(left.value.multiply(right.value, mc), right.nextPos);
+                // Use unlimited precision for multiplication
+                left = new ParseResult(left.value.multiply(right.value), right.nextPos);
             } else if (op.equals("/")) {
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
                     throw new EvalException(tr("notenoughcalculator.error.division_by_zero"), tok.pos);
                 }
+                // Only use MathContext for division to prevent infinite decimals (1/3 = 0.333...)
                 left = new ParseResult(left.value.divide(right.value, mc).stripTrailingZeros(), right.nextPos);
             } else { // modulo
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
                     throw new EvalException(tr("notenoughcalculator.error.modulo_by_zero"), tok.pos);
                 }
-                left = new ParseResult(left.value.remainder(right.value, mc), right.nextPos);
+                // Use unlimited precision for modulo
+                left = new ParseResult(left.value.remainder(right.value), right.nextPos);
             }
         }
 
@@ -293,6 +334,11 @@ public class ExpressionEvaluator {
         if (left.nextPos < tokens.size()) {
             Token tok = tokens.get(left.nextPos);
             if (tok.kind == TokenKind.OP && tok.value.equals("^")) {
+                // Check if there's a right operand - if not, expression is incomplete
+                if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                    throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+                }
+
                 ParseResult right = parsePower(tokens, left.nextPos + 1); // Right-associative: 2^3^2 = 2^(3^2)
 
                 // Sanity check: don't allow crazy huge exponents
@@ -349,7 +395,8 @@ public class ExpressionEvaluator {
             Token tok = tokens.get(result.nextPos);
             if (tok.kind == TokenKind.UNIT) {
                 BigDecimal multiplier = UNITS.get(tok.value);
-                result = new ParseResult(result.value.multiply(multiplier, mc), result.nextPos + 1);
+                // Use unlimited precision for unit multiplication
+                result = new ParseResult(result.value.multiply(multiplier), result.nextPos + 1);
             }
         }
 

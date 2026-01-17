@@ -1,4 +1,4 @@
-# Not Enough Calculator
+# 🧮Not Enough Calculator
 
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/notenoughcalculator)
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release)](https://github.com/Rijzzz/NotEnoughCalculator/releases)

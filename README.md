@@ -3,7 +3,6 @@
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/notenoughcalculator)
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
-[![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.4--1.21.6-brightgreen.svg)](https://www.minecraft.net/)
 
 **A powerful calculator mod that brings NEU-style calculator functionality to Roughly Enough Items (REI).**
 

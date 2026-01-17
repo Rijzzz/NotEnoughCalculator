@@ -1,4 +1,9 @@
-# 🧮 Not Enough Calculator
+# Not Enough Calculator
+
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/notenoughcalculator)
+[![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
+[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
+[![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.4--1.21.6-brightgreen.svg)](https://www.minecraft.net/)
 
 **A powerful calculator mod that brings NEU-style calculator functionality to Roughly Enough Items (REI).**
 
@@ -7,6 +12,7 @@
 ![Showcase](https://cdn.modrinth.com/data/cached_images/45906956cc96974985abed61ad9c769495409b4e_0.webp)
 
 ![Showcase 2](https://cdn.modrinth.com/data/cached_images/dcf5816503a635c49cee07b06fb5abda9dd8286a_0.webp)
+
 ---
 
 ## What does this mod do?
@@ -255,7 +261,6 @@ ans + 100 = 400                   (chain calculations)
 **Config file:** `config/notenoughcalculator.json`
 
 ### Available Settings
-
 ```json
 {
   "maxHistorySize": 100,
@@ -373,7 +378,7 @@ You can also reach me on Discord: [rijz.gg](https://discord.com/users/1303959182
 
 ## Credits
 
-Special thanks to **[(NEU) NotEnoughUpdated](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
+Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
 
 ---
 

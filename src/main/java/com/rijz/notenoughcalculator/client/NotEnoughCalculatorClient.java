@@ -93,9 +93,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             ScreenEvents.afterRender(screen).register(this::renderCalculatorOverlay);
 
             // Listen for Ctrl+Z and Ctrl+Y to navigate history (and intercept Enter)
-            // Use beforeKeyPress to be able to cancel the event
-            ScreenKeyboardEvents.allowKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
-                return handleKeyboardShortcutsWithCancel(screen1, key, scancode, modifiers);
+            ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
+                return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(), keyInput.modifiers());
             });
         });
     }

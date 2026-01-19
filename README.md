@@ -355,8 +355,6 @@ $items * $price = 50,000,000 (total cost)
 
 Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
 
-You can also reach me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
-
 ### Common Issues
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)

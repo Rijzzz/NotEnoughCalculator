@@ -355,19 +355,12 @@ $items * $price = 50,000,000 (total cost)
 
 Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
 
----
-
-<details>
-   
-<summary>Common Issues</summary>
+### Common Issues
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
 - **Red text in search bar?** This is a cosmetic issue that doesn't affect functionality
 - **History not working?** Make sure `enableHistoryNavigation` is `true` in config
 - **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
-- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated.
-
-</details>
 
 ---
 

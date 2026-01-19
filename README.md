@@ -58,7 +58,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 - Press `Ctrl+Z` in REI search to recall previous calculations
 - Press `Ctrl+Y` to redo/go forward in history
-- View full history with `/calchist` (shows last 10 entries)
+- View full history with `/calchist` (shows last 15 entries)
 - Session-based: History clears automatically when you leave a world/server
 
 </details>
@@ -354,8 +354,6 @@ $items * $price = 50,000,000 (total cost)
 **Need help or found a bug?**  
 
 Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
-
-You can also reach me on Discord: [rijz.gg](https://discord.com/users/1303959182201982989)
 
 ### Common Issues
 

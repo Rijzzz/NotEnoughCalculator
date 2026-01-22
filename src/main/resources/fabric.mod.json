@@ -12,7 +12,7 @@
     "issues": "https://github.com/Rijzzz/NotEnoughCalculator/issues"
   },
   "license": "All-Rights-Reserved",
-  "icon": "icon.png",
+  "icon": "assets/notenoughcalculator/icon.png",
   "environment": "client",
   "entrypoints": {
     "main": [

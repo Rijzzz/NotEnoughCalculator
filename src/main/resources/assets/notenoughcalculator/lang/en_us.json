@@ -71,7 +71,7 @@
   "notenoughcalculator.help.operators.basic": "§6➕ Basic Operators:",
   "notenoughcalculator.help.operators.add": "§e+ §7Addition §f│ §710 + 5 = 15",
   "notenoughcalculator.help.operators.subtract": "§e- §7Subtraction §f│ §710 - 5 = 5",
-  "notenoughcalculator.help.operators.multiply": "§e* §7Multiplication §f│ §710 * 5 = 50",
+  "notenoughcalculator.help.operators.multiply": "§e* or x §7Multiplication §f│ §710 * 5 = 50, 10 x 5 = 50",
   "notenoughcalculator.help.operators.divide": "§e/ §7Division §f│ §710 / 5 = 2",
   "notenoughcalculator.help.operators.power": "§e^ §7Power/Exponent §f│ §72 ^ 10 = 1,024",
   "notenoughcalculator.help.operators.modulo": "§e% §7Modulo/Remainder §f│ §710 % 3 = 1",
@@ -82,7 +82,7 @@
   "notenoughcalculator.help.operators.pemdas": "§6🔍 Order of Operations (PEMDAS):",
   "notenoughcalculator.help.operators.pemdas_1": "§71. §eParentheses §7( )",
   "notenoughcalculator.help.operators.pemdas_2": "§72. §eExponents §7^",
-  "notenoughcalculator.help.operators.pemdas_3": "§73. §eMultiplication/Division §7* /",
+  "notenoughcalculator.help.operators.pemdas_3": "§73. §eMultiplication/Division §7* x /",
   "notenoughcalculator.help.operators.pemdas_4": "§74. §eAddition/Subtraction §7+ -",
 
   "notenoughcalculator.help.functions.title": "§e§l──── Functions Help ────",

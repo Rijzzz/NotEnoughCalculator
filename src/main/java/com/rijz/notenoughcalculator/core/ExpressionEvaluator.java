@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  * Expression evaluator with support for:
- * - Basic math operators (+, -, *, /, ^, %)
+ * - Basic math operators (+, -, *, x, /, ^, %)
  * - Functions (sqrt, abs, floor, ceil, round)
  * - Skyblock units (k, m, b, t, s, e, h, sc, dc, eb)
  * - Variables (ans, $custom)
@@ -192,6 +192,34 @@ public class ExpressionEvaluator {
                 continue;
             }
 
+            // Handle 'x' or 'X' as multiplication
+            if (c == 'x' || c == 'X') {
+                boolean isMultiplication = true;
+
+                // Don't treat as multiplication if preceded by '0' (hex number like 0x123)
+                if (i > 0 && expr.charAt(i - 1) == '0') {
+                    isMultiplication = false;
+                }
+
+                // Don't treat as multiplication if looks like start of variable name
+                // "xVariable" should not be treated as multiplication
+                // But "5x" or "5xVariable" should be (the x is multiplication)
+                if (i + 1 < expr.length() && Character.isLetter(expr.charAt(i + 1))) {
+                    // Check if there's a number/operator before the 'x'
+                    // If nothing before, or if letter before, it's likely a variable name
+                    if (i == 0 || (!Character.isDigit(expr.charAt(i - 1)) && expr.charAt(i - 1) != ')')) {
+                        isMultiplication = false;
+                    }
+                }
+
+                if (isMultiplication) {
+                    // Normalize 'x' to '*' internally
+                    tokens.add(new Token(TokenKind.OP, "*", i));
+                    i++;
+                    continue;
+                }
+            }
+
             // Parentheses
             if (c == '(') {
                 tokens.add(new Token(TokenKind.LPAREN, "(", i));
@@ -214,7 +242,24 @@ public class ExpressionEvaluator {
                 }
 
                 while (i < expr.length() && (Character.isLetterOrDigit(expr.charAt(i)) || expr.charAt(i) == '_')) {
-                    name.append(expr.charAt(i));
+                    char current = expr.charAt(i);
+
+                    // Special handling: if we hit 'x' or 'X' after reading at least one character,
+                    // check if it should be multiplication instead of part of the variable name
+                    // This makes "10bx50k" work the same as "10b*50k"
+                    if ((current == 'x' || current == 'X') && name.length() > 0) {
+                        // If we started with '$', this is definitely a variable, so include the 'x'
+                        // Example: "$myxvar" should include the x
+                        if (c == '$') {
+                            name.append(current);
+                            i++;
+                            continue;
+                        }
+                        // Otherwise, we've read a unit/function name and hit 'x' - treat as multiplication
+                        break;
+                    }
+
+                    name.append(current);
                     i++;
                 }
 

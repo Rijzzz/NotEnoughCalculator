@@ -20,7 +20,7 @@ public class REIHelper {
 
     // Pre-compiled pattern so we don't recompile on every keystroke
     private static final Pattern CALCULATION_PATTERN = Pattern.compile(
-            ".*([+\\-*/^%()]|sqrt|abs|floor|ceil|round|ans|\\$|\\d+\\s*[kmbtseh]|\\d+\\s*(?:sc|dc|eb)).*",
+            ".*([+\\-*/^%xX()]|sqrt|abs|floor|ceil|round|ans|\\$|\\d+\\s*[kmbtseh]|\\d+\\s*(?:sc|dc|eb)).*",
             Pattern.CASE_INSENSITIVE
     );
 

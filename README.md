@@ -28,7 +28,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <details>
 <summary><strong>Basic Math</strong></summary>
 
-- Addition, subtraction, multiplication, division (`+`, `-`, `*`, `/`)
+- Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
 - Parentheses for complex expressions
 - Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`
@@ -76,15 +76,15 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 **Dependencies (Required):**
 - [Fabric API](https://modrinth.com/mod/fabric-api)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) 
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
 
 ---
 
 **How to Install:**
 1. Download the required mods and place them into your Minecraft `mods/` folder:
-   - [Fabric API](https://modrinth.com/mod/fabric-api)
-   - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
-   - **Not Enough Calculator** (this mod)
+    - [Fabric API](https://modrinth.com/mod/fabric-api)
+    - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+    - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Press your inventory key to open REI
 4. Start typing calculations directly into the REI search bar
@@ -222,6 +222,16 @@ ans * 2 = 300                     (using last result)
 ans + 100 = 400                   (chain calculations)
 ```
 
+### Basic Multiplication
+```
+10 x 10 = 100                     (using x operator)
+10x10 = 100                       (no spaces needed)
+5 * 5 = 25                        (traditional * also works)
+100m x 2 = 200,000,000            (x with units)
+3s x 5 = 960                      (stacks multiplication)
+10x5x2 = 100                      (chained multiplication)
+```
+
 </details>
 
 ---
@@ -236,12 +246,12 @@ ans + 100 = 400                   (chain calculations)
 
 ### Variable Commands
 - `/calcset <var> <value>` - Set custom variable
-  - Example: `/calcset profit 100m-50m`
-  - Example: `/calcset stacks 10`
+    - Example: `/calcset profit 100m-50m`
+    - Example: `/calcset stacks 10`
 
 ### Help Commands
 - `/calchelp` - Show main help menu
-- `/calchelp operators` - Learn about +, -, *, /, ^, %
+- `/calchelp operators` - Learn about +, -, *, x, /, ^, %
 - `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round
 - `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
 - `/calchelp variables` - Learn about ans and custom variables
@@ -345,22 +355,36 @@ $daily * 30 = 360,000,000 (monthly)
 $items * $price = 50,000,000 (total cost)
 ```
 
+### Use either * or x for multiplication
+```
+10 * 5 = 50    (traditional)
+10 x 5 = 50    (also works)
+10x5 = 50      (no spaces needed)
+```
+
 </details>
 
 ---
 
 ## Support
 
-**Need help or found a bug?**  
+**Need help or found a bug?**
 
 Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
 
-### Common Issues
+---
+
+<details>
+
+<summary>Common Issues</summary>
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
 - **Red text in search bar?** This is a cosmetic issue that doesn't affect functionality
 - **History not working?** Make sure `enableHistoryNavigation` is `true` in config
 - **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
+- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated. This is a temporary issue closing and reopening your inventory will fix it.
+
+</details>
 
 ---
 

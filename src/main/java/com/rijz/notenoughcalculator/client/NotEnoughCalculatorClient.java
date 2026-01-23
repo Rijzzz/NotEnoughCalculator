@@ -24,6 +24,9 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 // Main client-side initialization for the calculator mod
 // Sets up rendering, commands, and world state tracking
 public class NotEnoughCalculatorClient implements ClientModInitializer {
@@ -35,6 +38,13 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
     private static boolean wasInWorld = false;
     private static boolean shouldRender = false;
     private static boolean wasREIVisible = false; // Track REI visibility state
+
+    // Cached reflection fields/methods for TextField cursor and selection
+    private static Field cursorField = null;
+    private static Field selectionEndField = null;
+    private static Method getCursorMethod = null;
+    private static Method getSelectionEndMethod = null;
+    private static boolean reflectionInitialized = false;
 
     @Override
     public void onInitializeClient() {
@@ -100,6 +110,121 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         });
     }
 
+    // Initialize reflection once for TextField cursor/selection access
+    private static void initReflection(TextField searchField) {
+        if (reflectionInitialized) return;
+        reflectionInitialized = true;
+
+        if (searchField == null) return;
+
+        Class<?> fieldClass = searchField.getClass();
+
+        // Try to find cursor position field/method
+        try {
+            getCursorMethod = fieldClass.getMethod("getCursor");
+            getCursorMethod.setAccessible(true);
+            LOGGER.debug("Found getCursor() method");
+        } catch (NoSuchMethodException e) {
+            // Try field access
+            String[] cursorNames = {"cursor", "cursorPosition", "cursorPos", "caretPosition"};
+            for (String name : cursorNames) {
+                try {
+                    cursorField = findFieldInHierarchy(fieldClass, name);
+                    if (cursorField != null) {
+                        cursorField.setAccessible(true);
+                        LOGGER.debug("Found cursor field: {}", name);
+                        break;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // Try to find selection end field/method
+        try {
+            getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
+            getSelectionEndMethod.setAccessible(true);
+            LOGGER.debug("Found getSelectionEnd() method");
+        } catch (NoSuchMethodException e) {
+            // Try field access
+            String[] selectionNames = {"selectionEnd", "selectionEndPos", "selectionStart", "highlightPos"};
+            for (String name : selectionNames) {
+                try {
+                    selectionEndField = findFieldInHierarchy(fieldClass, name);
+                    if (selectionEndField != null) {
+                        selectionEndField.setAccessible(true);
+                        LOGGER.debug("Found selection field: {}", name);
+                        break;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    // Get cursor position from TextField using reflection
+    private static int getCursorPosition(TextField searchField) {
+        if (searchField == null) return 0;
+
+        try {
+            if (getCursorMethod != null) {
+                Object result = getCursorMethod.invoke(searchField);
+                if (result instanceof Integer) {
+                    return (Integer) result;
+                }
+            }
+
+            if (cursorField != null) {
+                Object result = cursorField.get(searchField);
+                if (result instanceof Integer) {
+                    return (Integer) result;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to get cursor position: {}", e.getMessage());
+        }
+
+        // Fallback: cursor at end of text
+        return searchField.getText().length();
+    }
+
+    // Get selection end position from TextField using reflection
+    private static int getSelectionEnd(TextField searchField) {
+        if (searchField == null) return 0;
+
+        try {
+            if (getSelectionEndMethod != null) {
+                Object result = getSelectionEndMethod.invoke(searchField);
+                if (result instanceof Integer) {
+                    return (Integer) result;
+                }
+            }
+
+            if (selectionEndField != null) {
+                Object result = selectionEndField.get(searchField);
+                if (result instanceof Integer) {
+                    return (Integer) result;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to get selection end: {}", e.getMessage());
+        }
+
+        // Fallback: no selection
+        return getCursorPosition(searchField);
+    }
+
+    // Find field in class hierarchy
+    private static Field findFieldInHierarchy(Class<?> clazz, String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            Class<?> superClass = clazz.getSuperclass();
+            if (superClass != null && !superClass.equals(Object.class)) {
+                return findFieldInHierarchy(superClass, fieldName);
+            }
+        }
+        return null;
+    }
+
     // Draw calculation results next to the user's input in REI search
     private void renderCalculatorOverlay(Screen screen, DrawContext context, int mouseX, int mouseY, float delta) {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -124,6 +249,9 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             if (searchField == null) {
                 return;
             }
+
+            // Initialize reflection once
+            initReflection(searchField);
 
             String searchText = searchField.getText();
             calcManager.formatSearchBar(searchText);
@@ -171,19 +299,69 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         int textX = searchBounds.x + 4;
         int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
-        // Draw what the user typed in white
-        drawText(context, textRenderer, searchText, textX, textY, 0xFFFFFFFF, true);
+        // Get cursor and selection info
+        int cursorPos = getCursorPosition(searchField);
+        int selectionEnd = getSelectionEnd(searchField);
+        int selectionStart = Math.min(cursorPos, selectionEnd);
+        int selectionEndPos = Math.max(cursorPos, selectionEnd);
+        boolean hasSelection = selectionStart != selectionEndPos;
 
-        // Show the calculation result (NEW APPROACH: moves to next line if overflow)
+        // Draw text with selection highlight
+        if (hasSelection) {
+            drawTextWithSelection(context, textRenderer, searchText, textX, textY,
+                    selectionStart, selectionEndPos);
+        } else {
+            drawText(context, textRenderer, searchText, textX, textY, 0xFFFFFFFF, true);
+        }
+
+        // Show the calculation result (moves to next line if overflow)
         if (calcManager.hasResult()) {
             drawCalculationResult(context, textRenderer, searchText, searchBounds, textX, textY);
         }
 
-        // Draw the blinking text cursor
-        drawCursor(context, searchBounds, searchText, textRenderer, textX, textY);
+        // Draw the blinking text cursor (only if no selection)
+        if (!hasSelection) {
+            drawCursor(context, searchBounds, searchText, textRenderer, textX, textY, cursorPos);
+        }
 
         // Done - restore the matrix state
         matrices.pop();
+    }
+
+    // Draw text with selection highlight
+    private void drawTextWithSelection(DrawContext context, TextRenderer textRenderer,
+                                       String text, int x, int y, int selStart, int selEnd) {
+        if (text.isEmpty()) return;
+
+        // Split text into three parts: before selection, selected, after selection
+        String beforeSelection = selStart > 0 ? text.substring(0, selStart) : "";
+        String selectedText = selEnd > selStart ? text.substring(selStart, selEnd) : "";
+        String afterSelection = selEnd < text.length() ? text.substring(selEnd) : "";
+
+        int currentX = x;
+
+        // Draw text before selection
+        if (!beforeSelection.isEmpty()) {
+            drawText(context, textRenderer, beforeSelection, currentX, y, 0xFFFFFFFF, true);
+            currentX += textRenderer.getWidth(beforeSelection);
+        }
+
+        // Draw selection highlight and selected text
+        if (!selectedText.isEmpty()) {
+            int selectionWidth = textRenderer.getWidth(selectedText);
+
+            // Draw blue highlight background
+            context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, 0xFF0066CC);
+
+            // Draw selected text in white
+            drawText(context, textRenderer, selectedText, currentX, y, 0xFFFFFFFF, true);
+            currentX += selectionWidth;
+        }
+
+        // Draw text after selection
+        if (!afterSelection.isEmpty()) {
+            drawText(context, textRenderer, afterSelection, currentX, y, 0xFFFFFFFF, true);
+        }
     }
 
     // Get MatrixStack in a way that works for both 1.21.5 and 1.21.6
@@ -262,21 +440,31 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         }
     }
 
-    // Draw a blinking cursor at the end of the text
-    private void drawCursor(DrawContext context, Rectangle bounds, String text, TextRenderer tr, int textX, int textY) {
+    // Draw a blinking cursor at the correct position
+    private void drawCursor(DrawContext context, Rectangle bounds, String text,
+                            TextRenderer tr, int textX, int textY, int cursorPos) {
         try {
             long time = System.currentTimeMillis();
             if ((time / 500) % 2 == 0) { // Blink every half second
-                int cursorX = textX + tr.getWidth(text);
+                // Calculate cursor X position based on cursor position in text
+                String textBeforeCursor = cursorPos > 0 && cursorPos <= text.length()
+                        ? text.substring(0, cursorPos)
+                        : "";
+
+                int cursorX = textX + tr.getWidth(textBeforeCursor);
                 int cursorY = textY - 1;
-                context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
+
+                // Make sure cursor stays within bounds
+                if (cursorX >= bounds.x + 4 && cursorX < bounds.getMaxX() - 4) {
+                    context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
+                }
             }
         } catch (Exception ignored) {
             // Don't crash if cursor rendering fails
         }
     }
 
-    // Listen for key presses and cancel Enter if it's a calculation
+    // Listen for key presses and handle Enter, Ctrl+Z, Ctrl+Y
     private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
         MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -298,12 +486,19 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     boolean isCalculation = calcManager.looksLikeCalculation(searchText);
                     boolean hasResult = calcManager.hasResult();
 
-                    // If Enter is pressed on a calculation, commit it and prevent REI from closing
+                    // If Enter is pressed on a calculation with a result
                     if (key == GLFW.GLFW_KEY_ENTER && isCalculation && hasResult) {
                         calcManager.commitPendingCalculationPublic();
-                        // Clear the search field so user can type a new calculation
-                        searchField.setText("");
-                        LOGGER.debug("Enter pressed on calculation - committed and cleared");
+
+                        // NEW: Put the result into the search bar so user can continue calculating
+                        String result = calcManager.getLastFormattedResult();
+                        if (result != null && !result.isEmpty()) {
+                            // Remove commas from result before inserting (e.g., "1,000" -> "1000")
+                            String cleanResult = result.replace(",", "");
+                            searchField.setText(cleanResult);
+                            LOGGER.debug("Enter pressed - result '{}' inserted into search bar", cleanResult);
+                        }
+
                         return false; // Cancel the Enter key - prevents REI from closing
                     }
                 }

@@ -53,14 +53,14 @@ public class CalculatorManager {
     private boolean sessionResetNotified = false;
 
     // Precompiled regex patterns (compiled once for performance)
-    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%].*");
-    private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%()])", Pattern.CASE_INSENSITIVE);
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX].*");
+    private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
-    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%]\\s*$");
+    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%xX]\\s*$");
     private static final Pattern MINECRAFT_ITEM = Pattern.compile("(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
 
     public CalculatorManager() {

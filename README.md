@@ -76,15 +76,15 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 **Dependencies (Required):**
 - [Fabric API](https://modrinth.com/mod/fabric-api)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) 
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
 
 ---
 
 **How to Install:**
 1. Download the required mods and place them into your Minecraft `mods/` folder:
-   - [Fabric API](https://modrinth.com/mod/fabric-api)
-   - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
-   - **Not Enough Calculator** (this mod)
+    - [Fabric API](https://modrinth.com/mod/fabric-api)
+    - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+    - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Press your inventory key to open REI
 4. Start typing calculations directly into the REI search bar
@@ -246,8 +246,8 @@ ans + 100 = 400                   (chain calculations)
 
 ### Variable Commands
 - `/calcset <var> <value>` - Set custom variable
-  - Example: `/calcset profit 100m-50m`
-  - Example: `/calcset stacks 10`
+    - Example: `/calcset profit 100m-50m`
+    - Example: `/calcset stacks 10`
 
 ### Help Commands
 - `/calchelp` - Show main help menu
@@ -368,21 +368,21 @@ $items * $price = 50,000,000 (total cost)
 
 ## Support
 
-**Need help or found a bug?**  
+**Need help or found a bug?**
 
 Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
 
 ---
 
 <details>
-   
+
 <summary>Common Issues</summary>
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
 - **Red text in search bar?** This is a cosmetic issue that doesn't affect functionality
 - **History not working?** Make sure `enableHistoryNavigation` is `true` in config
 - **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
-- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated.
+- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated. This is a temporary issue closing and reopening your inventory will fix it.
 
 </details>
 
@@ -415,4 +415,3 @@ Developed by **Rijz & Laze**
 ---
 
 *Last updated: January 2026*
-

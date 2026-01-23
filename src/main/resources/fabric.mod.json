@@ -35,7 +35,7 @@
   "depends": {
     "fabricloader": ">=0.16.0",
     "fabric-api": "*",
-    "minecraft": ">=1.21.4 <=1.21.7",
+    "minecraft": ">=1.21.5 <=1.21.7",
     "roughlyenoughitems": ">=18.0.795"
   },
   "suggests": {

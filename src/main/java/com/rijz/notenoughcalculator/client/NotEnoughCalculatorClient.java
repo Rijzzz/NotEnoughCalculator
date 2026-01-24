@@ -490,16 +490,31 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     if (key == GLFW.GLFW_KEY_ENTER && isCalculation && hasResult) {
                         calcManager.commitPendingCalculationPublic();
 
-                        // NEW: Put the result into the search bar so user can continue calculating
+                        // Put the result into the search bar so user can continue calculating
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
                             // Remove commas from result before inserting (e.g., "1,000" -> "1000")
                             String cleanResult = result.replace(",", "");
                             searchField.setText(cleanResult);
-                            LOGGER.debug("Enter pressed - result '{}' inserted into search bar", cleanResult);
+
+                            // Keep the search field focused so user can continue typing
+                            try {
+                                Method focusMethod = searchField.getClass().getMethod("setFocused", boolean.class);
+                                focusMethod.invoke(searchField, true);
+                            } catch (Exception e) {
+                                // Try alternative focus method
+                                try {
+                                    Method editMethod = searchField.getClass().getMethod("setEditable", boolean.class);
+                                    editMethod.invoke(searchField, true);
+                                } catch (Exception ex) {
+                                    LOGGER.debug("Could not set focus: {}", ex.getMessage());
+                                }
+                            }
+
+                            LOGGER.debug("Enter pressed - result '{}' inserted, REI stays open", cleanResult);
                         }
 
-                        return false; // Cancel the Enter key - prevents REI from closing
+                        return false; // Cancel the Enter key to keep REI open and focused
                     }
                 }
 
@@ -560,8 +575,20 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     // Only allow calculator in actual gameplay screens (not menus, loading screens, etc)
     // HandledScreen = inventory, chest, furnace, etc - all the in-game GUIs
+    // Also allow REI recipe screens and other REI-related screens
     private static boolean isNonGameplayScreen(Screen screen) {
-        return !(screen instanceof HandledScreen);
+        if (screen instanceof HandledScreen) {
+            return false; // Allow HandledScreen (inventories, chests, etc.)
+        }
+
+        // Allow REI screens (recipe viewing, etc.)
+        String screenClassName = screen.getClass().getName();
+        if (screenClassName.contains("rei") || screenClassName.contains("REI")) {
+            return false; // Allow REI screens
+        }
+
+        // Block everything else (main menu, loading screens, etc.)
+        return true;
     }
 
     // Is REI currently visible?

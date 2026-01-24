@@ -103,7 +103,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             ScreenEvents.afterRender(screen).register(this::renderCalculatorOverlay);
 
             // Listen for Ctrl+Z and Ctrl+Y to navigate history (and intercept Enter)
-            // Use beforeKeyPress to be able to cancel the event
+            // Use allowKeyPress to be able to cancel the event
             ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
                 return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(), keyInput.modifiers());
             });
@@ -490,7 +490,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     if (key == GLFW.GLFW_KEY_ENTER && isCalculation && hasResult) {
                         calcManager.commitPendingCalculationPublic();
 
-                        // NEW: Put the result into the search bar so user can continue calculating
+                        // Put the result into the search bar so user can continue calculating
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
                             // Remove commas from result before inserting (e.g., "1,000" -> "1000")
@@ -560,8 +560,20 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     // Only allow calculator in actual gameplay screens (not menus, loading screens, etc)
     // HandledScreen = inventory, chest, furnace, etc - all the in-game GUIs
+    // Also allow REI recipe screens and other REI-related screens
     private static boolean isNonGameplayScreen(Screen screen) {
-        return !(screen instanceof HandledScreen);
+        if (screen instanceof HandledScreen) {
+            return false; // Allow HandledScreen (inventories, chests, etc.)
+        }
+
+        // Allow REI screens (recipe viewing, etc.)
+        String screenClassName = screen.getClass().getName();
+        if (screenClassName.contains("rei") || screenClassName.contains("REI")) {
+            return false; // Allow REI screens
+        }
+
+        // Block everything else (main menu, loading screens, etc.)
+        return true;
     }
 
     // Is REI currently visible?

@@ -194,30 +194,35 @@ public class ExpressionEvaluator {
 
             // Handle 'x' or 'X' as multiplication
             if (c == 'x' || c == 'X') {
-                boolean isMultiplication = true;
+                boolean isMultiplication = false;
 
-                // Don't treat as multiplication if preceded by '0' (hex number like 0x123)
-                if (i > 0 && expr.charAt(i - 1) == '0') {
-                    isMultiplication = false;
-                }
-
-                // Don't treat as multiplication if looks like start of variable name
-                // "xVariable" should not be treated as multiplication
-                // But "5x" or "5xVariable" should be (the x is multiplication)
-                if (i + 1 < expr.length() && Character.isLetter(expr.charAt(i + 1))) {
-                    // Check if there's a number/operator before the 'x'
-                    // If nothing before, or if letter before, it's likely a variable name
-                    if (i == 0 || (!Character.isDigit(expr.charAt(i - 1)) && expr.charAt(i - 1) != ')')) {
+                // Check if 'x' should be treated as multiplication
+                if (i > 0) {
+                    // If preceded by a digit, it's multiplication (e.g., "10x5")
+                    char prevChar = expr.charAt(i - 1);
+                    if (Character.isDigit(prevChar)) {
+                        isMultiplication = true;
+                    }
+                    // If preceded by ')', it's multiplication (e.g., "(5+3)x2")
+                    else if (prevChar == ')') {
+                        isMultiplication = true;
+                    }
+                    // If we just parsed a unit token, it's multiplication (e.g., "10kx50k")
+                    else if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.UNIT) {
+                        isMultiplication = true;
+                    }
+                    // Don't treat as multiplication if preceded by '0' (hex like 0x123)
+                    else if (prevChar == '0') {
                         isMultiplication = false;
                     }
                 }
 
                 if (isMultiplication) {
-                    // Normalize 'x' to '*' internally
                     tokens.add(new Token(TokenKind.OP, "*", i));
                     i++;
                     continue;
                 }
+                // Otherwise, 'x' will be parsed as a variable/identifier below
             }
 
             // Parentheses

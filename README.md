@@ -368,9 +368,18 @@ $items * $price = 50,000,000 (total cost)
 
 ## Support
 
+<details>
+
+<summary>Important Version Notice:</summary>
+
+- Following Hypixel SkyBlock’s Modern Update, only the latest two major Minecraft versions are supported. This mod will **not receive updates for older versions**. Please ensure you are using a supported version to avoid issues.
+
+</details>
+
 **Need help or found a bug?**
 
-Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)
+Please report issues on GitHub: [Issues](https://github.com/Rijzzz/NotEnoughCalculator/issues)  
+Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 ---
 
@@ -414,4 +423,4 @@ Developed by **Rijz & Laze**
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

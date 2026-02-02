@@ -11,7 +11,7 @@
     "homepage": "https://modrinth.com/mod/notenoughcalculator",
     "issues": "https://github.com/Rijzzz/NotEnoughCalculator/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "LGPL-3.0-or-later",
   "icon": "assets/notenoughcalculator/icon.png",
   "environment": "client",
   "entrypoints": {

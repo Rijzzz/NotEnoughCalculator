@@ -1,5 +1,3 @@
-# NOTICE.md
-
 ## Licensing Notice and Transition Statement
 
 This project was previously licensed under **All Rights Reserved**.

@@ -452,7 +452,7 @@ Under the following conditions:
 * You must state any changes you make
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/tree/1.21.9-1.21.11?tab=readme-ov-file)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/tree/1.21.9-1.21.11?tab=License-1-ov-file)
 
 ---
 

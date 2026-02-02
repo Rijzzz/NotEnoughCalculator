@@ -1,9 +1,10 @@
 # 🧮Not Enough Calculator
 
-[![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C)](https://modrinth.com/mod/notenoughcalculator)
-[![CurseForge](https://img.shields.io/curseforge/dt/1431725?logo=curseforge&label=CurseForge&color=F16436)](https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator)
-[![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
-[![License](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C&style=for-the-badge)](https://modrinth.com/mod/notenoughcalculator)
+[![CurseForge Downloads](https://img.shields.io/curseforge/dt/1431725?logo=curseforge&label=CurseForge&color=F16436&style=for-the-badge)](https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator)
+[![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
+[![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/1389631948359598220)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](LICENSE)
 
 **A powerful calculator mod that brings NEU-style calculator functionality to Roughly Enough Items (REI).**
 
@@ -413,7 +414,21 @@ Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughu
 
 ## License
 
-**All Rights Reserved** - You can use this mod in modpacks with credit. Please link to the official mod page when featuring this mod.
+This mod is licensed under the **GNU Lesser General Public License v3.0 or later (LGPL-3.0-or-later)**.
+
+You are free to:
+
+* Use, modify, and redistribute this mod
+* Include it in modpacks (commercial or non-commercial)
+
+Under the following conditions:
+
+* Any modifications to this mod itself must be released under the same license
+* You must provide appropriate credit and include a copy of the license
+* You must state any changes you make
+
+See the full license text here:
+[View License](https://www.gnu.org/licenses/lgpl-3.0.en.html#license-text)
 
 ---
 

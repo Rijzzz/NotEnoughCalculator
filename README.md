@@ -434,7 +434,7 @@ As of **February 2nd, 2026**, the project has been relicensed under the
 ### Versioning and Legacy
 
 - **Previous Versions:** All versions released prior to **February 2nd, 2026** (v1.0.11 and earlier) remain under the **All Rights Reserved** license.
-- **Current and Future Versions:** All versions released on or after **February 2nd, 2026** (starting with **v2.0.0**) are licensed under **LGPL-3.0-or-later**.
+- **Current and Future Versions:** All versions released on or after **February 2nd, 2026** (starting with **v1.0.12**) are licensed under **LGPL-3.0-or-later**.
 
 </details>
 

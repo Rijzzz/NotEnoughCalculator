@@ -1,0 +1,40 @@
+name: CI Build and Test
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  compile-and-test:
+    name: Build Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper integrity
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Configure Java environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Set executable permissions on Gradle wrapper
+        run: chmod +x gradlew
+
+      - name: Execute Gradle build
+        run: ./gradlew build --stacktrace --no-daemon
+
+      - name: Archive build outputs
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-build-artifacts
+          path: build/libs/*.jar
+          retention-days: 30

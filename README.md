@@ -408,7 +408,7 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 ## Credits
 
-Special thanks to **[NotEnoughUpdated (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
+Special thanks to **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
 
 ---
 

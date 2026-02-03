@@ -2,9 +2,11 @@ name: CI Build and Test
 
 on:
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - '1.21.9-1.21.11'
   push:
-    branches: [ main, master ]
+    branches:
+      - '1.21.9-1.21.11'
 
 jobs:
   compile-and-test:

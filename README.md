@@ -456,8 +456,6 @@ See the full license text here:
 
 ---
 
-Developed by **Rijz & Laze**
-
 **Type. Calculate. Profit.**
 
 ---

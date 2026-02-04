@@ -456,7 +456,7 @@ See the full license text here:
 
 ---
 
-**Maintained by Rijz & Laze**
+**Created and maintained by Laze & Rijz**
 
 **Type. Calculate. Profit.**
 

@@ -1,14 +1,12 @@
 {
   "notenoughcalculator.name": "Not Enough Calculator",
   "notenoughcalculator.description": "A NEU-style calculator, inside REI's search bar.",
-
   "notenoughcalculator.command.calc.description": "Calculate an expression",
   "notenoughcalculator.command.calchist.description": "View calculation history",
   "notenoughcalculator.command.calcclear.description": "Clear calculation history",
   "notenoughcalculator.command.calcset.description": "Set a variable value",
   "notenoughcalculator.command.calchelp.description": "Show calculator help",
   "notenoughcalculator.command.calcconfig.description": "View current configuration",
-
   "notenoughcalculator.error.unfinished_expression": "Incomplete expression",
   "notenoughcalculator.error.invalid_expression": "Invalid expression",
   "notenoughcalculator.error.division_by_zero": "Division by zero",
@@ -26,20 +24,16 @@
   "notenoughcalculator.error.unexpected_end": "Unexpected end of expression",
   "notenoughcalculator.error.unexpected_token": "Unexpected token: %s",
   "notenoughcalculator.error.expected_closing_paren": "Expected ')' after function argument",
-
   "notenoughcalculator.variable.none": "No custom variables set. Use /calcset to create one!",
   "notenoughcalculator.variable.list_title": "Custom variables (%d):",
   "notenoughcalculator.variable.set": "✓ Variable set: §e$%s §7= %s%s",
-
   "notenoughcalculator.history.empty": "§e⚠ Calculation history is empty",
   "notenoughcalculator.history.cleared": "§a✓ Calculation history cleared!",
   "notenoughcalculator.history.title": "§e§l──── Calculation History ────",
   "notenoughcalculator.history.showing": "§7(Showing last %d of %d calculations)",
   "notenoughcalculator.history.tip": "§7Tip: Use §eCtrl+Z§7 in REI search to recall history!",
-
-  "notenoughcalculator.result.equals": "§7= ",
+  "notenoughcalculator.result.equals": " §f= ",
   "notenoughcalculator.result.error_prefix": "✗ Error: ",
-
   "notenoughcalculator.config.title": "§e§l──── Current Configuration ────",
   "notenoughcalculator.config.display_settings": "§6⚙ Display Settings:",
   "notenoughcalculator.config.calculation_settings": "§6🔢 Calculation Settings:",
@@ -54,19 +48,28 @@
   "notenoughcalculator.config.no": "No",
   "notenoughcalculator.config.enabled": "Enabled",
   "notenoughcalculator.config.disabled": "Disabled",
-
   "notenoughcalculator.help.main.title": "§e§l──── Not Enough Calculator Help ────",
   "notenoughcalculator.help.main.quick_start": "§6📋 Quick Start:",
   "notenoughcalculator.help.main.quick_start_1": "§7Type calculations directly in the §eREI search bar",
   "notenoughcalculator.help.main.quick_start_2": "§7Results appear §ainline §7next to your input!",
   "notenoughcalculator.help.main.commands": "§6💬 Commands:",
+  "notenoughcalculator.help.main.cmd_calc": "§e/calc <expression> §7- Calculate an expression",
+  "notenoughcalculator.help.main.cmd_calchist": "§e/calchist §7- View calculation history",
+  "notenoughcalculator.help.main.cmd_calcclear": "§e/calcclear §7- Clear calculation history",
+  "notenoughcalculator.help.main.cmd_calcset": "§e/calcset <var> <value> §7- Set a variable value",
+  "notenoughcalculator.help.main.cmd_calcconfig": "§e/calcconfig §7- View current configuration",
   "notenoughcalculator.help.main.help_pages": "§6📖 Help Pages:",
+  "notenoughcalculator.help.main.page_operators": "§e/calchelp operators §7- Learn about +, -, *, /, ^, %",
+  "notenoughcalculator.help.main.page_functions": "§e/calchelp functions §7- Learn about sqrt, abs, floor, etc.",
+  "notenoughcalculator.help.main.page_units": "§e/calchelp units §7- Learn Skyblock units (k, m, b, s, e, h)",
+  "notenoughcalculator.help.main.page_variables": "§e/calchelp variables §7- Learn about ans, $custom variables",
+  "notenoughcalculator.help.main.page_examples": "§e/calchelp examples §7- See practical examples",
+  "notenoughcalculator.help.main.page_config": "§e/calchelp config §7- Learn about configuration",
   "notenoughcalculator.help.main.keyboard_shortcuts": "§6⌨️ Keyboard Shortcuts:",
   "notenoughcalculator.help.main.keyboard_shortcuts_1": "§7Press §eCtrl+Z §7in REI search to recall previous calculations",
   "notenoughcalculator.help.main.keyboard_shortcuts_2": "§7Press §eCtrl+Y §7in REI search to redo",
   "notenoughcalculator.help.main.footer": "§7Type §e/calchelp <page> §7to learn more!",
   "notenoughcalculator.help.back": "§7Back: §e/calchelp",
-
   "notenoughcalculator.help.operators.title": "§e§l──── Operators Help ────",
   "notenoughcalculator.help.operators.basic": "§6➕ Basic Operators:",
   "notenoughcalculator.help.operators.add": "§e+ §7Addition §f│ §710 + 5 = 15",
@@ -84,7 +87,6 @@
   "notenoughcalculator.help.operators.pemdas_2": "§72. §eExponents §7^",
   "notenoughcalculator.help.operators.pemdas_3": "§73. §eMultiplication/Division §7* x /",
   "notenoughcalculator.help.operators.pemdas_4": "§74. §eAddition/Subtraction §7+ -",
-
   "notenoughcalculator.help.functions.title": "§e§l──── Functions Help ────",
   "notenoughcalculator.help.functions.available": "§6🔧 Available Functions:",
   "notenoughcalculator.help.functions.sqrt": "§esqrt(x) §7- Square root",
@@ -104,7 +106,6 @@
   "notenoughcalculator.help.functions.round_example_2": "  §7Example: §fround(3.6) = 4",
   "notenoughcalculator.help.functions.combining": "§6🔄 Combining Functions:",
   "notenoughcalculator.help.functions.combining_example": "§7You can nest functions: §fsqrt(abs(-144)) = 12",
-
   "notenoughcalculator.help.units.title": "§e§l──── Skyblock Units Help ────",
   "notenoughcalculator.help.units.currency": "§6💰 Currency Units:",
   "notenoughcalculator.help.units.currency_k": "§ek §7- Thousand §f│ §710k = 10,000",
@@ -128,7 +129,6 @@
   "notenoughcalculator.help.units.tips_1": "§7• Units must come §aafter§7 the number: §f10k §c✓ §7not §ck10 ✗",
   "notenoughcalculator.help.units.tips_2": "§7• You can mix units: §f100m + 500k = 100,500,000",
   "notenoughcalculator.help.units.tips_3": "§7• Results show best unit: §f1000000 → (1m)",
-
   "notenoughcalculator.help.variables.title": "§e§l──── Variables Help ────",
   "notenoughcalculator.help.variables.builtin": "§6🔤 Built-in Variable:",
   "notenoughcalculator.help.variables.builtin_ans": "§eans §7- Stores the last calculation result",
@@ -152,7 +152,6 @@
   "notenoughcalculator.help.variables.practical_2_step2": "   §e/calcset used 3s",
   "notenoughcalculator.help.variables.practical_2_step3": "   §f$wood - $used §7= 448 (7 stacks left)",
   "notenoughcalculator.help.variables.current": "§6📋 Current Variables:",
-
   "notenoughcalculator.help.examples.title": "§e§l──── Examples Help ────",
   "notenoughcalculator.help.examples.auction": "§6💸 Auction House Calculations:",
   "notenoughcalculator.help.examples.auction_1": "§7Calculate profit margin:",
@@ -184,7 +183,6 @@
   "notenoughcalculator.help.examples.tips_2": "§7• Save common values as §e$variables",
   "notenoughcalculator.help.examples.tips_3": "§7• Press §eCtrl+Z §7to recall previous calculations",
   "notenoughcalculator.help.examples.tips_4": "§7• Results auto-format with commas and units",
-
   "notenoughcalculator.help.config.title": "§e§l──── Configuration Help ────",
   "notenoughcalculator.help.config.file": "§6📁 Configuration File:",
   "notenoughcalculator.help.config.file_location": "§7Location: §fconfig/notenoughcalculator.json",
@@ -194,7 +192,6 @@
   "notenoughcalculator.help.config.file_edit_3": "  §7• Display preferences",
   "notenoughcalculator.help.config.current": "§6⚙️ Current Settings:",
   "notenoughcalculator.help.config.current_cmd": "§7See with: §e/calcconfig",
-
   "notenoughcalculator.unit.suggestion.ender_chest": "1 ender chest",
   "notenoughcalculator.unit.suggestion.double_chest": "1 double chest",
   "notenoughcalculator.unit.suggestion.shulker": "1 shulker",

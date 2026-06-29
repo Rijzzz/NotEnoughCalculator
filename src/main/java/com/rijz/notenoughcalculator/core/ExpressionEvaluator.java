@@ -19,7 +19,7 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -66,7 +66,7 @@ public class ExpressionEvaluator {
 
     // Helper for translation
     private static String tr(String key, Object... args) {
-        return I18n.translate(key, args);
+        return I18n.get(key, args);
     }
 
     // Token types recognized by the parser

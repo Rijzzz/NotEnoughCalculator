@@ -19,9 +19,10 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -41,7 +42,7 @@ public class ResultFormatter {
 
     // Helper method for translations
     private static String tr(String key, Object... args) {
-        return I18n.translate(key, args);
+        return I18n.get(key, args);
     }
 
     // Format with commas only (used for inline display in REI)
@@ -86,28 +87,28 @@ public class ResultFormatter {
 
         // Suggest currency units for large numbers
         if (abs.compareTo(new BigDecimal("1000000000000")) >= 0) {
-            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 2, RoundingMode.HALF_UP);
             if (t.stripTrailingZeros().scale() <= 2) {
                 return t.stripTrailingZeros().toPlainString() + "t";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000000000")) >= 0) {
-            BigDecimal b = value.divide(new BigDecimal("1000000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal b = value.divide(new BigDecimal("1000000000"), 2, RoundingMode.HALF_UP);
             if (b.stripTrailingZeros().scale() <= 2) {
                 return b.stripTrailingZeros().toPlainString() + "b";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000000")) >= 0) {
-            BigDecimal m = value.divide(new BigDecimal("1000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal m = value.divide(new BigDecimal("1000000"), 2, RoundingMode.HALF_UP);
             if (m.stripTrailingZeros().scale() <= 2) {
                 return m.stripTrailingZeros().toPlainString() + "m";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000")) >= 0) {
-            BigDecimal k = value.divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal k = value.divide(new BigDecimal("1000"), 2, RoundingMode.HALF_UP);
             if (k.stripTrailingZeros().scale() <= 2) {
                 return k.stripTrailingZeros().toPlainString() + "k";
             }
@@ -115,7 +116,7 @@ public class ResultFormatter {
 
         // Suggest stacks for smaller numbers that are multiples of 64
         if (abs.compareTo(new BigDecimal("64")) >= 0 && abs.compareTo(new BigDecimal("10000")) < 0) {
-            BigDecimal stacks = value.divide(new BigDecimal("64"), 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal stacks = value.divide(new BigDecimal("64"), 10, RoundingMode.HALF_UP);
             if (stacks.stripTrailingZeros().scale() <= 0) {
                 long stackCount = stacks.longValue();
                 if (stackCount == 1) {

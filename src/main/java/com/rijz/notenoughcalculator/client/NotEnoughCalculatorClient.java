@@ -27,48 +27,55 @@ import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.client.resources.language.I18n;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-// Main client-side initialization for the calculator mod
-// Sets up rendering, commands, and world state tracking
+// Client setup. Registers listeners, render hooks, and chat commands.
 public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotEnoughCalculatorClient.class);
     private static final CalculatorManager calcManager = new CalculatorManager();
 
-    // Track whether player is in a world for session-based history management
+    // Track world state for session-based history resets
     private static boolean wasInWorld = false;
     private static boolean shouldRender = false;
-    private static boolean wasREIVisible = false; // Track REI visibility state
+    private static boolean wasREIVisible = false;
 
-    // Cached reflection fields/methods for TextField cursor and selection
+    // Cache reflection lookups for TextField cursor position and text selection
     private static Field cursorField = null;
     private static Field selectionEndField = null;
     private static Method getCursorMethod = null;
     private static Method getSelectionEndMethod = null;
     private static boolean reflectionInitialized = false;
 
+    // Cache reflection fields for current screen retrieval (compat helper for 26.2+)
+    private static Field mcScreenField = null;
+    private static Field mcGuiField = null;
+    private static Field guiScreenField = null;
+    private static Method guiScreenMethod = null;
+    private static boolean screenReflectionInitialized = false;
+
     @Override
     public void onInitializeClient() {
         LOGGER.info("Not Enough Calculator initializing...");
 
-        // Load user settings from config file
         CalculatorConfig config = CalculatorConfig.getInstance();
         LOGGER.info("Configuration loaded: precision={}", config.decimalPrecision);
 
@@ -79,56 +86,47 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         LOGGER.info("Not Enough Calculator initialized successfully!");
     }
 
-    // Monitor when player joins/leaves worlds to reset history each session
+    // Wipes session history when leaving a world/server
     private void registerWorldStateTracking() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            boolean isInWorld = client.world != null && client.player != null;
+            boolean isInWorld = client.level != null && client.player != null;
 
-            // Player just left a world or server - clear everything for next session
             if (wasInWorld && !isInWorld) {
                 LOGGER.info("Player left world - resetting calculator session");
                 calcManager.reset();
                 calcManager.clearHistory();
                 shouldRender = false;
-
-                // Wipe the REI search bar too
                 clearREISearchField();
             }
 
-            // Update tracking state
             wasInWorld = isInWorld;
 
-            // Check if REI overlay state changed
             boolean isREIVisibleNow = isREIVisible();
 
-            // If REI just closed (was visible, now not visible), commit any pending calculation
+            // Commit the current calculation when closing the inventory/REI overlay
             if (wasREIVisible && !isREIVisibleNow) {
                 LOGGER.debug("REI overlay closed - committing pending calculation");
                 calcManager.commitPendingCalculationPublic();
             }
 
             wasREIVisible = isREIVisibleNow;
-
-            // Only render calculator when in-game with REI open
             shouldRender = isInWorld && isREIVisibleNow;
         });
     }
 
-    // Hook into screen rendering to draw our calculator overlay
+    // Handles overlay rendering hooks and keyboard events
     private void registerScreenRendering() {
         ScreenEvents.BEFORE_INIT.register((client, screen, sw, sh) -> {
-            // Draw calculator results over the REI search bar
-            ScreenEvents.afterRender(screen).register(this::renderCalculatorOverlay);
+            ScreenEvents.afterExtract(screen).register(this::renderCalculatorOverlay);
 
-            // Listen for Ctrl+Z and Ctrl+Y to navigate history (and intercept Enter)
-            // Use allowKeyPress to be able to cancel the event
+            // Intercept Enter to commit, Ctrl+Z/Y for history undo/redo
             ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
                 return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(), keyInput.modifiers());
             });
         });
     }
 
-    // Initialize reflection once for TextField cursor/selection access
+    // Set up reflection for text field cursor/selection access
     private static void initReflection(TextField searchField) {
         if (reflectionInitialized) return;
         reflectionInitialized = true;
@@ -137,13 +135,12 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
         Class<?> fieldClass = searchField.getClass();
 
-        // Try to find cursor position field/method
+        // Get cursor position method or field
         try {
             getCursorMethod = fieldClass.getMethod("getCursor");
             getCursorMethod.setAccessible(true);
             LOGGER.debug("Found getCursor() method");
         } catch (NoSuchMethodException e) {
-            // Try field access
             String[] cursorNames = {"cursor", "cursorPosition", "cursorPos", "caretPosition"};
             for (String name : cursorNames) {
                 try {
@@ -157,13 +154,12 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             }
         }
 
-        // Try to find selection end field/method
+        // Get selection end method or field
         try {
             getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
             getSelectionEndMethod.setAccessible(true);
             LOGGER.debug("Found getSelectionEnd() method");
         } catch (NoSuchMethodException e) {
-            // Try field access
             String[] selectionNames = {"selectionEnd", "selectionEndPos", "selectionStart", "highlightPos"};
             for (String name : selectionNames) {
                 try {
@@ -178,59 +174,49 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         }
     }
 
-    // Get cursor position from TextField using reflection
+    // Get cursor index
     private static int getCursorPosition(TextField searchField) {
         if (searchField == null) return 0;
 
         try {
             if (getCursorMethod != null) {
                 Object result = getCursorMethod.invoke(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
 
             if (cursorField != null) {
                 Object result = cursorField.get(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to get cursor position: {}", e.getMessage());
         }
 
-        // Fallback: cursor at end of text
         return searchField.getText().length();
     }
 
-    // Get selection end position from TextField using reflection
+    // Get selection end index
     private static int getSelectionEnd(TextField searchField) {
         if (searchField == null) return 0;
 
         try {
             if (getSelectionEndMethod != null) {
                 Object result = getSelectionEndMethod.invoke(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
 
             if (selectionEndField != null) {
                 Object result = selectionEndField.get(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
         } catch (Exception e) {
             LOGGER.debug("Failed to get selection end: {}", e.getMessage());
         }
 
-        // Fallback: no selection
         return getCursorPosition(searchField);
     }
 
-    // Find field in class hierarchy
+    // Lookup field traversing superclasses
     private static Field findFieldInHierarchy(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
@@ -243,53 +229,40 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         return null;
     }
 
-    // Draw calculation results next to the user's input in REI search
-    private void renderCalculatorOverlay(Screen screen, DrawContext context, int mouseX, int mouseY, float delta) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+    // Main render callback for drawing results in REI search overlay
+    private void renderCalculatorOverlay(Screen screen, GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        Minecraft mc = Minecraft.getInstance();
 
-        // Bunch of safety checks before we try to render anything
-        if (!shouldRenderCalculator(screen, mc)) {
-            return;
-        }
+        if (!shouldRenderCalculator(screen, mc)) return;
 
         try {
             REIRuntime runtime = REIRuntime.getInstance();
-            if (runtime == null || !runtime.isOverlayVisible()) {
-                return;
-            }
+            if (runtime == null || !runtime.isOverlayVisible()) return;
 
             ScreenOverlay overlay = runtime.getOverlay().orElse(null);
-            if (overlay == null) {
-                return;
-            }
+            if (overlay == null) return;
 
             TextField searchField = runtime.getSearchTextField();
-            if (searchField == null) {
-                return;
-            }
+            if (searchField == null) return;
 
-            // Initialize reflection once
             initReflection(searchField);
 
             String searchText = searchField.getText();
             calcManager.formatSearchBar(searchText);
 
-            // Only show results if this is actually a calculation with a valid answer
             if (!calcManager.looksLikeCalculation(searchText) || !calcManager.hasResult()) {
                 return;
             }
 
-            // All checks passed - draw the calculator UI
-            renderCalculatorUI(context, overlay, searchField, searchText, mc.textRenderer);
-
+            renderCalculatorUI(context, overlay, searchField, searchText, mc.font);
         } catch (Exception e) {
-            // If anything goes wrong, just silently skip this frame
+            // Silently swallow errors to avoid crashing Minecraft on render tick
         }
     }
 
-    // Actually draw all the calculator UI elements
-    private void renderCalculatorUI(DrawContext context, ScreenOverlay overlay, TextField searchField,
-                                    String searchText, TextRenderer textRenderer) {
+    // Performs the actual overlay component drawing
+    private void renderCalculatorUI(GuiGraphicsExtractor context, ScreenOverlay overlay, TextField searchField,
+                                    String searchText, Font font) {
         Rectangle overlayBounds = overlay.getBounds();
         Rectangle searchBounds = REIHelper.getSearchFieldBounds(searchField);
 
@@ -303,12 +276,11 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             );
         }
 
-        // Get the matrix stack (compatible with both 1.21.5 and 1.21.6)
-        MatrixStack matrices = getMatrixStack(context);
+        // Get the 2D pose stack directly
+        Matrix3x2fStack pose = context.pose();
 
-        // Move to top layer (z-index 1000) so we draw over everything else
-        matrices.push();
-        matrices.translate(0, 0, 1000);
+        // Push matrix before drawing elements
+        pose.pushMatrix();
 
         // Draw the search field background
         drawSearchFieldBackground(context, searchBounds);
@@ -326,28 +298,28 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
         // Draw text with selection highlight
         if (hasSelection) {
-            drawTextWithSelection(context, textRenderer, searchText, textX, textY,
+            drawTextWithSelection(context, font, searchText, textX, textY,
                     selectionStart, selectionEndPos);
         } else {
-            drawText(context, textRenderer, searchText, textX, textY, 0xFFFFFFFF, true);
+            context.text(font, searchText, textX, textY, 0xFFFFFFFF, true);
         }
 
         // Show the calculation result (moves to next line if overflow)
         if (calcManager.hasResult()) {
-            drawCalculationResult(context, textRenderer, searchText, searchBounds, textX, textY);
+            drawCalculationResult(context, font, searchText, searchBounds, textX, textY);
         }
 
         // Draw the blinking text cursor (only if no selection)
         if (!hasSelection) {
-            drawCursor(context, searchBounds, searchText, textRenderer, textX, textY, cursorPos);
+            drawCursor(context, searchBounds, searchText, font, textX, textY, cursorPos);
         }
 
         // Done - restore the matrix state
-        matrices.pop();
+        pose.popMatrix();
     }
 
     // Draw text with selection highlight
-    private void drawTextWithSelection(DrawContext context, TextRenderer textRenderer,
+    private void drawTextWithSelection(GuiGraphicsExtractor context, Font font,
                                        String text, int x, int y, int selStart, int selEnd) {
         if (text.isEmpty()) return;
 
@@ -360,107 +332,68 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
         // Draw text before selection
         if (!beforeSelection.isEmpty()) {
-            drawText(context, textRenderer, beforeSelection, currentX, y, 0xFFFFFFFF, true);
-            currentX += textRenderer.getWidth(beforeSelection);
+            context.text(font, beforeSelection, currentX, y, 0xFFFFFFFF, true);
+            currentX += font.width(beforeSelection);
         }
 
         // Draw selection highlight and selected text
         if (!selectedText.isEmpty()) {
-            int selectionWidth = textRenderer.getWidth(selectedText);
+            int selectionWidth = font.width(selectedText);
 
             // Draw blue highlight background
             context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, 0xFF0066CC);
 
             // Draw selected text in white
-            drawText(context, textRenderer, selectedText, currentX, y, 0xFFFFFFFF, true);
+            context.text(font, selectedText, currentX, y, 0xFFFFFFFF, true);
             currentX += selectionWidth;
         }
 
         // Draw text after selection
         if (!afterSelection.isEmpty()) {
-            drawText(context, textRenderer, afterSelection, currentX, y, 0xFFFFFFFF, true);
-        }
-    }
-
-    // Get MatrixStack in a way that works for both 1.21.5 and 1.21.6
-    private MatrixStack getMatrixStack(DrawContext context) {
-        try {
-            // Try 1.21.6 method first
-            return (MatrixStack) context.getClass().getMethod("getMatrices").invoke(context);
-        } catch (Exception e) {
-            try {
-                // Fall back to 1.21.5 method
-                return (MatrixStack) context.getClass().getMethod("method_51448").invoke(context);
-            } catch (Exception ex) {
-                // If both fail, create a new one (fallback)
-                LOGGER.warn("Could not get MatrixStack, using new instance");
-                return new MatrixStack();
-            }
-        }
-    }
-
-    // Draw text with version compatibility
-    private void drawText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
-        try {
-            // Try 1.21.6 method signature (returns int)
-            context.getClass()
-                    .getMethod("drawText", TextRenderer.class, String.class, int.class, int.class, int.class, boolean.class)
-                    .invoke(context, textRenderer, text, x, y, color, shadow);
-        } catch (Exception e) {
-            try {
-                // Try 1.21.5 method signature (returns int, different method name)
-                context.getClass()
-                        .getMethod("method_51433", TextRenderer.class, String.class, int.class, int.class, int.class, boolean.class)
-                        .invoke(context, textRenderer, text, x, y, color, shadow);
-            } catch (Exception ex) {
-                // Ultimate fallback - just skip drawing this text
-                LOGGER.warn("Could not draw text, incompatible Minecraft version");
-            }
+            context.text(font, afterSelection, currentX, y, 0xFFFFFFFF, true);
         }
     }
 
     // Draw the gray border and black background for the search field
-    private void drawSearchFieldBackground(DrawContext context, Rectangle bounds) {
+    private void drawSearchFieldBackground(GuiGraphicsExtractor context, Rectangle bounds) {
         // Gray border (matches REI's normal style)
         context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), 0xFF8B8B8B);
         // Black inside
         context.fill(bounds.x + 1, bounds.y + 1, bounds.getMaxX() - 1, bounds.getMaxY() - 1, 0xFF000000);
     }
 
-    // Show the calculation result
-    // NEW APPROACH: If result doesn't fit on same line, show it ABOVE the search bar
-    private void drawCalculationResult(DrawContext context, TextRenderer textRenderer, String searchText,
+    // Draw the calculation result
+    // If it doesn't fit on the search bar line, draw it as a tooltip above it
+    private void drawCalculationResult(GuiGraphicsExtractor context, Font font, String searchText,
                                        Rectangle searchBounds, int textX, int textY) {
         String result = calcManager.getLastFormattedResult();
-        int queryWidth = textRenderer.getWidth(searchText);
-        String resultDisplay = " = " + result;
+        int queryWidth = font.width(searchText);
+        String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+                CalculatorConfig.getInstance().getResultColorCode() + result;
 
         int resultX = textX + queryWidth;
         int maxX = searchBounds.getMaxX() - 4;
-        int displayWidth = textRenderer.getWidth(resultDisplay);
+        int displayWidth = font.width(resultDisplay);
 
-        // Check if result fits on the same line
         if (resultX + displayWidth <= maxX) {
-            // Result fits - draw on same line
-            drawText(context, textRenderer, resultDisplay, resultX, textY, 0xFFFFFFFF, true);
+            // Fits on the same line, draw it inline
+            context.text(font, resultDisplay, resultX, textY, 0xFFFFFFFF, true);
         } else {
-            // Result doesn't fit - draw ABOVE the search bar
-            int aboveY = searchBounds.y - 12; // 12 pixels above search bar
+            // Overflow: draw a small box above the search bar
+            int aboveY = searchBounds.y - 12;
             int aboveX = searchBounds.x + 4;
 
-            // Draw a background for the result above
             int bgHeight = 12;
             int bgWidth = Math.min(displayWidth + 8, searchBounds.width - 4);
             context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xCC000000);
 
-            // Draw the result text
-            drawText(context, textRenderer, resultDisplay, aboveX, aboveY, 0xFFFFFFFF, true);
+            context.text(font, resultDisplay, aboveX, aboveY, 0xFFFFFFFF, true);
         }
     }
 
     // Draw a blinking cursor at the correct position
-    private void drawCursor(DrawContext context, Rectangle bounds, String text,
-                            TextRenderer tr, int textX, int textY, int cursorPos) {
+    private void drawCursor(GuiGraphicsExtractor context, Rectangle bounds, String text,
+                            Font font, int textX, int textY, int cursorPos) {
         try {
             long time = System.currentTimeMillis();
             if ((time / 500) % 2 == 0) { // Blink every half second
@@ -469,7 +402,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         ? text.substring(0, cursorPos)
                         : "";
 
-                int cursorX = textX + tr.getWidth(textBeforeCursor);
+                int cursorX = textX + font.width(textBeforeCursor);
                 int cursorY = textY - 1;
 
                 // Make sure cursor stays within bounds
@@ -484,10 +417,10 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     // Listen for key presses and handle Enter, Ctrl+Z, Ctrl+Y
     private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Make sure we're actually on the right screen and in-game
-        if (mc.currentScreen != screen || mc.world == null || mc.player == null) {
+        if (getCurrentScreen(mc) != screen || mc.level == null || mc.player == null) {
             return true; // Allow the key press
         }
 
@@ -538,50 +471,121 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
     private void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             // Main calculation command
-            dispatcher.register(ClientCommandManager.literal("calc")
-                    .then(ClientCommandManager.argument("expression", StringArgumentType.greedyString())
+            dispatcher.register(ClientCommands.literal("calc")
+                    .then(ClientCommands.argument("expression", StringArgumentType.greedyString())
                             .executes(CalcCommands::executeCalc)));
 
             // History management
-            dispatcher.register(ClientCommandManager.literal("calchist")
+            dispatcher.register(ClientCommands.literal("calchist")
                     .executes(CalcCommands::executeHistory));
-            dispatcher.register(ClientCommandManager.literal("calcclear")
+            dispatcher.register(ClientCommands.literal("calcclear")
                     .executes(CalcCommands::executeClear));
 
             // Custom variables
-            dispatcher.register(ClientCommandManager.literal("calcset")
-                    .then(ClientCommandManager.argument("variable", StringArgumentType.word())
-                            .then(ClientCommandManager.argument("value", StringArgumentType.greedyString())
+            dispatcher.register(ClientCommands.literal("calcset")
+                    .then(ClientCommands.argument("variable", StringArgumentType.word())
+                            .then(ClientCommands.argument("value", StringArgumentType.greedyString())
                                     .executes(CalcCommands::executeSet))));
 
             // Help system
-            dispatcher.register(ClientCommandManager.literal("calchelp")
+            dispatcher.register(ClientCommands.literal("calchelp")
                     .executes(CalcCommands::executeHelp)
-                    .then(ClientCommandManager.argument("page", StringArgumentType.word())
+                    .then(ClientCommands.argument("page", StringArgumentType.word())
                             .executes(CalcCommands::executeHelpPage)));
 
             // Configuration
-            dispatcher.register(ClientCommandManager.literal("calcconfig")
+            dispatcher.register(ClientCommands.literal("calcconfig")
                     .executes(CalcCommands::executeConfig));
         });
     }
 
     // Should we render the calculator right now?
-    private boolean shouldRenderCalculator(Screen screen, MinecraftClient mc) {
+    private boolean shouldRenderCalculator(Screen screen, Minecraft mc) {
         return !isNonGameplayScreen(screen)
-                && mc.currentScreen == screen
-                && mc.world != null
+                && getCurrentScreen(mc) == screen
+                && mc.level != null
                 && mc.player != null
                 && shouldRender
                 && CalculatorConfig.getInstance().showInlineResults;
     }
 
+    // Safely retrieve the current screen using reflection for cross-version (26.1 / 26.2+) compatibility.
+    // In 26.2, the 'screen' field was moved from Minecraft to Minecraft.gui.
+    // We cache the reflection objects to avoid expensive lookups on every frame.
+    private static void initScreenReflection(Minecraft mc) {
+        if (screenReflectionInitialized) return;
+        screenReflectionInitialized = true;
+
+        try {
+            // Try Minecraft.screen (Minecraft 26.1 and older)
+            mcScreenField = Minecraft.class.getDeclaredField("screen");
+            mcScreenField.setAccessible(true);
+            LOGGER.debug("Cached Minecraft.screen field successfully");
+        } catch (NoSuchFieldException e1) {
+            try {
+                // Try mc.gui (Minecraft 26.2+)
+                mcGuiField = Minecraft.class.getDeclaredField("gui");
+                mcGuiField.setAccessible(true);
+                LOGGER.debug("Cached Minecraft.gui field successfully");
+
+                Object gui = mcGuiField.get(mc);
+                if (gui != null) {
+                    Class<?> guiClass = gui.getClass();
+                    try {
+                        // Try gui.screen field
+                        guiScreenField = guiClass.getDeclaredField("screen");
+                        guiScreenField.setAccessible(true);
+                        LOGGER.debug("Cached Gui.screen field successfully");
+                    } catch (NoSuchFieldException e2) {
+                        try {
+                            // Try gui.screen() method
+                            guiScreenMethod = guiClass.getDeclaredMethod("screen");
+                            guiScreenMethod.setAccessible(true);
+                            LOGGER.debug("Cached Gui.screen() method successfully");
+                        } catch (NoSuchMethodException e3) {
+                            LOGGER.error("Failed to find screen field or method in Gui class");
+                        }
+                    }
+                }
+            } catch (Exception e3) {
+                LOGGER.error("Failed to initialize 26.2+ screen reflection", e3);
+            }
+        }
+    }
+
+    public static Screen getCurrentScreen(Minecraft mc) {
+        if (mc == null) return null;
+        initScreenReflection(mc);
+
+        if (mcScreenField != null) {
+            try {
+                return (Screen) mcScreenField.get(mc);
+            } catch (Exception ignored) {}
+        }
+
+        if (mcGuiField != null) {
+            try {
+                Object gui = mcGuiField.get(mc);
+                if (gui != null) {
+                    if (guiScreenField != null) {
+                        return (Screen) guiScreenField.get(gui);
+                    }
+                    if (guiScreenMethod != null) {
+                        return (Screen) guiScreenMethod.invoke(gui);
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+
+        return null;
+    }
+
     // Only allow calculator in actual gameplay screens (not menus, loading screens, etc)
-    // HandledScreen = inventory, chest, furnace, etc - all the in-game GUIs
+    // AbstractContainerScreen = inventory, chest, furnace, etc - all the in-game GUIs
     // Also allow REI recipe screens and other REI-related screens
     private static boolean isNonGameplayScreen(Screen screen) {
-        if (screen instanceof HandledScreen) {
-            return false; // Allow HandledScreen (inventories, chests, etc.)
+        if (screen instanceof AbstractContainerScreen) {
+            return false; // Allow AbstractContainerScreen (inventories, chests, etc.)
         }
 
         // Allow REI screens (recipe viewing, etc.)

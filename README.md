@@ -462,4 +462,4 @@ See the full license text here:
 
 ---
 
-*Last updated: February 2026*
+*Last updated: 29-06-2026*

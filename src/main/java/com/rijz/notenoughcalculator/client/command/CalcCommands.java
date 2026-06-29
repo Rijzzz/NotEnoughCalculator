@@ -25,8 +25,7 @@ import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
-
+import net.minecraft.network.chat.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -38,20 +37,20 @@ public class CalcCommands {
     // Hardcoded: show max 10 history entries at once
     private static final int MAX_HISTORY_DISPLAY = 15;
 
-    private static Text t(String key, Object... args) {
-        return Text.translatable(key, args);
+    private static Component t(String key, Object... args) {
+        return Component.translatable(key, args);
     }
 
     private static void send(CommandContext<FabricClientCommandSource> ctx, String key, Object... args) {
-        ctx.getSource().getPlayer().sendMessage(t(key, args), false);
+        ctx.getSource().getPlayer().sendSystemMessage(t(key, args));
     }
 
     private static void sendLiteral(CommandContext<FabricClientCommandSource> ctx, String text) {
-        ctx.getSource().getPlayer().sendMessage(Text.literal(text), false);
+        ctx.getSource().getPlayer().sendSystemMessage(Component.literal(text));
     }
 
     private static void sendEmpty(CommandContext<FabricClientCommandSource> ctx) {
-        ctx.getSource().getPlayer().sendMessage(Text.literal(""), false);
+        ctx.getSource().getPlayer().sendSystemMessage(Component.literal(""));
     }
 
     public static int executeCalc(CommandContext<FabricClientCommandSource> ctx) {
@@ -178,20 +177,20 @@ public class CalcCommands {
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.commands");
-        sendLiteral(ctx, "§e/calc <expression> §7- " + t("notenoughcalculator.command.calc.description").getString());
-        sendLiteral(ctx, "§e/calchist §7- " + t("notenoughcalculator.command.calchist.description").getString());
-        sendLiteral(ctx, "§e/calcclear §7- " + t("notenoughcalculator.command.calcclear.description").getString());
-        sendLiteral(ctx, "§e/calcset <var> <value> §7- " + t("notenoughcalculator.command.calcset.description").getString());
-        sendLiteral(ctx, "§e/calcconfig §7- " + t("notenoughcalculator.command.calcconfig.description").getString());
+        send(ctx, "notenoughcalculator.help.main.cmd_calc");
+        send(ctx, "notenoughcalculator.help.main.cmd_calchist");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcclear");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcset");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcconfig");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.help_pages");
-        sendLiteral(ctx, "§e/calchelp operators §7- Learn about +, -, *, /, ^, %");
-        sendLiteral(ctx, "§e/calchelp functions §7- Learn about sqrt, abs, floor, etc.");
-        sendLiteral(ctx, "§e/calchelp units §7- Learn Skyblock units (k, m, b, s, e, h)");
-        sendLiteral(ctx, "§e/calchelp variables §7- Learn about ans, $custom variables");
-        sendLiteral(ctx, "§e/calchelp examples §7- See practical examples");
-        sendLiteral(ctx, "§e/calchelp config §7- Learn about configuration");
+        send(ctx, "notenoughcalculator.help.main.page_operators");
+        send(ctx, "notenoughcalculator.help.main.page_functions");
+        send(ctx, "notenoughcalculator.help.main.page_units");
+        send(ctx, "notenoughcalculator.help.main.page_variables");
+        send(ctx, "notenoughcalculator.help.main.page_examples");
+        send(ctx, "notenoughcalculator.help.main.page_config");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts");

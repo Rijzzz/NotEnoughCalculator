@@ -28,12 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * User settings for the calculator mod.
- * Config file auto-reloads when changed, no restart needed.
- *
- * Note: History size is hardcoded at 15 equations and not configurable.
- */
+// User configuration class. Supports live reloading on file changes without game restarts.
 public class CalculatorConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
@@ -45,7 +40,7 @@ public class CalculatorConfig {
     private static CalculatorConfig INSTANCE;
     private static long lastModified = 0;
 
-    // User-configurable settings
+    // Config options
     public int decimalPrecision = 10;
     public boolean showUnitSuggestions = true;
     public boolean enableHistoryNavigation = true;
@@ -54,10 +49,8 @@ public class CalculatorConfig {
     public boolean enableAutoComplete = false;
     public String language = "en_us";
 
-    // Note: maxHistorySize is NOT here - it's hardcoded at 15 in CalculatorManager
-
     public static CalculatorConfig getInstance() {
-        // Hot reload: check if config file changed and reload if needed
+        // Live-reload config if the file was modified
         if (INSTANCE != null && Files.exists(CONFIG_PATH)) {
             try {
                 long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
@@ -66,7 +59,7 @@ public class CalculatorConfig {
                     INSTANCE = load();
                 }
             } catch (IOException e) {
-                // Can't check mod time, just keep current config
+                // Ignore failure and stick to the current instance
             }
         }
 
@@ -86,10 +79,10 @@ public class CalculatorConfig {
                 return config;
             }
         } catch (IOException e) {
-            LOGGER.warn("Failed to load config, using defaults: {}", e.getMessage());
+            LOGGER.warn("Failed to load config, falling back to defaults: {}", e.getMessage());
         }
 
-        // No config file yet, create default
+        // File doesn't exist, create it with defaults
         CalculatorConfig config = new CalculatorConfig();
         config.save();
         return config;

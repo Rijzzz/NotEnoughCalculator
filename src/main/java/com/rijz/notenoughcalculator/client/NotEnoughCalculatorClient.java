@@ -509,7 +509,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                 && CalculatorConfig.getInstance().showInlineResults;
     }
 
-    // Safely retrieve the current screen using reflection for cross-version (26.1 / 26.2+) compatibility.
+    // Safely retrieve the current screen using reflection for cross-version 26.2+ compatibility.
     // In 26.2, the 'screen' field was moved from Minecraft to Minecraft.gui.
     // We cache the reflection objects to avoid expensive lookups on every frame.
     private static void initScreenReflection(Minecraft mc) {

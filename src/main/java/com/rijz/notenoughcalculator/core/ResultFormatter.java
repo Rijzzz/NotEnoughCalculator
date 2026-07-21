@@ -48,6 +48,10 @@ public class ResultFormatter {
     // Format with commas only (used for inline display in REI)
     // This matches how NEU calculator shows results
     public static String formatWithCommas(BigDecimal value) {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        if (!config.enableCommaFormatting) {
+            return value.stripTrailingZeros().toPlainString();
+        }
         return COMMA_FORMAT.format(value.stripTrailingZeros());
     }
 

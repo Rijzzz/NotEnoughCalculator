@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class CalcCommands {
 
-    // Hardcoded: show max 10 history entries at once
+    // Hardcoded: show max 15 history entries at once
     private static final int MAX_HISTORY_DISPLAY = 15;
 
     private static Component t(String key, Object... args) {
@@ -81,7 +81,7 @@ public class CalcCommands {
             send(ctx, "notenoughcalculator.history.title");
             sendEmpty(ctx);
 
-            // Show last 10 entries max (hardcoded)
+            // Show last 15 entries max (hardcoded)
             int maxDisplay = Math.min(MAX_HISTORY_DISPLAY, history.size());
             for (int i = Math.max(0, history.size() - maxDisplay); i < history.size(); i++) {
                 sendLiteral(ctx, "§7" + (i + 1) + ". §f" + history.get(i));

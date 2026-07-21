@@ -46,7 +46,6 @@ public class CalculatorConfig {
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
-    public boolean enableAutoComplete = false;
     public String language = "en_us";
 
     public static CalculatorConfig getInstance() {

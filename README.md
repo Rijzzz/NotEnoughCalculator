@@ -31,8 +31,10 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 - Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
+- Factorial: `5!` = 120, `10!` = 3,628,800
 - Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
 - Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
+- Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
 - Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `min(a,b)`, `max(a,b)`
 
 </details>
@@ -50,6 +52,8 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <summary><strong>Variables</strong></summary>
 
 - `ans` – Automatically stores last calculation result
+- `pi` – Pi constant (3.14159265...)
+- `e` – Euler's number (2.71828182...) when standalone; enchanted unit (160) after a number
 - Custom variables with `/calcset` command
 - Chain calculations easily with `ans`
 
@@ -153,10 +157,21 @@ dc / 333 = 10.38                  (hours to fill double chest)
 sqrt(144) = 12                    (square root)
 2^10 = 1,024                      (exponents)
 100 % 7 = 2                       (modulo)
+5! = 120                          (factorial)
+10! = 3,628,800                   (large factorial)
 abs(-50) = 50                     (absolute value)
 floor(3.9) = 3                    (round down)
 ceil(3.1) = 4                     (round up)
 round(3.5) = 4                    (round nearest)
+log(100) = 2                      (base-10 logarithm)
+ln(e) = 1                         (natural logarithm)
+sin(90) = 1                       (sine, degrees)
+cos(0) = 1                        (cosine, degrees)
+tan(45) = 1                       (tangent, degrees)
+min(10, 5) = 5                    (minimum)
+max(10, 5) = 10                   (maximum)
+pi * 2 = 6.283...                 (using pi constant)
+e^2 = 7.389...                    (using Euler's number)
 ```
 
 ### Compound Calculations
@@ -259,14 +274,14 @@ ans + 100 = 400                   (chain calculations)
 ### Help Commands
 - `/calchelp` - Show main help menu
 - `/calchelp operators` - Learn about +, -, *, x, /, ^, %
-- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round
+- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, !
 - `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
 - `/calchelp variables` - Learn about ans and custom variables
 - `/calchelp examples` - See practical examples
 - `/calchelp config` - Learn about configuration
 
 ### Configuration Commands
-- `/calcconfig` - View current configuration
+- `/calcconfig` - Open settings screen
 
 </details>
 
@@ -306,6 +321,7 @@ ans + 100 = 400                   (chain calculations)
 ### History Navigation
 - **`Ctrl + Z`** in REI search - Recall previous calculation (undo)
 - **`Ctrl + Y`** in REI search - Go forward in history (redo)
+- **`Ctrl + C`** in REI search - Copy calculation result to clipboard
 
 ### Notes
 - History is session-based and automatically clears when you leave a world or server

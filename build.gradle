@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -13,6 +13,12 @@ base {
 repositories {
     maven { url = "https://maven.fabricmc.net/" }
     maven { url = "https://maven.shedaniel.me" }
+    maven {
+        url "https://api.modrinth.com/maven"
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
     gradlePluginPortal()
 }
 
@@ -31,6 +37,13 @@ dependencies {
 
     // REI transitive math dependency
     compileOnly "me.shedaniel.cloth:basic-math:0.6.1"
+
+    // ModMenu (optional - config screen button in mod list)
+    compileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
+
+    // Unit tests
+    testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 processResources {
@@ -58,6 +71,10 @@ tasks.withType(JavaCompile).configureEach {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     withSourcesJar()
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {

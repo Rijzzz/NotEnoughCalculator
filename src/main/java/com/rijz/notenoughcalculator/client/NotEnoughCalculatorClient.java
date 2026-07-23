@@ -435,17 +435,33 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     CalculatorConfig.getInstance().getResultColorCode() + result;
 
             int aboveY = searchBounds.y - 14;
-            int aboveX = searchBounds.x + 4;
             int resultWidth = font.width(resultDisplay);
 
+            int maxBoxWidth = overlayBounds.width - 12;
             int bgHeight = 12;
-            int bgWidth = Math.min(resultWidth + 8, searchBounds.width - 4);
+            int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
+
+            int aboveX = searchBounds.x + 4;
+            if (aboveX + bgWidth > overlayBounds.getMaxX() - 4) {
+                aboveX = Math.max(overlayBounds.x + 4, overlayBounds.getMaxX() - bgWidth - 4);
+            }
+
+            int resultScroll = 0;
+            int visibleWidth = bgWidth - 8;
+            if (resultWidth > visibleWidth) {
+                int overflowPixels = resultWidth - visibleWidth;
+                long time = System.currentTimeMillis();
+                // Smooth 4-second ping-pong marquee scroll back and forth
+                double cycle = (time % 4000) / 4000.0;
+                double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
+                resultScroll = (int) (overflowPixels * normalized);
+            }
 
             context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
 
-            // Clip floating box text within search bar width
+            // Clip floating box text within floating box bounds
             enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2);
-            context.text(font, resultDisplay, aboveX, aboveY, 0xFFFFFFFF, true);
+            context.text(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
             disableScissor(context);
         }
 

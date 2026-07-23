@@ -89,7 +89,7 @@ public class ExpressionEvaluator {
 
     // Token types recognized by the parser
     private enum TokenKind {
-        NUM, OP, LPAREN, RPAREN, COMMA, PERCENT, FUNC, VAR, UNIT, EOF
+        NUM, OP, LPAREN, RPAREN, COMMA, PERCENT, FACTORIAL, FUNC, VAR, UNIT, EOF
     }
 
     private static class Token {
@@ -252,6 +252,13 @@ public class ExpressionEvaluator {
                 continue;
             }
 
+            // Factorial
+            if (c == '!') {
+                tokens.add(new Token(TokenKind.FACTORIAL, "!", i));
+                i++;
+                continue;
+            }
+
             // Operators
             if ("+-*/^".indexOf(c) != -1) {
                 tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
@@ -345,6 +352,21 @@ public class ExpressionEvaluator {
                 // Determine token type
                 if (FUNCTIONS.contains(nameStr)) {
                     tokens.add(new Token(TokenKind.FUNC, nameStr, start));
+                } else if (nameStr.equals("pi")) {
+                    // Pi constant
+                    Token tok = new Token(TokenKind.NUM, "pi", start);
+                    tok.number = new BigDecimal("3.14159265358979323846");
+                    tokens.add(tok);
+                } else if (nameStr.equals("e")) {
+                    // 'e' after a number = Skyblock enchanted unit (2e = 320)
+                    // 'e' standalone or after operator = Euler's number (2.718...)
+                    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
+                        tokens.add(new Token(TokenKind.UNIT, nameStr, start));
+                    } else {
+                        Token tok = new Token(TokenKind.NUM, "e", start);
+                        tok.number = new BigDecimal("2.71828182845904523536");
+                        tokens.add(tok);
+                    }
                 } else if (UNITS.containsKey(nameStr)) {
                     // Units only make sense after numbers
                     if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
@@ -574,6 +596,30 @@ public class ExpressionEvaluator {
                 BigDecimal percentValue = result.value.divide(BigDecimal.valueOf(100), mc);
                 result = new ParseResult(percentValue, result.nextPos + 1);
                 result.isPercentage = true;
+            }
+        }
+
+        // Handle factorial postfix: 5! = 120
+        if (result.nextPos < tokens.size()) {
+            Token tok = tokens.get(result.nextPos);
+            if (tok.kind == TokenKind.FACTORIAL) {
+                if (result.value.compareTo(BigDecimal.ZERO) < 0 || !isInteger(result.value)) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_non_integer"), tok.pos);
+                }
+                int n;
+                try {
+                    n = result.value.intValueExact();
+                } catch (ArithmeticException e) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_too_large"), tok.pos);
+                }
+                if (n > 1000) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_too_large"), tok.pos);
+                }
+                BigDecimal factResult = BigDecimal.ONE;
+                for (int i = 2; i <= n; i++) {
+                    factResult = factResult.multiply(BigDecimal.valueOf(i));
+                }
+                result = new ParseResult(factResult, result.nextPos + 1);
             }
         }
 

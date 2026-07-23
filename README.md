@@ -78,11 +78,11 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 ---
 
 **Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (>=0.152.1)
 - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (>=26.2.820)
 
 **Dependencies (Optional / Recommended):**
-- [ModMenu](https://modrinth.com/mod/modmenu) (>=20.0.0) — Adds an in-game settings button in your mod list to open `/calcconfig`.
+- [ModMenu](https://modrinth.com/mod/modmenu) (>=20.0.0)
 
 ---
 

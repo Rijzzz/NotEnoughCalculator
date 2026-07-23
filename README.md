@@ -27,12 +27,13 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 ## Key Features
 
 <details>
-<summary><strong>Basic Math</strong></summary>
+<summary><strong>Basic Math & Functions</strong></summary>
 
 - Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
-- Parentheses for complex expressions
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`
+- Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
+- Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
+- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `min(a,b)`, `max(a,b)`
 
 </details>
 
@@ -57,8 +58,9 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <details>
 <summary><strong>History & Shortcuts</strong></summary>
 
-- Press `Ctrl+Z` in REI search to recall previous calculations
+- Press `Ctrl+Z` in REI search to recall previous calculations (undo)
 - Press `Ctrl+Y` to redo/go forward in history
+- Press `Ctrl+C` in REI search to copy calculation result to clipboard
 - View full history with `/calchist` (shows last 15 entries)
 - Session-based: History clears automatically when you leave a world/server
 
@@ -389,10 +391,8 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 <summary>Common Issues</summary>
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
-- **Red text in search bar?** This is a cosmetic issue that doesn't affect functionality
 - **History not working?** Make sure `enableHistoryNavigation` is `true` in config
 - **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
-- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated. This is a temporary issue closing and reopening your inventory will fix it.
 
 </details>
 
@@ -462,4 +462,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 29-06-2026*
+*Last updated: 23-07-2026*

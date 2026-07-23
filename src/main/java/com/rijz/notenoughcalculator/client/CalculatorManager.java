@@ -65,7 +65,7 @@ public class CalculatorManager {
     private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX].*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
@@ -334,7 +334,7 @@ public class CalculatorManager {
             return;
         }
 
-        boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
+        boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
 
         // Ctrl+Z: Undo (go back to previous equation)
         if (keyCode == GLFW.GLFW_KEY_Z && isCtrlPressed) {
@@ -404,7 +404,11 @@ public class CalculatorManager {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
                 String historyText = reiSearchHistory.get(index);
-                REIRuntime.getInstance().getSearchTextField().setText(historyText);
+                me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
+                if (searchField != null) {
+                    searchField.setText(historyText);
+                    NotEnoughCalculatorClient.clampSearchField(searchField);
+                }
 
                 // Update internal state without triggering history save
                 lastSearchInput = historyText;
@@ -426,7 +430,11 @@ public class CalculatorManager {
      */
     private void restoreSavedInput() {
         try {
-            REIRuntime.getInstance().getSearchTextField().setText(savedCurrentInput);
+            me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
+            if (searchField != null) {
+                searchField.setText(savedCurrentInput);
+                NotEnoughCalculatorClient.clampSearchField(searchField);
+            }
             lastSearchInput = savedCurrentInput;
             currentEquation = savedCurrentInput;  // Resume tracking this equation
 
@@ -505,7 +513,6 @@ public class CalculatorManager {
     public boolean isSessionResetNotified() {
         return sessionResetNotified;
     }
-
     public void markSessionReset() {
         sessionResetNotified = true;
     }

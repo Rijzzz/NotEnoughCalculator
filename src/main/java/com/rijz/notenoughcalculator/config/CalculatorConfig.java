@@ -33,12 +33,21 @@ public class CalculatorConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance()
-            .getConfigDir()
-            .resolve("notenoughcalculator.json");
+    private static final Path CONFIG_PATH = getConfigPath();
+
+    private static Path getConfigPath() {
+        try {
+            if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
+                return FabricLoader.getInstance().getConfigDir().resolve("notenoughcalculator.json");
+            }
+        } catch (Throwable ignored) {}
+        return Path.of("build", "tmp", "notenoughcalculator.json");
+    }
 
     private static CalculatorConfig INSTANCE;
     private static long lastModified = 0;
+    private static long lastChecked = 0;
+    private static final long CHECK_INTERVAL_MS = 2000;
 
     // Config options
     public int decimalPrecision = 10;
@@ -46,19 +55,22 @@ public class CalculatorConfig {
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
-    public String language = "en_us";
 
     public static CalculatorConfig getInstance() {
-        // Live-reload config if the file was modified
-        if (INSTANCE != null && Files.exists(CONFIG_PATH)) {
-            try {
-                long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-                if (currentModified > lastModified) {
-                    LOGGER.info("Config file changed, reloading...");
-                    INSTANCE = load();
+        // Live-reload config if the file was modified (check at most every 2 seconds)
+        long now = System.currentTimeMillis();
+        if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
+            lastChecked = now;
+            if (Files.exists(CONFIG_PATH)) {
+                try {
+                    long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
+                    if (currentModified > lastModified) {
+                        LOGGER.info("Config file changed, reloading...");
+                        INSTANCE = load();
+                    }
+                } catch (IOException e) {
+                    // Ignore failure and stick to the current instance
                 }
-            } catch (IOException e) {
-                // Ignore failure and stick to the current instance
             }
         }
 

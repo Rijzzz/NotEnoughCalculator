@@ -365,4 +365,59 @@ class ExpressionEvaluatorTest {
             assertEquals(1, eval.getHistory().size());
         }
     }
+
+    @Nested
+    @DisplayName("Constants")
+    class Constants {
+        @Test void pi() throws Exception { assertCalcApprox("pi", 3.14159265, 0.0001); }
+        @Test void piArithmetic() throws Exception { assertCalcApprox("2*pi", 6.28318530, 0.0001); }
+        @Test void piInFunction() throws Exception { assertCalcApprox("sin(180)", 0.0, 0.0001); }
+        @Test void eulerStandalone() throws Exception { assertCalcApprox("e", 2.71828182, 0.0001); }
+        @Test void eulerArithmetic() throws Exception { assertCalcApprox("e*2", 5.43656365, 0.001); }
+        @Test void eulerInFunction() throws Exception { assertCalcApprox("ln(e)", 1.0, 0.001); }
+
+        @Test
+        @DisplayName("2e = 320 (enchanted unit, not Euler)")
+        void eAsUnitAfterNumber() throws Exception { assertCalc("2e", "320"); }
+
+        @Test
+        @DisplayName("5e = 800 (enchanted unit)")
+        void eAsUnitNotEuler() throws Exception { assertCalc("5e", "800"); }
+
+        @Test
+        @DisplayName("e + 1 = 3.718... (Euler's number)")
+        void eStandaloneInExpression() throws Exception { assertCalcApprox("e + 1", 3.71828182, 0.0001); }
+
+        @Test
+        @DisplayName("pi * e (both constants)")
+        void piTimesE() throws Exception { assertCalcApprox("pi * e", 8.53973422, 0.001); }
+    }
+
+    @Nested
+    @DisplayName("Factorial")
+    class Factorial {
+        @Test void factorial0() throws Exception { assertCalc("0!", "1"); }
+        @Test void factorial1() throws Exception { assertCalc("1!", "1"); }
+        @Test void factorial5() throws Exception { assertCalc("5!", "120"); }
+        @Test void factorial10() throws Exception { assertCalc("10!", "3628800"); }
+        @Test void factorial20() throws Exception { assertCalc("20!", "2432902008176640000"); }
+        @Test void factorialInExpression() throws Exception { assertCalc("5! + 1", "121"); }
+        @Test void factorialMultiply() throws Exception { assertCalc("3! * 2", "12"); }
+        @Test void factorialWithParens() throws Exception { assertCalc("(3+2)!", "120"); }
+
+        @Test
+        void factorialNegative() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("(-5)!"));
+        }
+
+        @Test
+        void factorialDecimal() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("3.5!"));
+        }
+
+        @Test
+        void factorialTooLarge() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("1001!"));
+        }
+    }
 }

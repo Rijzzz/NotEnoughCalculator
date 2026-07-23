@@ -24,7 +24,10 @@ import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
+import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import java.math.BigDecimal;
 import java.util.List;
@@ -262,6 +265,36 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.functions.round_example_2");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.functions.log");
+        send(ctx, "notenoughcalculator.help.functions.log_example_1");
+        send(ctx, "notenoughcalculator.help.functions.log_example_2");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.ln");
+        send(ctx, "notenoughcalculator.help.functions.ln_example_1");
+        send(ctx, "notenoughcalculator.help.functions.ln_example_2");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.sin");
+        send(ctx, "notenoughcalculator.help.functions.sin_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.cos");
+        send(ctx, "notenoughcalculator.help.functions.cos_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.tan");
+        send(ctx, "notenoughcalculator.help.functions.tan_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.min");
+        send(ctx, "notenoughcalculator.help.functions.min_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.max");
+        send(ctx, "notenoughcalculator.help.functions.max_example_1");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.functions.combining");
         send(ctx, "notenoughcalculator.help.functions.combining_example");
         sendEmpty(ctx);
@@ -422,40 +455,11 @@ public class CalcCommands {
     }
 
     public static int executeConfig(CommandContext<FabricClientCommandSource> ctx) {
-        CalculatorConfig config = CalculatorConfig.getInstance();
-
-        send(ctx, "notenoughcalculator.config.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.display_settings");
-        send(ctx, "notenoughcalculator.config.inline_results",
-                config.showInlineResults ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        send(ctx, "notenoughcalculator.config.unit_suggestions",
-                config.showUnitSuggestions ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        send(ctx, "notenoughcalculator.config.comma_formatting",
-                config.enableCommaFormatting ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.calculation_settings");
-        send(ctx, "notenoughcalculator.config.decimal_precision", config.decimalPrecision);
-        // Removed max_history line since it's now hardcoded at 15
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.features");
-        send(ctx, "notenoughcalculator.config.history_navigation",
-                config.enableHistoryNavigation ?
-                        t("notenoughcalculator.config.enabled").getString() :
-                        t("notenoughcalculator.config.disabled").getString());
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.edit_file");
-
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> {
+            Screen currentScreen = NotEnoughCalculatorClient.getCurrentScreen(client);
+            CalculatorConfigScreen.openScreen(client, new CalculatorConfigScreen(currentScreen));
+        });
         return 1;
     }
 }

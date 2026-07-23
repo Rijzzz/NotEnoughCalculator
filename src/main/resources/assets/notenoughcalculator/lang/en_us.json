@@ -27,6 +27,8 @@
   "notenoughcalculator.error.expected_closing_paren": "Expected ')' after function argument",
   "notenoughcalculator.error.log_non_positive": "Logarithm requires a positive number",
   "notenoughcalculator.error.expected_comma": "Expected ',' in function '%s'",
+  "notenoughcalculator.error.factorial_non_integer": "Factorial requires a non-negative integer",
+  "notenoughcalculator.error.factorial_too_large": "Factorial too large (max 1000!)",
 
   "notenoughcalculator.variable.none": "No custom variables set. Use /calcset to create one!",
   "notenoughcalculator.variable.list_title": "Custom variables (%d):",
@@ -73,6 +75,7 @@
   "notenoughcalculator.help.operators.divide": "§e/ §7Division | §710 / 5 = 2",
   "notenoughcalculator.help.operators.power": "§e^ §7Power/Exponent | §72 ^ 10 = 1,024",
   "notenoughcalculator.help.operators.modulo": "§e% §7Modulo/Remainder | §710 % 3 = 1",
+  "notenoughcalculator.help.operators.factorial": "§e! §7Factorial | §75! = 120",
   "notenoughcalculator.help.operators.parentheses": "§6[Parentheses]",
   "notenoughcalculator.help.operators.parentheses_desc": "§e( ) §7Group operations | §7(5 + 3) * 2 = 16",
   "notenoughcalculator.help.operators.parentheses_note": "§7Use parentheses to control order of operations",
@@ -119,6 +122,10 @@
   "notenoughcalculator.help.functions.combining": "§6[Combining Functions]",
   "notenoughcalculator.help.functions.combining_example": "§7You can nest functions: §fsqrt(abs(-144)) = 12",
 
+  "notenoughcalculator.help.functions.factorial": "§e! §7- Factorial (postfix operator)",
+  "notenoughcalculator.help.functions.factorial_example_1": "  §7Example: §f5! = 120",
+  "notenoughcalculator.help.functions.factorial_example_2": "  §7Example: §f10! = 3,628,800",
+
   "notenoughcalculator.help.units.title": "§e§l--- Skyblock Units Help ---",
   "notenoughcalculator.help.units.currency": "§6[Currency Units]",
   "notenoughcalculator.help.units.currency_k": "§ek §7- Thousand | §710k = 10,000",
@@ -144,8 +151,10 @@
   "notenoughcalculator.help.units.tips_3": "§7• Results show best unit: §f1000000 -> (1m)",
 
   "notenoughcalculator.help.variables.title": "§e§l--- Variables Help ---",
-  "notenoughcalculator.help.variables.builtin": "§6[Built-in Variable]",
+  "notenoughcalculator.help.variables.builtin": "§6[Built-in Constants & Variables]",
   "notenoughcalculator.help.variables.builtin_ans": "§eans §7- Stores the last calculation result",
+  "notenoughcalculator.help.variables.builtin_pi": "§epi §7- Pi constant (3.14159265...)",
+  "notenoughcalculator.help.variables.builtin_e": "§ee §7- Euler's number (2.71828182...) §8- after a number it means enchanted",
   "notenoughcalculator.help.variables.builtin_example_1": "  §7Example: §f100 + 50 = 150",
   "notenoughcalculator.help.variables.builtin_example_2": "  §7Then: §fans * 2 = 300",
   "notenoughcalculator.help.variables.custom": "§6[Custom Variables]",

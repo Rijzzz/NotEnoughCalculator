@@ -29,7 +29,9 @@ import java.util.*;
 /**
  * Expression evaluator with support for:
  * - Basic math operators (+, -, *, x, /, ^, %)
- * - Functions (sqrt, abs, floor, ceil, round)
+ * - Functions (sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max)
+ * - Smart percentage (10% = 0.1, 100 + 10% = 110)
+ * - Implicit multiplication (2(3+4), (3)(4))
  * - Skyblock units (k, m, b, t, s, e, h, sc, dc, eb)
  * - Variables (ans, $custom)
  */
@@ -53,6 +55,14 @@ public class ExpressionEvaluator {
         this.lastAnswer = BigDecimal.ZERO;
     }
 
+    // Package-private constructor for unit tests (no Minecraft dependencies needed)
+    ExpressionEvaluator(int precision) {
+        this.mc = new MathContext(Math.max(precision, 50), RoundingMode.HALF_UP);
+        this.variables = new HashMap<>();
+        this.history = new ArrayList<>();
+        this.lastAnswer = BigDecimal.ZERO;
+    }
+
     public static class EvalException extends Exception {
         private final int position;
 
@@ -64,14 +74,22 @@ public class ExpressionEvaluator {
         public int getPosition() { return position; }
     }
 
-    // Helper for translation
+    // Helper for translation (falls back to key + args if I18n is unavailable in tests)
     private static String tr(String key, Object... args) {
-        return I18n.get(key, args);
+        try {
+            return I18n.get(key, args);
+        } catch (Exception | NoClassDefFoundError e) {
+            // Outside Minecraft (unit tests) - return key with formatted args
+            if (args.length > 0) {
+                return String.format(key.replace("%s", "%s").replace("%d", "%s"), args);
+            }
+            return key;
+        }
     }
 
     // Token types recognized by the parser
     private enum TokenKind {
-        NUM, OP, LPAREN, RPAREN, FUNC, VAR, UNIT, EOF
+        NUM, OP, LPAREN, RPAREN, COMMA, PERCENT, FUNC, VAR, UNIT, EOF
     }
 
     private static class Token {
@@ -105,9 +123,14 @@ public class ExpressionEvaluator {
     }
 
     // Supported math functions
-    private static final Set<String> FUNCTIONS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("sqrt", "abs", "floor", "ceil", "round"))
+    private static final Set<String> FUNCTIONS = Set.of(
+            "sqrt", "abs", "floor", "ceil", "round",
+            "log", "ln", "sin", "cos", "tan",
+            "min", "max"
     );
+
+    // Functions that take two comma-separated arguments
+    private static final Set<String> MULTI_ARG_FUNCTIONS = Set.of("min", "max");
 
     /**
      * Evaluate without adding to history (for live display).
@@ -118,6 +141,7 @@ public class ExpressionEvaluator {
         }
 
         List<Token> tokens = tokenize(expr);
+        tokens = insertImplicitMultiplication(tokens);
         BigDecimal result = parseExpression(tokens, 0).value;
 
         // Update lastAnswer but don't add to history
@@ -135,6 +159,7 @@ public class ExpressionEvaluator {
         }
 
         List<Token> tokens = tokenize(expr);
+        tokens = insertImplicitMultiplication(tokens);
         BigDecimal result = parseExpression(tokens, 0).value;
 
         // Update lastAnswer and add to history
@@ -203,8 +228,32 @@ public class ExpressionEvaluator {
                 continue;
             }
 
+            // Comma separator (for multi-arg functions like min, max)
+            if (c == ',') {
+                tokens.add(new Token(TokenKind.COMMA, ",", i));
+                i++;
+                continue;
+            }
+
+            // Percentage vs modulo disambiguation
+            // Adjacent to number (no space) = percentage: 10% -> 0.1
+            // Spaced from number = modulo operator: 10 % 3 -> 1
+            if (c == '%') {
+                boolean isPercentage = false;
+                if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
+                    Token prevNum = tokens.get(tokens.size() - 1);
+                    int numEndPos = prevNum.pos + prevNum.value.length();
+                    if (numEndPos == i) {
+                        isPercentage = true;
+                    }
+                }
+                tokens.add(new Token(isPercentage ? TokenKind.PERCENT : TokenKind.OP, "%", i));
+                i++;
+                continue;
+            }
+
             // Operators
-            if ("+-*/^%".indexOf(c) != -1) {
+            if ("+-*/^".indexOf(c) != -1) {
                 tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
                 i++;
                 continue;
@@ -280,8 +329,11 @@ public class ExpressionEvaluator {
                             i++;
                             continue;
                         }
-                        // Otherwise, we've read a unit/function name and hit 'x' - treat as multiplication
-                        break;
+                        // Only break if what we've read so far is a valid unit (e.g., "10bx50k")
+                        // This allows "max(10, 5)" to be parsed correctly as "max"
+                        if (UNITS.containsKey(name.toString().toLowerCase())) {
+                            break;
+                        }
                     }
 
                     name.append(current);
@@ -318,14 +370,50 @@ public class ExpressionEvaluator {
         return tokens;
     }
 
+    // Insert implicit multiplication tokens where multiplication is implied
+    // Examples: 2(3+4) -> 2*(3+4), (3)(4) -> (3)*(4), 2sqrt(4) -> 2*sqrt(4)
+    private List<Token> insertImplicitMultiplication(List<Token> tokens) {
+        List<Token> result = new ArrayList<>();
+        for (int i = 0; i < tokens.size(); i++) {
+            result.add(tokens.get(i));
+            if (i + 1 < tokens.size()) {
+                Token cur = tokens.get(i);
+                Token next = tokens.get(i + 1);
+                boolean insert = false;
+
+                // NUM followed by LPAREN: 2(3+4)
+                if (cur.kind == TokenKind.NUM && next.kind == TokenKind.LPAREN) insert = true;
+                // NUM followed by FUNC: 2sqrt(4)
+                if (cur.kind == TokenKind.NUM && next.kind == TokenKind.FUNC) insert = true;
+                // RPAREN followed by NUM: (3+4)2
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.NUM) insert = true;
+                // RPAREN followed by LPAREN: (3)(4)
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.LPAREN) insert = true;
+                // RPAREN followed by FUNC: (3)sqrt(4)
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.FUNC) insert = true;
+                // UNIT followed by LPAREN: 10k(5)
+                if (cur.kind == TokenKind.UNIT && next.kind == TokenKind.LPAREN) insert = true;
+                // PERCENT followed by NUM/LPAREN/FUNC: 10%(5+3) -> 0.1*(5+3)
+                if (cur.kind == TokenKind.PERCENT && (next.kind == TokenKind.NUM || next.kind == TokenKind.LPAREN || next.kind == TokenKind.FUNC)) insert = true;
+
+                if (insert) {
+                    result.add(new Token(TokenKind.OP, "*", cur.pos));
+                }
+            }
+        }
+        return result;
+    }
+
     // Helper class for parser results
     private static class ParseResult {
         BigDecimal value;
         int nextPos;
+        boolean isPercentage;
 
         ParseResult(BigDecimal v, int p) {
             value = v;
             nextPos = p;
+            isPercentage = false;
         }
     }
 
@@ -334,6 +422,7 @@ public class ExpressionEvaluator {
     }
 
     // Addition and subtraction (lowest precedence)
+    // Supports smart percentage: 100 + 10% = 110, 200 - 25% = 150
     private ParseResult parseAddSub(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseMulDiv(tokens, pos);
 
@@ -351,11 +440,21 @@ public class ExpressionEvaluator {
 
             ParseResult right = parseMulDiv(tokens, left.nextPos + 1);
 
-            // Use unlimited precision for add/subtract
-            if (op.equals("+")) {
-                left = new ParseResult(left.value.add(right.value), right.nextPos);
+            if (right.isPercentage) {
+                // Smart percentage: 100 + 10% means "add 10% of 100"
+                BigDecimal percentOfLeft = left.value.multiply(right.value);
+                if (op.equals("+")) {
+                    left = new ParseResult(left.value.add(percentOfLeft), right.nextPos);
+                } else {
+                    left = new ParseResult(left.value.subtract(percentOfLeft), right.nextPos);
+                }
             } else {
-                left = new ParseResult(left.value.subtract(right.value), right.nextPos);
+                // Normal add/subtract
+                if (op.equals("+")) {
+                    left = new ParseResult(left.value.add(right.value), right.nextPos);
+                } else {
+                    left = new ParseResult(left.value.subtract(right.value), right.nextPos);
+                }
             }
         }
 
@@ -455,15 +554,26 @@ public class ExpressionEvaluator {
         return parsePostfix(tokens, pos);
     }
 
-    // Unit suffixes (like "100m")
+    // Unit suffixes (like "100m") and percentage postfix (like "10%")
     private ParseResult parsePostfix(List<Token> tokens, int pos) throws EvalException {
         ParseResult result = parsePrimary(tokens, pos);
 
+        // Handle unit suffixes
         if (result.nextPos < tokens.size()) {
             Token tok = tokens.get(result.nextPos);
             if (tok.kind == TokenKind.UNIT) {
                 BigDecimal multiplier = UNITS.get(tok.value);
                 result = new ParseResult(result.value.multiply(multiplier), result.nextPos + 1);
+            }
+        }
+
+        // Handle percentage postfix: 10% = 0.1
+        if (result.nextPos < tokens.size()) {
+            Token tok = tokens.get(result.nextPos);
+            if (tok.kind == TokenKind.PERCENT) {
+                BigDecimal percentValue = result.value.divide(BigDecimal.valueOf(100), mc);
+                result = new ParseResult(percentValue, result.nextPos + 1);
+                result.isPercentage = true;
             }
         }
 
@@ -494,6 +604,25 @@ public class ExpressionEvaluator {
                 throw new EvalException(tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
             }
 
+            // Multi-argument functions like min(a, b) and max(a, b)
+            if (MULTI_ARG_FUNCTIONS.contains(tok.value)) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                if (arg1.nextPos >= tokens.size() || tokens.get(arg1.nextPos).kind != TokenKind.COMMA) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_comma", tok.value), tok.pos);
+                }
+                ParseResult arg2 = parseExpression(tokens, arg1.nextPos + 1);
+                if (arg2.nextPos >= tokens.size() || tokens.get(arg2.nextPos).kind != TokenKind.RPAREN) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
+                }
+                BigDecimal result = switch (tok.value) {
+                    case "min" -> arg1.value.min(arg2.value);
+                    case "max" -> arg1.value.max(arg2.value);
+                    default -> throw new EvalException(tr("notenoughcalculator.error.unknown_function", tok.value), tok.pos);
+                };
+                return new ParseResult(result, arg2.nextPos + 1);
+            }
+
+            // Single-argument functions
             ParseResult arg = parseExpression(tokens, pos + 2);
 
             if (arg.nextPos >= tokens.size() || tokens.get(arg.nextPos).kind != TokenKind.RPAREN) {
@@ -517,14 +646,14 @@ public class ExpressionEvaluator {
         throw new EvalException(tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);
     }
 
-    // Apply math functions
+    // Apply single-argument math functions
     private BigDecimal applyFunction(String func, BigDecimal arg, int pos) throws EvalException {
         switch (func) {
             case "sqrt":
                 if (arg.compareTo(BigDecimal.ZERO) < 0) {
                     throw new EvalException(tr("notenoughcalculator.error.negative_sqrt"), pos);
                 }
-                return new BigDecimal(Math.sqrt(arg.doubleValue()), mc);
+                return arg.sqrt(mc);
 
             case "abs":
                 return arg.abs();
@@ -537,6 +666,27 @@ public class ExpressionEvaluator {
 
             case "round":
                 return arg.setScale(0, RoundingMode.HALF_UP);
+
+            case "log":
+                if (arg.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new EvalException(tr("notenoughcalculator.error.log_non_positive"), pos);
+                }
+                return BigDecimal.valueOf(Math.log10(arg.doubleValue()));
+
+            case "ln":
+                if (arg.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new EvalException(tr("notenoughcalculator.error.log_non_positive"), pos);
+                }
+                return BigDecimal.valueOf(Math.log(arg.doubleValue()));
+
+            case "sin":
+                return BigDecimal.valueOf(Math.sin(Math.toRadians(arg.doubleValue())));
+
+            case "cos":
+                return BigDecimal.valueOf(Math.cos(Math.toRadians(arg.doubleValue())));
+
+            case "tan":
+                return BigDecimal.valueOf(Math.tan(Math.toRadians(arg.doubleValue())));
 
             default:
                 throw new EvalException(tr("notenoughcalculator.error.unknown_function", func), pos);

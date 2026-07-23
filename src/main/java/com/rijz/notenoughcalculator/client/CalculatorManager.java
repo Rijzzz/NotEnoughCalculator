@@ -59,10 +59,9 @@ public class CalculatorManager {
     private BigDecimal lastCompletedResult = null;
     private boolean hasUncommittedCalculation = false;
 
-    private boolean sessionResetNotified = false;
 
     // Precompiled patterns to avoid GC pressure on every keystroke
-    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX].*");
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX!].*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\(", Pattern.CASE_INSENSITIVE);
@@ -77,7 +76,7 @@ public class CalculatorManager {
     }
 
     // Heuristics to determine if the query is a math equation or a standard item search
-    public boolean looksLikeCalculation(String input) {
+    public static boolean looksLikeCalculation(String input) {
         if (input == null || input.trim().isEmpty()) {
             return false;
         }
@@ -136,7 +135,7 @@ public class CalculatorManager {
         if (parenCount != 0) return false;  // Unmatched parens
 
         // Can't end with incomplete function call
-        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round)\\s*\\([^)]*$")) {
+        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\([^)]*$")) {
             return false;
         }
 
@@ -454,6 +453,10 @@ public class CalculatorManager {
         evaluator.setVariable(name, valueExpr);
     }
 
+    public void setVariableDirect(String name, BigDecimal value) {
+        evaluator.setVariable(name, value);
+    }
+
     public List<String> getHistory() {
         return new ArrayList<>(completedHistory);
     }
@@ -478,7 +481,6 @@ public class CalculatorManager {
         lastCompletedExpression = null;
         lastCompletedResult = null;
         hasUncommittedCalculation = false;
-        sessionResetNotified = false;
         LOGGER.info("Cleared all history");
     }
 
@@ -505,15 +507,7 @@ public class CalculatorManager {
         lastCompletedExpression = null;
         lastCompletedResult = null;
         hasUncommittedCalculation = false;
-        sessionResetNotified = false;
         evaluator.clearHistory();
         LOGGER.info("Calculator reset (session ended)");
-    }
-
-    public boolean isSessionResetNotified() {
-        return sessionResetNotified;
-    }
-    public void markSessionReset() {
-        sessionResetNotified = true;
     }
 }

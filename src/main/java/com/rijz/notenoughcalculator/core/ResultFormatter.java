@@ -23,22 +23,10 @@ import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
 // Makes numbers look nice with commas and unit suggestions
 // Example: 1000000 -> "1,000,000 (1m)"
 public class ResultFormatter {
-
-    private static final DecimalFormat COMMA_FORMAT;
-
-    static {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        symbols.setGroupingSeparator(',');
-        COMMA_FORMAT = new DecimalFormat("#,##0.##########", symbols);
-        COMMA_FORMAT.setMaximumFractionDigits(10);
-    }
 
     // Helper method for translations
     private static String tr(String key, Object... args) {
@@ -46,13 +34,47 @@ public class ResultFormatter {
     }
 
     // Format with commas only (used for inline display in REI)
-    // This matches how NEU calculator shows results
+    // Uses pure String manipulation to preserve 100% arbitrary precision without double-casting loss
     public static String formatWithCommas(BigDecimal value) {
+        if (value == null) return "0";
         CalculatorConfig config = CalculatorConfig.getInstance();
+
+        BigDecimal stripped = value.stripTrailingZeros();
+        String plain = stripped.toPlainString();
+
         if (!config.enableCommaFormatting) {
-            return value.stripTrailingZeros().toPlainString();
+            return plain;
         }
-        return COMMA_FORMAT.format(value.stripTrailingZeros());
+
+        return insertCommas(plain);
+    }
+
+    // Pure string comma inserter preserving unlimited digits
+    public static String insertCommas(String numberStr) {
+        if (numberStr == null || numberStr.isEmpty()) return "";
+
+        int dotIdx = numberStr.indexOf('.');
+        String intPart = dotIdx >= 0 ? numberStr.substring(0, dotIdx) : numberStr;
+        String fracPart = dotIdx >= 0 ? numberStr.substring(dotIdx) : "";
+
+        // Handle leading sign (- or +)
+        String sign = "";
+        if (intPart.startsWith("-") || intPart.startsWith("+")) {
+            sign = intPart.substring(0, 1);
+            intPart = intPart.substring(1);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int len = intPart.length();
+
+        for (int i = 0; i < len; i++) {
+            if (i > 0 && (len - i) % 3 == 0) {
+                sb.append(',');
+            }
+            sb.append(intPart.charAt(i));
+        }
+
+        return sign + sb.toString() + fracPart;
     }
 
     // Format with commas AND unit suggestions (used for chat commands)

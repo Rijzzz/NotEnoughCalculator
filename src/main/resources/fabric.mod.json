@@ -26,6 +26,9 @@
     ],
     "rei_client": [
       "com.rijz.notenoughcalculator.client.CalculatorREIPlugin"
+    ],
+    "modmenu": [
+      "com.rijz.notenoughcalculator.client.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -42,7 +45,7 @@
     "roughlyenoughitems": ">=26.2.820"
   },
   "suggests": {
-    "another-mod": "*"
+    "modmenu": ">=20.0.0"
   },
   "custom": {
     "modmenu": {

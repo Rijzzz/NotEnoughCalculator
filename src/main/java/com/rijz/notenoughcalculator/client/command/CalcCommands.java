@@ -114,8 +114,8 @@ public class CalcCommands {
         String valueExpr = StringArgumentType.getString(ctx, "value");
 
         try {
-            NotEnoughCalculatorClient.getCalculatorManager().setVariable(varName, valueExpr);
             BigDecimal result = NotEnoughCalculatorClient.getCalculatorManager().calculate(valueExpr);
+            NotEnoughCalculatorClient.getCalculatorManager().setVariableDirect(varName, result);
             String formatted = ResultFormatter.formatWithUnits(result);
 
             send(ctx, "notenoughcalculator.variable.set", varName,
@@ -199,6 +199,7 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_1");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_2");
+        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_3");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.footer");
@@ -215,6 +216,7 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.operators.divide");
         send(ctx, "notenoughcalculator.help.operators.power");
         send(ctx, "notenoughcalculator.help.operators.modulo");
+        send(ctx, "notenoughcalculator.help.operators.factorial");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.operators.parentheses");
@@ -299,6 +301,11 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.functions.combining_example");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.functions.factorial");
+        send(ctx, "notenoughcalculator.help.functions.factorial_example_1");
+        send(ctx, "notenoughcalculator.help.functions.factorial_example_2");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.back");
     }
 
@@ -347,6 +354,8 @@ public class CalcCommands {
 
         send(ctx, "notenoughcalculator.help.variables.builtin");
         send(ctx, "notenoughcalculator.help.variables.builtin_ans");
+        send(ctx, "notenoughcalculator.help.variables.builtin_pi");
+        send(ctx, "notenoughcalculator.help.variables.builtin_e");
         send(ctx, "notenoughcalculator.help.variables.builtin_example_1");
         send(ctx, "notenoughcalculator.help.variables.builtin_example_2");
         sendEmpty(ctx);

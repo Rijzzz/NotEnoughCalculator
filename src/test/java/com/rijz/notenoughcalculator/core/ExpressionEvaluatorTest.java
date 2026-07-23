@@ -1,0 +1,368 @@
+/*
+ * This file is part of Not Enough Calculator.
+ *
+ * Not Enough Calculator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Not Enough Calculator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.rijz.notenoughcalculator.core;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ExpressionEvaluatorTest {
+
+    private ExpressionEvaluator eval;
+
+    @BeforeEach
+    void setUp() {
+        eval = new ExpressionEvaluator(10);
+    }
+
+    private BigDecimal calc(String expr) throws ExpressionEvaluator.EvalException {
+        return eval.evaluate(expr);
+    }
+
+    private void assertCalc(String expr, String expected) throws ExpressionEvaluator.EvalException {
+        BigDecimal result = calc(expr);
+        assertEquals(0, new BigDecimal(expected).compareTo(result),
+                expr + " should equal " + expected + " but got " + result.toPlainString());
+    }
+
+    private void assertCalcApprox(String expr, double expected, double tolerance) throws ExpressionEvaluator.EvalException {
+        BigDecimal result = calc(expr);
+        assertEquals(expected, result.doubleValue(), tolerance,
+                expr + " should be approximately " + expected);
+    }
+
+    @Nested
+    @DisplayName("Basic Arithmetic")
+    class BasicArithmetic {
+        @Test void addition() throws Exception { assertCalc("2+3", "5"); }
+        @Test void subtraction() throws Exception { assertCalc("10-4", "6"); }
+        @Test void multiplication() throws Exception { assertCalc("6*7", "42"); }
+        @Test void division() throws Exception { assertCalcApprox("10/3", 3.3333333333, 0.0001); }
+        @Test void multipleOperations() throws Exception { assertCalc("1+2+3+4+5", "15"); }
+        @Test void mixedOperations() throws Exception { assertCalc("10+5*2", "20"); }
+        @Test void decimals() throws Exception { assertCalc("1.5+2.5", "4"); }
+        @Test void largeNumbers() throws Exception { assertCalc("999999999+1", "1000000000"); }
+        @Test void decimalMultiplication() throws Exception { assertCalc("0.5 * 0.2", "0.1"); }
+        @Test void decimalDivision() throws Exception { assertCalc("1.5 / 0.5", "3"); }
+        @Test void massiveExpression() throws Exception {
+            BigDecimal res = calc("1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+121232131231231231231231231231+23123123123123123123123123123+123+13123131232322+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1");
+            assertEquals("144355254354354367477485586851", res.toPlainString());
+        }
+    }
+
+    @Nested
+    @DisplayName("Operator Precedence")
+    class Precedence {
+        @Test void mulBeforeAdd() throws Exception { assertCalc("2+3*4", "14"); }
+        @Test void parensOverride() throws Exception { assertCalc("(2+3)*4", "20"); }
+        @Test void powerBeforeMul() throws Exception { assertCalc("2*3^2", "18"); }
+        @Test void nestedParens() throws Exception { assertCalc("((2+3)*4)+1", "21"); }
+        @Test void complexExpression() throws Exception { assertCalc("2^3+1", "9"); }
+        @Test void deepNestedParens() throws Exception { assertCalc("(((10 + 5) * 2) - 10) / 2", "10"); }
+    }
+
+    @Nested
+    @DisplayName("Unary Operators")
+    class UnaryOperators {
+        @Test void negation() throws Exception { assertCalc("-5+3", "-2"); }
+        @Test void positiveUnary() throws Exception { assertCalc("+5", "5"); }
+        @Test void doubleNegation() throws Exception { assertCalc("--5", "5"); }
+        @Test void tripleNegation() throws Exception { assertCalc("---5", "-5"); }
+        @Test void negationWithParens() throws Exception { assertCalc("-(3+2)", "-5"); }
+        @Test void unaryInMultiply() throws Exception { assertCalc("5 * -2", "-10"); }
+    }
+
+    @Nested
+    @DisplayName("Exponentiation")
+    class Exponentiation {
+        @Test void basicPower() throws Exception { assertCalc("2^10", "1024"); }
+        @Test void negativePower() throws Exception { assertCalc("(-2)^3", "-8"); }
+        @Test void zeroPower() throws Exception { assertCalc("5^0", "1"); }
+        @Test void onePower() throws Exception { assertCalc("5^1", "5"); }
+        @Test void fractionalResultPower() throws Exception { assertCalc("2^-2", "0.25"); }
+
+        @Test
+        void exponentTooLarge() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("2^1001"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Modulo")
+    class Modulo {
+        @Test void basicModulo() throws Exception { assertCalc("10 % 3", "1"); }
+        @Test void exactDivisor() throws Exception { assertCalc("9 % 3", "0"); }
+        @Test void moduloSelf() throws Exception { assertCalc("7 % 7", "0"); }
+        @Test void moduloDecimal() throws Exception { assertCalc("10.5 % 3", "1.5"); }
+
+        @Test
+        void moduloByZero() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("10 % 0"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Skyblock Units")
+    class Units {
+        @Test void thousand() throws Exception { assertCalc("10k", "10000"); }
+        @Test void million() throws Exception { assertCalc("5m", "5000000"); }
+        @Test void billion() throws Exception { assertCalc("2b", "2000000000"); }
+        @Test void trillion() throws Exception { assertCalc("1t", "1000000000000"); }
+        @Test void stack() throws Exception { assertCalc("3s", "192"); }
+        @Test void enchanted() throws Exception { assertCalc("2e", "320"); }
+        @Test void shulker() throws Exception { assertCalc("1h", "1728"); }
+        @Test void smallChest() throws Exception { assertCalc("1sc", "1728"); }
+        @Test void doubleChest() throws Exception { assertCalc("2dc", "6912"); }
+        @Test void enderChest() throws Exception { assertCalc("1eb", "2880"); }
+        @Test void unitArithmetic() throws Exception { assertCalc("10k+5k", "15000"); }
+        @Test void mixedUnits() throws Exception { assertCalc("1m+500k", "1500000"); }
+        @Test void storageMath() throws Exception { assertCalc("2h + 3dc", "13824"); }
+        @Test void unitInFunction() throws Exception { assertCalc("log(10k)", "4"); }
+        @Test void unitInSqrt() throws Exception { assertCalcApprox("sqrt(1h)", 41.569219, 0.001); }
+    }
+
+    @Nested
+    @DisplayName("Existing Functions")
+    class ExistingFunctions {
+        @Test void sqrt() throws Exception { assertCalc("sqrt(144)", "12"); }
+        @Test void sqrtDecimal() throws Exception { assertCalcApprox("sqrt(2)", 1.41421356, 0.0001); }
+        @Test void abs() throws Exception { assertCalc("abs(-50)", "50"); }
+        @Test void absPositive() throws Exception { assertCalc("abs(25)", "25"); }
+        @Test void floor() throws Exception { assertCalc("floor(3.9)", "3"); }
+        @Test void ceil() throws Exception { assertCalc("ceil(3.1)", "4"); }
+        @Test void round() throws Exception { assertCalc("round(3.5)", "4"); }
+        @Test void roundDown() throws Exception { assertCalc("round(3.4)", "3"); }
+        @Test void nested() throws Exception { assertCalc("sqrt(abs(-144))", "12"); }
+
+        @Test
+        void negativeSqrt() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("sqrt(-1)"));
+        }
+    }
+
+    @Nested
+    @DisplayName("New Functions - Logarithms")
+    class Logarithms {
+        @Test void log10() throws Exception { assertCalc("log(100)", "2"); }
+        @Test void log1000() throws Exception { assertCalc("log(1000)", "3"); }
+        @Test void log1() throws Exception { assertCalc("log(1)", "0"); }
+        @Test void ln1() throws Exception { assertCalc("ln(1)", "0"); }
+        @Test void lnE() throws Exception { assertCalcApprox("ln(2.718281828)", 1.0, 0.0001); }
+
+        @Test
+        void logNonPositive() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("log(0)"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("log(-1)"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("ln(0)"));
+        }
+    }
+
+    @Nested
+    @DisplayName("New Functions - Trigonometry (Degrees)")
+    class Trigonometry {
+        @Test void sin90() throws Exception { assertCalcApprox("sin(90)", 1.0, 0.0001); }
+        @Test void sin0() throws Exception { assertCalcApprox("sin(0)", 0.0, 0.0001); }
+        @Test void sin30() throws Exception { assertCalcApprox("sin(30)", 0.5, 0.0001); }
+        @Test void cos0() throws Exception { assertCalcApprox("cos(0)", 1.0, 0.0001); }
+        @Test void cos90() throws Exception { assertCalcApprox("cos(90)", 0.0, 0.0001); }
+        @Test void cos60() throws Exception { assertCalcApprox("cos(60)", 0.5, 0.0001); }
+        @Test void tan45() throws Exception { assertCalcApprox("tan(45)", 1.0, 0.0001); }
+        @Test void tan0() throws Exception { assertCalcApprox("tan(0)", 0.0, 0.0001); }
+        @Test void trigCombination() throws Exception { assertCalcApprox("sin(90) + cos(0)", 2.0, 0.0001); }
+    }
+
+    @Nested
+    @DisplayName("New Functions - Min/Max")
+    class MinMax {
+        @Test void minBasic() throws Exception { assertCalc("min(3, 5)", "3"); }
+        @Test void maxBasic() throws Exception { assertCalc("max(3, 5)", "5"); }
+        @Test void minNegative() throws Exception { assertCalc("min(-1, 1)", "-1"); }
+        @Test void maxNegative() throws Exception { assertCalc("max(-10, -5)", "-5"); }
+        @Test void minEqual() throws Exception { assertCalc("min(7, 7)", "7"); }
+        @Test void minExpression() throws Exception { assertCalc("min(2+3, 10-4)", "5"); }
+        @Test void maxExpression() throws Exception { assertCalc("max(2+3, 10-4)", "6"); }
+        @Test void minNested() throws Exception { assertCalc("min(min(1, 2), 3)", "1"); }
+        @Test void maxNested() throws Exception { assertCalc("max(max(10, 20), sqrt(100))", "20"); }
+        @Test void minWithUnits() throws Exception { assertCalc("min(5m, 10m)", "5000000"); }
+        @Test void maxWithUnits() throws Exception { assertCalc("max(1k, 500)", "1000"); }
+    }
+
+    @Nested
+    @DisplayName("Implicit Multiplication")
+    class ImplicitMultiplication {
+        @Test void numParen() throws Exception { assertCalc("2(3+4)", "14"); }
+        @Test void parenParen() throws Exception { assertCalc("(3)(4)", "12"); }
+        @Test void parenNum() throws Exception { assertCalc("(2+3)4", "20"); }
+        @Test void numFunc() throws Exception { assertCalc("2sqrt(4)", "4"); }
+        @Test void numLog() throws Exception { assertCalc("3log(100)", "6"); }
+        @Test void numMin() throws Exception { assertCalc("5min(10, 20)", "50"); }
+        @Test void unitParen() throws Exception { assertCalc("10k(2+3)", "50000"); }
+        @Test void complexImplicit() throws Exception { assertCalc("(2+3)(4+5)", "45"); }
+        @Test void tripleImplicit() throws Exception { assertCalc("(2+3)(4+5)(6+7)", "585"); }
+    }
+
+    @Nested
+    @DisplayName("Percentage")
+    class Percentage {
+        @Test void basicPercentage() throws Exception { assertCalcApprox("10%", 0.1, 0.0001); }
+        @Test void halfPercent() throws Exception { assertCalcApprox("50%", 0.5, 0.0001); }
+        @Test void fullPercent() throws Exception { assertCalcApprox("100%", 1.0, 0.0001); }
+
+        @Test
+        @DisplayName("Smart: 100 + 10% = 110")
+        void smartAddPercent() throws Exception { assertCalc("100 + 10%", "110"); }
+
+        @Test
+        @DisplayName("Smart: 200 - 25% = 150")
+        void smartSubPercent() throws Exception { assertCalc("200 - 25%", "150"); }
+
+        @Test
+        @DisplayName("Smart compound: 100 + 10% + 5% = 115.5")
+        void smartCompound() throws Exception { assertCalcApprox("100 + 10% + 5%", 115.5, 0.0001); }
+
+        @Test
+        @DisplayName("Multiply with percentage: 100 * 10% = 10")
+        void multiplyPercent() throws Exception { assertCalc("100 * 10%", "10"); }
+
+        @Test
+        @DisplayName("Divide by percentage: 200 / 50% = 400")
+        void dividePercent() throws Exception { assertCalc("200 / 50%", "400"); }
+
+        @Test
+        @DisplayName("Paren with percentage: (100 + 20%) * 2 = 240")
+        void parenPercent() throws Exception { assertCalc("((100 + 20%)) * 2", "240"); }
+    }
+
+    @Nested
+    @DisplayName("Percentage vs Modulo Disambiguation")
+    class PercentVsModulo {
+        @Test
+        @DisplayName("Spaced: 10 % 3 = 1 (modulo)")
+        void spacedIsModulo() throws Exception { assertCalc("10 % 3", "1"); }
+
+        @Test
+        @DisplayName("Adjacent: 10% = 0.1 (percentage)")
+        void adjacentIsPercentage() throws Exception { assertCalcApprox("10%", 0.1, 0.0001); }
+
+        @Test
+        @DisplayName("Modulo in context: 10 % 3 + 5 = 6")
+        void moduloInContext() throws Exception { assertCalc("10 % 3 + 5", "6"); }
+    }
+
+    @Nested
+    @DisplayName("Variables")
+    class Variables {
+        @Test
+        void ansVariable() throws Exception {
+            calc("100+50");
+            assertCalc("ans*2", "300");
+        }
+
+        @Test
+        void customVariable() throws Exception {
+            eval.setVariable("profit", new BigDecimal("50000000"));
+            assertCalc("$profit * 2", "100000000");
+        }
+
+        @Test
+        void chainedVariables() throws Exception {
+            eval.setVariable("a", "10k");
+            eval.setVariable("b", "$a + 5k");
+            assertCalc("$b / $a", "1.5");
+        }
+
+        @Test
+        void undefinedVariable() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("$undefined + 1"));
+        }
+    }
+
+    @Nested
+    @DisplayName("x as Multiplication")
+    class XMultiplication {
+        @Test void basicX() throws Exception { assertCalc("10x5", "50"); }
+        @Test void upperX() throws Exception { assertCalc("10X5", "50"); }
+        @Test void unitX() throws Exception { assertCalc("10kx50k", "500000000"); }
+        @Test void parenX() throws Exception { assertCalc("(2+3)x4", "20"); }
+    }
+
+    @Nested
+    @DisplayName("Edge Cases & Errors")
+    class EdgeCases {
+        @Test
+        void emptyExpression() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc(""));
+        }
+
+        @Test
+        void nullExpression() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc(null));
+        }
+
+        @Test
+        void divisionByZero() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("1/0"));
+        }
+
+        @Test
+        void unmatchedParen() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("(2+3"));
+        }
+
+        @Test
+        void trailingOperator() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("5+"));
+        }
+
+        @Test
+        void unexpectedCharacter() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("5 & 3"));
+        }
+    }
+
+    @Nested
+    @DisplayName("History")
+    class History {
+        @Test
+        void historyTracked() throws Exception {
+            calc("1+1");
+            calc("2+2");
+            assertEquals(2, eval.getHistory().size());
+        }
+
+        @Test
+        void clearHistory() throws Exception {
+            calc("1+1");
+            eval.clearHistory();
+            assertEquals(0, eval.getHistory().size());
+        }
+
+        @Test
+        void duplicateNotAdded() throws Exception {
+            calc("1+1");
+            calc("1+1");
+            assertEquals(1, eval.getHistory().size());
+        }
+    }
+}

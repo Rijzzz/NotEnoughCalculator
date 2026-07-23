@@ -79,7 +79,10 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 **Dependencies (Required):**
 - [Fabric API](https://modrinth.com/mod/fabric-api)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (>=26.2.820)
+
+**Dependencies (Optional / Recommended):**
+- [ModMenu](https://modrinth.com/mod/modmenu) (>=20.0.0) — Adds an in-game settings button in your mod list to open `/calcconfig`.
 
 ---
 
@@ -87,6 +90,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 1. Download the required mods and place them into your Minecraft `mods/` folder:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
     - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+    - [ModMenu](https://modrinth.com/mod/modmenu) *(Optional)*
     - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Press your inventory key to open REI

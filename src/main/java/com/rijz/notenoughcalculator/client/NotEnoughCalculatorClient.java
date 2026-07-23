@@ -580,9 +580,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
                 // Ctrl+C / Cmd+C on a calculation copies the result to clipboard
                 if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd) {
-                    TextField searchField2 = runtime.getSearchTextField();
-                    if (searchField2 != null) {
-                        String text = searchField2.getText();
+                    if (searchField != null) {
+                        String text = searchField.getText();
                         if (calcManager.looksLikeCalculation(text) && calcManager.hasResult()) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {

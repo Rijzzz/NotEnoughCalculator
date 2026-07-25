@@ -434,5 +434,20 @@ class ExpressionEvaluatorTest {
         @Test void arithmetic() throws Exception { assertCalc("(0b1101! - 0o6_6^0x5) % 0XAaA0B", "607244"); }
         @Test void literalAddition() throws Exception { assertCalc("0b10 + 0xA + 0o10", "20"); }
         @Test void zeroBillion() throws Exception { assertCalc("0b", "0"); }
+        @Test void literalImplicitMultiplication() throws Exception { assertCalc("2(0b10)", "4"); }
+        @Test void literalInFunction() throws Exception { assertCalc("sqrt(0x64)", "10"); }
+        @Test void literalMaxFunction() throws Exception { assertCalc("max(0b10, 0xFF)", "255"); }
+        @Test void literalWithUnit() throws Exception { assertCalc("0b10k", "2000"); }
+        @Test void literalWithStack() throws Exception { assertCalc("0xA * 1s", "640"); }
+
+        @Test
+        void invalidBinaryDigit() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("0b102"));
+        }
+
+        @Test
+        void invalidOctalDigit() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("0o78"));
+        }
     }
 }

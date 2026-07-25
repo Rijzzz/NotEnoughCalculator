@@ -60,6 +60,9 @@ class CalculatorManagerTest {
         @Test void storageUnit() { assertTrue(CalculatorManager.looksLikeCalculation("2dc + 1sc")); }
         @Test void complexExpression() { assertTrue(CalculatorManager.looksLikeCalculation("100m - 50m * 1.1")); }
         @Test void mixedUnitsAndOps() { assertTrue(CalculatorManager.looksLikeCalculation("10kx5k")); }
+        @Test void binaryLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0b0_10")); }
+        @Test void hexLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0xa1b")); }
+        @Test void octalLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0o511")); }
     }
 
     @Nested

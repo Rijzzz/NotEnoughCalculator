@@ -219,6 +219,12 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.operators.factorial");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.operators.literals");
+        send(ctx, "notenoughcalculator.help.operators.binary");
+        send(ctx, "notenoughcalculator.help.operators.hex");
+        send(ctx, "notenoughcalculator.help.operators.octal");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.operators.parentheses");
         send(ctx, "notenoughcalculator.help.operators.parentheses_desc");
         send(ctx, "notenoughcalculator.help.operators.parentheses_note");

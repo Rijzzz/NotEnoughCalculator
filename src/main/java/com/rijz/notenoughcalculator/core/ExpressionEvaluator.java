@@ -22,6 +22,7 @@ import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
@@ -34,6 +35,7 @@ import java.util.*;
  * - Implicit multiplication (2(3+4), (3)(4))
  * - Skyblock units (k, m, b, t, s, e, h, sc, dc, eb)
  * - Variables (ans, $custom)
+ * - Literals (0b, 0x, 0o)
  */
 public class ExpressionEvaluator {
 
@@ -266,6 +268,78 @@ public class ExpressionEvaluator {
                 continue;
             }
 
+            parseLiteral:
+            {
+                if (tokens.isEmpty())
+                    break parseLiteral;
+
+                Token previous = tokens.get(tokens.size() - 1);
+
+                // Enforce adjacency: previous "0" token must directly touch this character (no space)
+                if (previous.kind != TokenKind.NUM || !previous.value.equals("0") || previous.pos + previous.value.length() != i)
+                    break parseLiteral;
+
+                char prefix = c;
+
+                int radix;
+                switch (prefix) {
+                    case 'x', 'X' -> radix = 16;
+                    case 'b', 'B' -> radix = 2;
+                    case 'o', 'O' -> radix = 8;
+                    default -> {
+                        break parseLiteral;
+                    }
+                }
+
+                int start = i;
+                i++; // skip 'b', 'x', or 'o'
+
+                StringBuilder num = new StringBuilder();
+                boolean lastWasUnderscore = false;
+
+                while (i < expr.length()) {
+                    char ch = expr.charAt(i);
+
+                    if (ch == '_') {
+                        // Underscore must follow a digit and cannot follow another underscore
+                        if (num.isEmpty() || lastWasUnderscore) {
+                            break;
+                        }
+                        lastWasUnderscore = true;
+                        i++;
+                        continue;
+                    }
+
+                    int digit = Character.digit(ch, radix);
+                    if (digit == -1) {
+                        // If it's an out-of-range digit for this base (e.g. '2' in 0b102, '8' in 0o78), fail immediately
+                        if (Character.isDigit(ch)) {
+                            throw new EvalException(tr("notenoughcalculator.error.invalid_number"), i);
+                        }
+                        break;
+                    }
+
+                    num.append(ch);
+                    lastWasUnderscore = false;
+                    i++;
+                }
+
+                // If literal ended on an underscore, backtrack that underscore
+                if (lastWasUnderscore) {
+                    i--;
+                }
+
+                if (num.isEmpty()) {
+                    i = start;
+                    break parseLiteral;
+                }
+
+                String literal = num.toString();
+                previous.value += prefix + literal;
+                previous.number = new BigDecimal(new BigInteger(literal, radix));
+                continue;
+            }
+
             // Handle 'x' or 'X' as multiplication
             if (c == 'x' || c == 'X') {
                 boolean isMultiplication = false;
@@ -285,10 +359,6 @@ public class ExpressionEvaluator {
                     // If we just parsed a unit token, it's multiplication (e.g., "10kx50k")
                     else if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.UNIT) {
                         isMultiplication = true;
-                    }
-                    // Don't treat as multiplication if preceded by '0' (hex like 0x123)
-                    else if (prevChar == '0') {
-                        isMultiplication = false;
                     }
                 }
 

@@ -5,10 +5,12 @@
   "name": "Not Enough Calculator",
   "description": "A NEU-style calculator, inside REI's search bar.",
   "authors": [
-    "Rijz", "Laze"
+    "Rijz",
+    "Laze"
   ],
   "contributors": [
-    "kaori-23"
+    "kaori-23",
+    "ninjaguardian"
   ],
   "contact": {
     "homepage": "https://modrinth.com/mod/notenoughcalculator",

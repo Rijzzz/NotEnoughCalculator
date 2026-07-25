@@ -60,6 +60,15 @@ class CalculatorManagerTest {
         @Test void storageUnit() { assertTrue(CalculatorManager.looksLikeCalculation("2dc + 1sc")); }
         @Test void complexExpression() { assertTrue(CalculatorManager.looksLikeCalculation("100m - 50m * 1.1")); }
         @Test void mixedUnitsAndOps() { assertTrue(CalculatorManager.looksLikeCalculation("10kx5k")); }
+        @Test void binaryLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0b0_10")); }
+        @Test void binaryLiteralUppercase() { assertTrue(CalculatorManager.looksLikeCalculation("0B1101")); }
+        @Test void hexLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0xa1b")); }
+        @Test void hexLiteralUppercase() { assertTrue(CalculatorManager.looksLikeCalculation("0XFF")); }
+        @Test void octalLiteral() { assertTrue(CalculatorManager.looksLikeCalculation("0o511")); }
+        @Test void octalLiteralUppercase() { assertTrue(CalculatorManager.looksLikeCalculation("0O77")); }
+        @Test void literalArithmetic() { assertTrue(CalculatorManager.looksLikeCalculation("0b10 + 0xA")); }
+        @Test void literalParentheses() { assertTrue(CalculatorManager.looksLikeCalculation("(0xFA)")); }
+        @Test void literalFactorial() { assertTrue(CalculatorManager.looksLikeCalculation("0b100!")); }
     }
 
     @Nested

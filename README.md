@@ -33,6 +33,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
 - Factorial: `5!` = 120, `10!` = 3,628,800
+- Number Literals: Binary (`0b1010` = 10), Hexadecimal (`0xFF` = 255), Octal (`0o77` = 63)
 - Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
 - Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
 - Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
@@ -173,6 +174,10 @@ min(10, 5) = 5                    (minimum)
 max(10, 5) = 10                   (maximum)
 pi * 2 = 6.283...                 (using pi constant)
 e^2 = 7.389...                    (using Euler's number)
+0b1010 = 10                       (binary literal)
+0xFF = 255                        (hexadecimal literal)
+0o77 = 63                         (octal literal)
+0b10 + 0xA = 12                   (arithmetic with literals)
 ```
 
 ### Compound Calculations

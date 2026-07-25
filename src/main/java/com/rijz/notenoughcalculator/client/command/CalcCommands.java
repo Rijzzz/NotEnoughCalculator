@@ -60,15 +60,16 @@ public class CalcCommands {
         CalculatorConfig config = CalculatorConfig.getInstance();
         String expr = StringArgumentType.getString(ctx, "expression");
 
+        String prefix = t("notenoughcalculator.result.prefix").getString();
         try {
             BigDecimal result = NotEnoughCalculatorClient.getCalculatorManager().calculate(expr);
             String formatted = ResultFormatter.formatWithUnits(result);
 
-            sendLiteral(ctx, config.getOperatorColorCode() + expr + " " +
+            sendLiteral(ctx, prefix + config.getOperatorColorCode() + expr + " " +
                     t("notenoughcalculator.result.equals").getString() +
-                    config.getResultColorCode() + formatted);
+                    config.getChatResultColorCode() + formatted);
         } catch (ExpressionEvaluator.EvalException e) {
-            sendLiteral(ctx, config.getErrorColorCode() +
+            sendLiteral(ctx, prefix + config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
         }
 
@@ -120,7 +121,7 @@ public class CalcCommands {
 
             send(ctx, "notenoughcalculator.variable.set", varName,
                     t("notenoughcalculator.result.equals").getString(),
-                    config.getResultColorCode() + formatted);
+                    config.getChatResultColorCode() + formatted);
         } catch (ExpressionEvaluator.EvalException e) {
             sendLiteral(ctx, config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());

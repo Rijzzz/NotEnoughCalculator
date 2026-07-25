@@ -312,6 +312,10 @@ public class ExpressionEvaluator {
 
                     int digit = Character.digit(ch, radix);
                     if (digit == -1) {
+                        // If it's an out-of-range digit for this base (e.g. '2' in 0b102, '8' in 0o78), fail immediately
+                        if (Character.isDigit(ch)) {
+                            throw new EvalException(tr("notenoughcalculator.error.invalid_number"), i);
+                        }
                         break;
                     }
 

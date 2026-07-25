@@ -67,6 +67,7 @@ public class CalculatorManager {
     private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
+    // Binary (0b), Hex (0x), or Octal (0o) number literal prefix
     private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
     private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%xX]\\s*$");

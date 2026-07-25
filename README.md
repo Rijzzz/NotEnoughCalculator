@@ -7,7 +7,7 @@
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/1389631948359598220)
 [![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.x-26.x.x/LICENSE.txt)
 
-**A powerful calculator mod that brings NEU-style calculator functionality to Roughly Enough Items (REI).**
+**A NEU-style calculator mod for Roughly Enough Items (REI). Type calculations directly into REI's search bar.**
 
 > Inspired by [NotEnoughUpdates's](https://modrinth.com/mod/notenoughupdates) calculator, recreated for newer Minecraft versions where NEU isn't available.
 

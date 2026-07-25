@@ -275,7 +275,8 @@ public class ExpressionEvaluator {
 
                 Token previous = tokens.get(tokens.size() - 1);
 
-                if (previous.kind != TokenKind.NUM || !previous.value.equals("0"))
+                // Enforce adjacency: previous "0" token must directly touch this character (no space)
+                if (previous.kind != TokenKind.NUM || !previous.value.equals("0") || previous.pos + previous.value.length() != i)
                     break parseLiteral;
 
                 char prefix = c;
@@ -291,24 +292,37 @@ public class ExpressionEvaluator {
                 }
 
                 int start = i;
+                i++; // skip 'b', 'x', or 'o'
 
-                i++;
                 StringBuilder num = new StringBuilder();
-                while (i < expr.length()) {
-                    c = expr.charAt(i);
+                boolean lastWasUnderscore = false;
 
-                    // TODO: maybe make this more strict, because it allows _ in weird places
-                    if (c == '_') {
+                while (i < expr.length()) {
+                    char ch = expr.charAt(i);
+
+                    if (ch == '_') {
+                        // Underscore must follow a digit and cannot follow another underscore
+                        if (num.isEmpty() || lastWasUnderscore) {
+                            break;
+                        }
+                        lastWasUnderscore = true;
                         i++;
                         continue;
                     }
 
-                    if (Character.digit(c, radix) == -1) {
+                    int digit = Character.digit(ch, radix);
+                    if (digit == -1) {
                         break;
                     }
 
-                    num.append(c);
+                    num.append(ch);
+                    lastWasUnderscore = false;
                     i++;
+                }
+
+                // If literal ended on an underscore, backtrack that underscore
+                if (lastWasUnderscore) {
+                    i--;
                 }
 
                 if (num.isEmpty()) {

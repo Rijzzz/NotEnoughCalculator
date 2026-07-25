@@ -40,7 +40,8 @@
   "notenoughcalculator.history.showing": "§7(Showing last %d of %d calculations)",
   "notenoughcalculator.history.tip": "§7Tip: Use §eCtrl+Z§7 in REI search to recall history!",
 
-  "notenoughcalculator.result.equals": " §f= ",
+  "notenoughcalculator.result.prefix": "§9[NEC] ",
+  "notenoughcalculator.result.equals": "§f= ",
   "notenoughcalculator.result.error_prefix": "§c[Error] ",
 
   "notenoughcalculator.help.main.title": "§e§l--- Not Enough Calculator Help ---",

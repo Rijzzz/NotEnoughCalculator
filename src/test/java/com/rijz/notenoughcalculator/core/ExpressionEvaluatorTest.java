@@ -420,4 +420,13 @@ class ExpressionEvaluatorTest {
             assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("1001!"));
         }
     }
+
+    @Nested
+    @DisplayName("Literal")
+    class Literal {
+        @Test void binary() throws Exception { assertCalc("0b010", "2"); }
+        @Test void hex() throws Exception { assertCalc("0xa1b", "2587"); }
+        @Test void octal() throws Exception { assertCalc("0o511", "329"); }
+        @Test void arithmetic() throws Exception { assertCalc("(0b1101! - 0o6_6^0x5) % 0XAaA0B", "607244"); }
+    }
 }

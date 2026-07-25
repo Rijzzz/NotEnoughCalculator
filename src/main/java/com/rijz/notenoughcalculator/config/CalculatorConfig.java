@@ -112,7 +112,11 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return "§f"; // White
+        return "§f"; // White for REI search bar
+    }
+
+    public String getChatResultColorCode() {
+        return "§a"; // Green for chat output (NEU style)
     }
 
     public String getErrorColorCode() {

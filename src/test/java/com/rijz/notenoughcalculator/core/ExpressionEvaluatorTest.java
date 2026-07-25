@@ -420,4 +420,34 @@ class ExpressionEvaluatorTest {
             assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("1001!"));
         }
     }
+
+    @Nested
+    @DisplayName("Literal")
+    class Literal {
+        @Test void binary() throws Exception { assertCalc("0b010", "2"); }
+        @Test void binaryUppercase() throws Exception { assertCalc("0B1101", "13"); }
+        @Test void hex() throws Exception { assertCalc("0xa1b", "2587"); }
+        @Test void hexUppercase() throws Exception { assertCalc("0XFF", "255"); }
+        @Test void octal() throws Exception { assertCalc("0o511", "329"); }
+        @Test void octalUppercase() throws Exception { assertCalc("0O77", "63"); }
+        @Test void underscoreInLiteral() throws Exception { assertCalc("0b1010_0001", "161"); }
+        @Test void arithmetic() throws Exception { assertCalc("(0b1101! - 0o6_6^0x5) % 0XAaA0B", "607244"); }
+        @Test void literalAddition() throws Exception { assertCalc("0b10 + 0xA + 0o10", "20"); }
+        @Test void zeroBillion() throws Exception { assertCalc("0b", "0"); }
+        @Test void literalImplicitMultiplication() throws Exception { assertCalc("2(0b10)", "4"); }
+        @Test void literalInFunction() throws Exception { assertCalc("sqrt(0x64)", "10"); }
+        @Test void literalMaxFunction() throws Exception { assertCalc("max(0b10, 0xFF)", "255"); }
+        @Test void literalWithUnit() throws Exception { assertCalc("0b10k", "2000"); }
+        @Test void literalWithStack() throws Exception { assertCalc("0xA * 1s", "640"); }
+
+        @Test
+        void invalidBinaryDigit() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("0b102"));
+        }
+
+        @Test
+        void invalidOctalDigit() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("0o78"));
+        }
+    }
 }

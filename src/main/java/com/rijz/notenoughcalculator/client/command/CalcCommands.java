@@ -62,12 +62,20 @@ public class CalcCommands {
 
         String prefix = t("notenoughcalculator.result.prefix").getString();
         try {
-            BigDecimal result = NotEnoughCalculatorClient.getCalculatorManager().calculate(expr);
-            String formatted = ResultFormatter.formatWithUnits(result);
+            ExpressionEvaluator.EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
+            String formatted = ResultFormatter.formatResultWithUnits(evalRes);
+            String cleanResult = evalRes.value.toPlainString();
 
-            sendLiteral(ctx, prefix + config.getOperatorColorCode() + expr + " " +
+            net.minecraft.network.chat.MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
                     t("notenoughcalculator.result.equals").getString() +
                     config.getChatResultColorCode() + formatted);
+
+            Component tooltip = t("notenoughcalculator.chat.click_to_copy_tooltip");
+            msg.setStyle(msg.getStyle()
+                    .withClickEvent(new net.minecraft.network.chat.ClickEvent.CopyToClipboard(cleanResult))
+                    .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(tooltip)));
+
+            ctx.getSource().getPlayer().sendSystemMessage(msg);
         } catch (ExpressionEvaluator.EvalException e) {
             sendLiteral(ctx, prefix + config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());

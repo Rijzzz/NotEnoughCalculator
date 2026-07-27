@@ -55,6 +55,7 @@ public class CalculatorConfig {
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
+    public java.util.Map<String, String> customVariables = new java.util.LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {
         // Live-reload config if the file was modified (check at most every 2 seconds)

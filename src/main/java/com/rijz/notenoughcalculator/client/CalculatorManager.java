@@ -61,20 +61,34 @@ public class CalculatorManager {
 
 
     // Precompiled patterns to avoid GC pressure on every keystroke
-    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX!].*");
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     // Binary (0b), Hex (0x), or Octal (0o) number literal prefix
     private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
-    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%xX]\\s*$");
+    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*(?:[+\\-*/^%xX&|~]|<<|>>)\\s*$");
     private static final Pattern MINECRAFT_ITEM = Pattern.compile("(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
 
     public CalculatorManager() {
         this.evaluator = new ExpressionEvaluator();
+        loadPersistentVariables();
+    }
+
+    private void loadPersistentVariables() {
+        try {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+            if (config.customVariables != null) {
+                for (var entry : config.customVariables.entrySet()) {
+                    try {
+                        evaluator.setVariable(entry.getKey(), new BigDecimal(entry.getValue()));
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     // Heuristics to determine if the query is a math equation or a standard item search
@@ -236,12 +250,12 @@ public class CalculatorManager {
         }
 
         try {
-            BigDecimal result = evaluator.evaluateQuiet(input);
-            lastFormattedResult = ResultFormatter.formatWithCommas(result);
+            ExpressionEvaluator.EvalResult evalRes = evaluator.evaluateQuietResult(input);
+            lastFormattedResult = ResultFormatter.formatResult(evalRes);
 
             // Mark as uncommitted (will be committed when user clears search)
             lastCompletedExpression = input;
-            lastCompletedResult = result;
+            lastCompletedResult = evalRes.value;
             hasUncommittedCalculation = true;
 
         } catch (ExpressionEvaluator.EvalException e) {
@@ -452,12 +466,33 @@ public class CalculatorManager {
         }
     }
 
+    public ExpressionEvaluator.EvalResult calculateResult(String input) throws ExpressionEvaluator.EvalException {
+        String cleanInput = ResultFormatter.cleanInput(input);
+        ExpressionEvaluator.EvalResult result = evaluator.evaluateResult(cleanInput);
+        addToCompletedHistory(cleanInput, result.value);
+        return result;
+    }
+
     public void setVariable(String name, String valueExpr) throws ExpressionEvaluator.EvalException {
         evaluator.setVariable(name, valueExpr);
+        BigDecimal val = evaluator.evaluateQuiet(valueExpr);
+        saveVariableToConfig(name, val);
     }
 
     public void setVariableDirect(String name, BigDecimal value) {
         evaluator.setVariable(name, value);
+        saveVariableToConfig(name, value);
+    }
+
+    private void saveVariableToConfig(String name, BigDecimal value) {
+        try {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+            if (config.customVariables == null) {
+                config.customVariables = new java.util.LinkedHashMap<>();
+            }
+            config.customVariables.put(name.toLowerCase(), value.toPlainString());
+            config.save();
+        } catch (Exception ignored) {}
     }
 
     public List<String> getHistory() {

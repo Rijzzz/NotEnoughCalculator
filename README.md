@@ -91,6 +91,8 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.818 or newer according to the Minecraft version you play on)
 - Minecraft (26.1 or newer)
 
+*Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1, 26.1.1, 26.1.2, 26.2, or newer.!*
+
 **Dependencies (Optional / Recommended):**
 - [ModMenu](https://modrinth.com/mod/modmenu) (18.0.0 or newer according to the Minecraft version you play on)
 

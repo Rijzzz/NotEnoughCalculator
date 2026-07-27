@@ -337,7 +337,7 @@ class ExpressionEvaluatorTest {
 
         @Test
         void unexpectedCharacter() {
-            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("5 & 3"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("5 @ 3"));
         }
     }
 
@@ -371,7 +371,7 @@ class ExpressionEvaluatorTest {
     class Constants {
         @Test void pi() throws Exception { assertCalcApprox("pi", 3.14159265, 0.0001); }
         @Test void piArithmetic() throws Exception { assertCalcApprox("2*pi", 6.28318530, 0.0001); }
-        @Test void piInFunction() throws Exception { assertCalcApprox("sin(180)", 0.0, 0.0001); }
+        @Test void piInFunction() throws Exception { assertCalcApprox("sin(pi * 90 / pi)", 1.0, 0.0001); }
         @Test void eulerStandalone() throws Exception { assertCalcApprox("e", 2.71828182, 0.0001); }
         @Test void eulerArithmetic() throws Exception { assertCalcApprox("e*2", 5.43656365, 0.001); }
         @Test void eulerInFunction() throws Exception { assertCalcApprox("ln(e)", 1.0, 0.001); }
@@ -449,5 +449,62 @@ class ExpressionEvaluatorTest {
         void invalidOctalDigit() {
             assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("0o78"));
         }
+    }
+
+    private void assertCalcResult(String expr, String expectedVal, ExpressionEvaluator.RadixMode expectedMode) throws ExpressionEvaluator.EvalException {
+        ExpressionEvaluator.EvalResult res = eval.evaluateResult(expr);
+        assertEquals(0, new BigDecimal(expectedVal).compareTo(res.value), expr + " value error");
+        assertEquals(expectedMode, res.radixMode, expr + " radix mode error");
+    }
+
+    @Nested
+    @DisplayName("Bitwise Operators")
+    class BitwiseOperators {
+        @Test void bitwiseAnd() throws Exception { assertCalc("0b1010 & 0b1100", "8"); }
+        @Test void bitwiseOr() throws Exception { assertCalc("0b1010 | 0b0101", "15"); }
+        @Test void bitwiseNot() throws Exception { assertCalc("~0", "-1"); }
+        @Test void bitwiseNotValue() throws Exception { assertCalc("~5", "-6"); }
+        @Test void bitwiseShiftLeft() throws Exception { assertCalc("1 << 4", "16"); }
+        @Test void bitwiseShiftRight() throws Exception { assertCalc("16 >> 2", "4"); }
+        @Test void bitwiseXorFunc() throws Exception { assertCalc("xor(0b1010, 0b1100)", "6"); }
+        @Test void bitwiseShiftWithHex() throws Exception { assertCalc("0x0F << 4", "240"); }
+        @Test void chainedBitwiseOr() throws Exception { assertCalc("1 | 2 | 4 | 8", "15"); }
+        @Test void chainedBitwiseAnd() throws Exception { assertCalc("15 & 7 & 3", "3"); }
+        @Test void bitwiseWithUnits() throws Exception { assertCalc("(1s) & 64", "64"); }
+    }
+
+    @Nested
+    @DisplayName("Base Conversions")
+    class BaseConversions {
+        @Test void hexFunc() throws Exception { assertCalcResult("hex(255)", "255", ExpressionEvaluator.RadixMode.HEX); }
+        @Test void binFunc() throws Exception { assertCalcResult("bin(10)", "10", ExpressionEvaluator.RadixMode.BIN); }
+        @Test void octFunc() throws Exception { assertCalcResult("oct(63)", "63", ExpressionEvaluator.RadixMode.OCT); }
+        @Test void hexExpression() throws Exception { assertCalcResult("hex(0b1010 + 0o10)", "18", ExpressionEvaluator.RadixMode.HEX); }
+        @Test void binExpression() throws Exception { assertCalcResult("bin(0xFF)", "255", ExpressionEvaluator.RadixMode.BIN); }
+        @Test void octExpression() throws Exception { assertCalcResult("oct(0b111111)", "63", ExpressionEvaluator.RadixMode.OCT); }
+        @Test void hexZero() throws Exception { assertCalcResult("hex(0)", "0", ExpressionEvaluator.RadixMode.HEX); }
+        @Test void binZero() throws Exception { assertCalcResult("bin(0)", "0", ExpressionEvaluator.RadixMode.BIN); }
+    }
+
+    @Nested
+    @DisplayName("Math Helper Functions")
+    class MathHelperFunctions {
+        @Test void avgTwo() throws Exception { assertCalc("avg(10, 20)", "15"); }
+        @Test void avgThree() throws Exception { assertCalc("avg(10, 20, 30)", "20"); }
+        @Test void avgFour() throws Exception { assertCalc("avg(100, 200, 300, 400)", "250"); }
+        @Test void avgDecimal() throws Exception { assertCalc("avg(1, 2)", "1.5"); }
+        @Test void pctRatio() throws Exception { assertCalc("pct(50, 200)", "25"); }
+        @Test void pctQuarter() throws Exception { assertCalc("pct(1, 4)", "25"); }
+        @Test void pctFull() throws Exception { assertCalc("pct(100, 100)", "100"); }
+        @Test void gcdBasic() throws Exception { assertCalc("gcd(12, 18)", "6"); }
+        @Test void gcdCoPrime() throws Exception { assertCalc("gcd(17, 13)", "1"); }
+        @Test void gcdSame() throws Exception { assertCalc("gcd(42, 42)", "42"); }
+        @Test void lcmBasic() throws Exception { assertCalc("lcm(12, 18)", "36"); }
+        @Test void lcmCoPrime() throws Exception { assertCalc("lcm(5, 7)", "35"); }
+        @Test void clampMiddle() throws Exception { assertCalc("clamp(5, 0, 10)", "5"); }
+        @Test void clampLower() throws Exception { assertCalc("clamp(-5, 0, 10)", "0"); }
+        @Test void clampUpper() throws Exception { assertCalc("clamp(15, 0, 10)", "10"); }
+        @Test void clampExactMin() throws Exception { assertCalc("clamp(0, 0, 10)", "0"); }
+        @Test void clampExactMax() throws Exception { assertCalc("clamp(10, 0, 10)", "10"); }
     }
 }

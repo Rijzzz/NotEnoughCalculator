@@ -67,4 +67,107 @@ class ResultFormatterTest {
         assertNotNull(formatted);
         assertTrue(formatted.startsWith("50,000,000"));
     }
+
+    @Test
+    @DisplayName("Format with Hex radix")
+    void formatHexRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("255"), ExpressionEvaluator.RadixMode.HEX);
+        assertEquals("0xFF", formatted);
+    }
+
+    @Test
+    @DisplayName("Format with Binary radix")
+    void formatBinRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("10"), ExpressionEvaluator.RadixMode.BIN);
+        assertEquals("0b1010", formatted);
+    }
+
+    @Test
+    @DisplayName("Format with Octal radix")
+    void formatOctRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("63"), ExpressionEvaluator.RadixMode.OCT);
+        assertEquals("0o77", formatted);
+    }
+
+    @Test
+    @DisplayName("Format negative number with Hex radix")
+    void formatNegativeHexRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-255"), ExpressionEvaluator.RadixMode.HEX);
+        assertEquals("-0xFF", formatted);
+    }
+
+    @Test
+    @DisplayName("Format negative number with commas")
+    void formatNegativeCommas() {
+        String formatted = ResultFormatter.formatWithCommas(new BigDecimal("-1000000"));
+        assertEquals("-1,000,000", formatted);
+    }
+
+    @Test
+    @DisplayName("Format decimal with commas")
+    void formatDecimalCommas() {
+        String formatted = ResultFormatter.formatWithCommas(new BigDecimal("1234567.89"));
+        assertEquals("1,234,567.89", formatted);
+    }
+
+    @Test
+    @DisplayName("Format zero with Hex radix")
+    void formatZeroHexRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.HEX);
+        assertEquals("0x0", formatted);
+    }
+
+    @Test
+    @DisplayName("Format zero with Binary radix")
+    void formatZeroBinRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.BIN);
+        assertEquals("0b0", formatted);
+    }
+
+    @Test
+    @DisplayName("Format zero with Octal radix")
+    void formatZeroOctRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.OCT);
+        assertEquals("0o0", formatted);
+    }
+
+    @Test
+    @DisplayName("Format large hex value")
+    void formatLargeHex() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("4294967295"), ExpressionEvaluator.RadixMode.HEX);
+        assertEquals("0xFFFFFFFF", formatted);
+    }
+
+    @Test
+    @DisplayName("Format negative binary radix")
+    void formatNegativeBinRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-10"), ExpressionEvaluator.RadixMode.BIN);
+        assertEquals("-0b1010", formatted);
+    }
+
+    @Test
+    @DisplayName("Format negative octal radix")
+    void formatNegativeOctRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-63"), ExpressionEvaluator.RadixMode.OCT);
+        assertEquals("-0o77", formatted);
+    }
+
+    @Test
+    @DisplayName("Format null value with commas returns 0")
+    void formatNullCommas() {
+        assertEquals("0", ResultFormatter.formatWithCommas(null));
+    }
+
+    @Test
+    @DisplayName("Format null value with radix returns 0")
+    void formatNullRadix() {
+        assertEquals("0", ResultFormatter.formatWithRadix(null, ExpressionEvaluator.RadixMode.HEX));
+    }
+
+    @Test
+    @DisplayName("Format result with null EvalResult returns 0")
+    void formatNullEvalResult() {
+        assertEquals("0", ResultFormatter.formatResult(null));
+        assertEquals("0", ResultFormatter.formatResultWithUnits(null));
+    }
 }

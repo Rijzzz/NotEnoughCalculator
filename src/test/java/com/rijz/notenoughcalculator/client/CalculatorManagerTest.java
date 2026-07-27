@@ -18,9 +18,13 @@
 
 package com.rijz.notenoughcalculator.client;
 
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,6 +73,20 @@ class CalculatorManagerTest {
         @Test void literalArithmetic() { assertTrue(CalculatorManager.looksLikeCalculation("0b10 + 0xA")); }
         @Test void literalParentheses() { assertTrue(CalculatorManager.looksLikeCalculation("(0xFA)")); }
         @Test void literalFactorial() { assertTrue(CalculatorManager.looksLikeCalculation("0b100!")); }
+        @Test void bitwiseAnd() { assertTrue(CalculatorManager.looksLikeCalculation("0b1010 & 0b1100")); }
+        @Test void bitwiseOr() { assertTrue(CalculatorManager.looksLikeCalculation("0b1010 | 0b0101")); }
+        @Test void bitwiseNot() { assertTrue(CalculatorManager.looksLikeCalculation("~0")); }
+        @Test void bitwiseShiftLeft() { assertTrue(CalculatorManager.looksLikeCalculation("1 << 4")); }
+        @Test void bitwiseShiftRight() { assertTrue(CalculatorManager.looksLikeCalculation("16 >> 2")); }
+        @Test void hexFunction() { assertTrue(CalculatorManager.looksLikeCalculation("hex(255)")); }
+        @Test void binFunction() { assertTrue(CalculatorManager.looksLikeCalculation("bin(10)")); }
+        @Test void octFunction() { assertTrue(CalculatorManager.looksLikeCalculation("oct(63)")); }
+        @Test void avgFunction() { assertTrue(CalculatorManager.looksLikeCalculation("avg(10, 20, 30)")); }
+        @Test void pctFunction() { assertTrue(CalculatorManager.looksLikeCalculation("pct(50, 200)")); }
+        @Test void gcdFunction() { assertTrue(CalculatorManager.looksLikeCalculation("gcd(12, 18)")); }
+        @Test void lcmFunction() { assertTrue(CalculatorManager.looksLikeCalculation("lcm(12, 18)")); }
+        @Test void clampFunction() { assertTrue(CalculatorManager.looksLikeCalculation("clamp(5, 0, 10)")); }
+        @Test void xorFunction() { assertTrue(CalculatorManager.looksLikeCalculation("xor(10, 12)")); }
     }
 
     @Nested
@@ -86,5 +104,72 @@ class CalculatorManagerTest {
         @Test void bow() { assertFalse(CalculatorManager.looksLikeCalculation("bow")); }
         @Test void coal() { assertFalse(CalculatorManager.looksLikeCalculation("coal")); }
         @Test void redstone() { assertFalse(CalculatorManager.looksLikeCalculation("redstone")); }
+        @Test void lapisLazuli() { assertFalse(CalculatorManager.looksLikeCalculation("lapis lazuli")); }
+        @Test void goldenApple() { assertFalse(CalculatorManager.looksLikeCalculation("golden apple")); }
+        @Test void cobblestone() { assertFalse(CalculatorManager.looksLikeCalculation("cobblestone")); }
+    }
+
+    @Nested
+    @DisplayName("CalculatorManager Instance Operations")
+    class InstanceOperations {
+        private CalculatorManager manager;
+
+        @org.junit.jupiter.api.BeforeEach
+        void setUp() {
+            manager = new CalculatorManager();
+        }
+
+        @Test
+        void calculateDirect() throws Exception {
+            BigDecimal res = manager.calculate("10 + 20");
+            assertEquals(0, new BigDecimal("30").compareTo(res));
+        }
+
+        @Test
+        void calculateResultWithRadix() throws Exception {
+            ExpressionEvaluator.EvalResult res = manager.calculateResult("hex(255)");
+            assertEquals(0, new BigDecimal("255").compareTo(res.value));
+            assertEquals(ExpressionEvaluator.RadixMode.HEX, res.radixMode);
+        }
+
+        @Test
+        void setVariableAndUse() throws Exception {
+            manager.setVariableDirect("tax", new BigDecimal("0.10"));
+            BigDecimal res = manager.calculate("100 * $tax");
+            assertEquals(0, new BigDecimal("10").compareTo(res));
+        }
+
+        @Test
+        void historyTracking() throws Exception {
+            manager.calculate("5 + 5");
+            manager.calculate("10 * 10");
+            List<String> hist = manager.getHistory();
+            assertFalse(hist.isEmpty());
+            assertTrue(hist.stream().anyMatch(e -> e.contains("5 + 5 = 10")));
+        }
+
+        @Test
+        void clearHistoryWipesData() throws Exception {
+            manager.calculate("5 + 5");
+            manager.clearHistory();
+            assertTrue(manager.getHistory().isEmpty());
+            assertNull(manager.getLastFormattedResult());
+        }
+
+        @Test
+        void resetSessionWipesData() throws Exception {
+            manager.calculate("100 + 100");
+            manager.reset();
+            assertTrue(manager.getHistory().isEmpty());
+            assertNull(manager.getLastFormattedResult());
+        }
+
+        @Test
+        void formatSearchBarLiveEvaluation() {
+            String clean = manager.formatSearchBar("10 + 20");
+            assertEquals("10 + 20", clean);
+            assertTrue(manager.hasResult());
+            assertEquals("30", manager.getLastFormattedResult());
+        }
     }
 }

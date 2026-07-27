@@ -32,12 +32,14 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 - Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
+- Bitwise operators: `&` (AND), `|` (OR), `~` (NOT), `<<` (Left Shift), `>>` (Right Shift), `xor(a, b)`
 - Factorial: `5!` = 120, `10!` = 3,628,800
 - Number Literals: Binary (`0b1010` = 10), Hexadecimal (`0xFF` = 255), Octal (`0o77` = 63)
+- Base Conversions: `hex(255)` = `0xFF`, `bin(10)` = `0b1010`, `oct(63)` = `0o77`
 - Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
 - Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
 - Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `min(a,b)`, `max(a,b)`
+- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`
 
 </details>
 
@@ -51,24 +53,25 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 </details>
 
 <details>
-<summary><strong>Variables</strong></summary>
+<summary><strong>Variables (Persistent)</strong></summary>
 
 - `ans` – Automatically stores last calculation result
 - `pi` – Pi constant (3.14159265...)
 - `e` – Euler's number (2.71828182...) when standalone; enchanted unit (160) after a number
-- Custom variables with `/calcset` command
+- Custom variables with `/calcset <name> <value>` (saved automatically to config & persist across restarts)
 - Chain calculations easily with `ans`
 
 </details>
 
 <details>
-<summary><strong>History & Shortcuts</strong></summary>
+<summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
 - Press `Ctrl+Z` in REI search to recall previous calculations (undo)
 - Press `Ctrl+Y` to redo/go forward in history
 - Press `Ctrl+C` in REI search to copy calculation result to clipboard
+- Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
 - View full history with `/calchist` (shows last 15 entries)
-- Session-based: History clears automatically when you leave a world/server
+- Session-based: REI search history clears automatically when you leave a world/server
 
 </details>
 
@@ -84,11 +87,12 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 ---
 
 **Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api) (>=0.152.1)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (>=26.2.820)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (0.144.0 or newer)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.818 or newer according to the Minecraft version you play on)
+- Minecraft (26.1 or newer)
 
 **Dependencies (Optional / Recommended):**
-- [ModMenu](https://modrinth.com/mod/modmenu) (>=20.0.0)
+- [ModMenu](https://modrinth.com/mod/modmenu) (18.0.0 or newer according to the Minecraft version you play on)
 
 ---
 
@@ -154,13 +158,12 @@ dc / 333 = 10.38                  (hours to fill double chest)
 50m * 30 = 1,500,000,000          (bulk buying)
 ```
 
-### Advanced Math
+### Advanced Math & Functions
 ```
 sqrt(144) = 12                    (square root)
 2^10 = 1,024                      (exponents)
 100 % 7 = 2                       (modulo)
 5! = 120                          (factorial)
-10! = 3,628,800                   (large factorial)
 abs(-50) = 50                     (absolute value)
 floor(3.9) = 3                    (round down)
 ceil(3.1) = 4                     (round up)
@@ -174,10 +177,40 @@ min(10, 5) = 5                    (minimum)
 max(10, 5) = 10                   (maximum)
 pi * 2 = 6.283...                 (using pi constant)
 e^2 = 7.389...                    (using Euler's number)
-0b1010 = 10                       (binary literal)
-0xFF = 255                        (hexadecimal literal)
-0o77 = 63                         (octal literal)
+```
+
+### Base Conversions
+```
+hex(255) = 0xFF                   (decimal to hexadecimal wrapper)
+bin(10) = 0b1010                  (decimal to binary wrapper)
+oct(63) = 0o77                    (decimal to octal wrapper)
+hex(0b1010 + 0o10) = 0x12         (expression base conversion)
+0b1010 = 10                       (binary literal input)
+0xFF = 255                        (hexadecimal literal input)
+0o77 = 63                         (octal literal input)
 0b10 + 0xA = 12                   (arithmetic with literals)
+```
+
+### Bitwise Operators & Functions
+```
+0b1010 & 0b1100 = 8               (bitwise AND)
+0b1010 | 0b0101 = 15              (bitwise OR)
+~0 = -1                           (bitwise NOT)
+~5 = -6                           (bitwise NOT value)
+1 << 4 = 16                       (bitwise left shift)
+16 >> 2 = 4                       (bitwise right shift)
+0x0F << 4 = 240                   (hex bitwise left shift)
+xor(0b1010, 0b1100) = 6           (bitwise XOR function)
+```
+
+### Math Helpers
+```
+avg(10, 20, 30) = 20              (variadic average)
+pct(50, 200) = 25                 (ratio percentage: 50 is 25% of 200)
+gcd(12, 18) = 6                   (greatest common divisor)
+lcm(12, 18) = 36                  (least common multiple)
+clamp(15, 0, 10) = 10             (clamp value to maximum bound)
+clamp(-5, 0, 10) = 0              (clamp value to minimum bound)
 ```
 
 ### Compound Calculations
@@ -279,8 +312,8 @@ ans + 100 = 400                   (chain calculations)
 
 ### Help Commands
 - `/calchelp` - Show main help menu
-- `/calchelp operators` - Learn about +, -, *, x, /, ^, %
-- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, !
+- `/calchelp operators` - Learn about +, -, *, x, /, ^, %, !, &, |, ~, <<, >>, literals (0b, 0x, 0o)
+- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, hex, bin, oct, pct, gcd, lcm, clamp, avg, xor
 - `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
 - `/calchelp variables` - Learn about ans and custom variables
 - `/calchelp examples` - See practical examples

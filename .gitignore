@@ -33,3 +33,7 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+CURSEFORGE_DESCRIPTION.md
+MODRINTH_DESCRIPTION.md
+.gitignore

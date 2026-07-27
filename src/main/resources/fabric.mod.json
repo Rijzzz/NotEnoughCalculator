@@ -41,13 +41,13 @@
     }
   ],
   "depends": {
-    "fabricloader": ">=0.19.3",
-    "fabric-api": ">=0.152.1",
-    "minecraft": ">=26.2",
-    "roughlyenoughitems": ">=26.2.820"
+    "fabricloader": ">=0.144.0",
+    "fabric-api": ">=0.144.0",
+    "minecraft": ">=26.1",
+    "roughlyenoughitems": ">=26.1.818"
   },
   "suggests": {
-    "modmenu": ">=20.0.0"
+    "modmenu": ">=18.0.0"
   },
   "custom": {
     "modmenu": {

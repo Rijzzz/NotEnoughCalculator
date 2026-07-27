@@ -77,6 +77,49 @@ public class ResultFormatter {
         return sign + sb.toString() + fracPart;
     }
 
+    // Format result considering radix mode (hex, bin, oct) or decimal commas
+    public static String formatResult(ExpressionEvaluator.EvalResult evalResult) {
+        if (evalResult == null) return "0";
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithRadix(evalResult.value, evalResult.radixMode);
+        }
+        return formatWithCommas(evalResult.value);
+    }
+
+    // Convert value to base 16 (0xFF), base 2 (0b1010), or base 8 (0o77)
+    public static String formatWithRadix(BigDecimal value, ExpressionEvaluator.RadixMode radixMode) {
+        if (value == null) return "0";
+        if (radixMode == null || radixMode == ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithCommas(value);
+        }
+        try {
+            java.math.BigInteger bi = value.toBigInteger();
+            return switch (radixMode) {
+                case HEX -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0x" + bi.abs().toString(16).toUpperCase()
+                        : "0x" + bi.toString(16).toUpperCase();
+                case BIN -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0b" + bi.abs().toString(2)
+                        : "0b" + bi.toString(2);
+                case OCT -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0o" + bi.abs().toString(8)
+                        : "0o" + bi.toString(8);
+                default -> formatWithCommas(value);
+            };
+        } catch (Exception e) {
+            return formatWithCommas(value);
+        }
+    }
+
+    // Format with units OR radix representation
+    public static String formatResultWithUnits(ExpressionEvaluator.EvalResult evalResult) {
+        if (evalResult == null) return "0";
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithRadix(evalResult.value, evalResult.radixMode);
+        }
+        return formatWithUnits(evalResult.value);
+    }
+
     // Format with commas AND unit suggestions (used for chat commands)
     // Example: "50,000,000 (50m)"
     public static String formatWithUnits(BigDecimal value) {

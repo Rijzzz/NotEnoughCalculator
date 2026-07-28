@@ -19,35 +19,105 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
+import java.math.RoundingMode;
 
 // Makes numbers look nice with commas and unit suggestions
 // Example: 1000000 -> "1,000,000 (1m)"
 public class ResultFormatter {
 
-    private static final DecimalFormat COMMA_FORMAT;
-
-    static {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
-        symbols.setGroupingSeparator(',');
-        COMMA_FORMAT = new DecimalFormat("#,##0.##########", symbols);
-        COMMA_FORMAT.setMaximumFractionDigits(10);
-    }
-
     // Helper method for translations
     private static String tr(String key, Object... args) {
-        return I18n.translate(key, args);
+        return I18n.get(key, args);
     }
 
     // Format with commas only (used for inline display in REI)
-    // This matches how NEU calculator shows results
+    // Uses pure String manipulation to preserve 100% arbitrary precision without double-casting loss
     public static String formatWithCommas(BigDecimal value) {
-        return COMMA_FORMAT.format(value.stripTrailingZeros());
+        if (value == null) return "0";
+        CalculatorConfig config = CalculatorConfig.getInstance();
+
+        BigDecimal stripped = value.stripTrailingZeros();
+        String plain = stripped.toPlainString();
+
+        if (!config.enableCommaFormatting) {
+            return plain;
+        }
+
+        return insertCommas(plain);
+    }
+
+    // Pure string comma inserter preserving unlimited digits
+    public static String insertCommas(String numberStr) {
+        if (numberStr == null || numberStr.isEmpty()) return "";
+
+        int dotIdx = numberStr.indexOf('.');
+        String intPart = dotIdx >= 0 ? numberStr.substring(0, dotIdx) : numberStr;
+        String fracPart = dotIdx >= 0 ? numberStr.substring(dotIdx) : "";
+
+        // Handle leading sign (- or +)
+        String sign = "";
+        if (intPart.startsWith("-") || intPart.startsWith("+")) {
+            sign = intPart.substring(0, 1);
+            intPart = intPart.substring(1);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int len = intPart.length();
+
+        for (int i = 0; i < len; i++) {
+            if (i > 0 && (len - i) % 3 == 0) {
+                sb.append(',');
+            }
+            sb.append(intPart.charAt(i));
+        }
+
+        return sign + sb.toString() + fracPart;
+    }
+
+    // Format result considering radix mode (hex, bin, oct) or decimal commas
+    public static String formatResult(ExpressionEvaluator.EvalResult evalResult) {
+        if (evalResult == null) return "0";
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithRadix(evalResult.value, evalResult.radixMode);
+        }
+        return formatWithCommas(evalResult.value);
+    }
+
+    // Convert value to base 16 (0xFF), base 2 (0b1010), or base 8 (0o77)
+    public static String formatWithRadix(BigDecimal value, ExpressionEvaluator.RadixMode radixMode) {
+        if (value == null) return "0";
+        if (radixMode == null || radixMode == ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithCommas(value);
+        }
+        try {
+            java.math.BigInteger bi = value.toBigInteger();
+            return switch (radixMode) {
+                case HEX -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0x" + bi.abs().toString(16).toUpperCase()
+                        : "0x" + bi.toString(16).toUpperCase();
+                case BIN -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0b" + bi.abs().toString(2)
+                        : "0b" + bi.toString(2);
+                case OCT -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                        ? "-0o" + bi.abs().toString(8)
+                        : "0o" + bi.toString(8);
+                default -> formatWithCommas(value);
+            };
+        } catch (Exception e) {
+            return formatWithCommas(value);
+        }
+    }
+
+    // Format with units OR radix representation
+    public static String formatResultWithUnits(ExpressionEvaluator.EvalResult evalResult) {
+        if (evalResult == null) return "0";
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+            return formatWithRadix(evalResult.value, evalResult.radixMode);
+        }
+        return formatWithUnits(evalResult.value);
     }
 
     // Format with commas AND unit suggestions (used for chat commands)
@@ -86,28 +156,28 @@ public class ResultFormatter {
 
         // Suggest currency units for large numbers
         if (abs.compareTo(new BigDecimal("1000000000000")) >= 0) {
-            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 2, RoundingMode.HALF_UP);
             if (t.stripTrailingZeros().scale() <= 2) {
                 return t.stripTrailingZeros().toPlainString() + "t";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000000000")) >= 0) {
-            BigDecimal b = value.divide(new BigDecimal("1000000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal b = value.divide(new BigDecimal("1000000000"), 2, RoundingMode.HALF_UP);
             if (b.stripTrailingZeros().scale() <= 2) {
                 return b.stripTrailingZeros().toPlainString() + "b";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000000")) >= 0) {
-            BigDecimal m = value.divide(new BigDecimal("1000000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal m = value.divide(new BigDecimal("1000000"), 2, RoundingMode.HALF_UP);
             if (m.stripTrailingZeros().scale() <= 2) {
                 return m.stripTrailingZeros().toPlainString() + "m";
             }
         }
 
         if (abs.compareTo(new BigDecimal("1000")) >= 0) {
-            BigDecimal k = value.divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal k = value.divide(new BigDecimal("1000"), 2, RoundingMode.HALF_UP);
             if (k.stripTrailingZeros().scale() <= 2) {
                 return k.stripTrailingZeros().toPlainString() + "k";
             }
@@ -115,7 +185,7 @@ public class ResultFormatter {
 
         // Suggest stacks for smaller numbers that are multiples of 64
         if (abs.compareTo(new BigDecimal("64")) >= 0 && abs.compareTo(new BigDecimal("10000")) < 0) {
-            BigDecimal stacks = value.divide(new BigDecimal("64"), 10, BigDecimal.ROUND_HALF_UP);
+            BigDecimal stacks = value.divide(new BigDecimal("64"), 10, RoundingMode.HALF_UP);
             if (stacks.stripTrailingZeros().scale() <= 0) {
                 long stackCount = stacks.longValue();
                 if (stackCount == 1) {

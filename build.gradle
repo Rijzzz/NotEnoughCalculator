@@ -1,9 +1,9 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom-remap' version '1.17-SNAPSHOT'
     id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.mod_version}"
 group = project.maven_group
 
 base {
@@ -13,12 +13,18 @@ base {
 repositories {
     maven { url = "https://maven.fabricmc.net/" }
     maven { url = "https://maven.shedaniel.me" }
+    maven {
+        url "https://api.modrinth.com/maven"
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
     gradlePluginPortal()
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API
@@ -29,6 +35,16 @@ dependencies {
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
+
+    // REI transitive math dependency
+    modCompileOnly "me.shedaniel.cloth:basic-math:0.6.1"
+
+    // ModMenu (optional - config screen button in mod list)
+    modCompileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
+
+    // Unit tests
+    testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 processResources {
@@ -58,8 +74,12 @@ java {
     withSourcesJar()
 }
 
+test {
+    useJUnitPlatform()
+}
+
 jar {
-    from("LICENSE") {
+    from("LICENSE.txt") {
         rename { "${it}_${project.archives_base_name}" }
     }
 }

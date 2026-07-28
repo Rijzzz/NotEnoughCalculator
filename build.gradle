@@ -27,7 +27,7 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API
-    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
 
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
@@ -39,7 +39,8 @@ dependencies {
     compileOnly "me.shedaniel.cloth:basic-math:0.6.1"
 
     // ModMenu (optional - config screen button in mod list)
-    compileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
+    compileOnly  "maven.modrinth:modmenu:${project.modmenu_version}"
+    localRuntime "maven.modrinth:modmenu:${project.modmenu_version}"
 
     // Unit tests
     testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
@@ -54,10 +55,13 @@ processResources {
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
+        expand  "version": project.version,
                 "loader_version": project.loader_version,
-                "rei_version": project.rei_version
+                "rei_version": project.rei_version,
+                "fabric_version": project.fabric_version,
+                "modmenu_version": project.modmenu_version,
+                "min_minecraft_version": project.min_minecraft_version,
+                "max_minecraft_version": project.max_minecraft_version
     }
 }
 

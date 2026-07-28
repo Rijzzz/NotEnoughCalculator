@@ -24,9 +24,11 @@ import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
+import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -35,38 +37,47 @@ import java.util.List;
  */
 public class CalcCommands {
 
-    // Hardcoded: show max 10 history entries at once
+    // Hardcoded: show max 15 history entries at once
     private static final int MAX_HISTORY_DISPLAY = 15;
 
-    private static Text t(String key, Object... args) {
-        return Text.translatable(key, args);
+    private static Component t(String key, Object... args) {
+        return Component.translatable(key, args);
     }
 
     private static void send(CommandContext<FabricClientCommandSource> ctx, String key, Object... args) {
-        ctx.getSource().getPlayer().sendMessage(t(key, args), false);
+        ctx.getSource().getPlayer().displayClientMessage(t(key, args), false);
     }
 
     private static void sendLiteral(CommandContext<FabricClientCommandSource> ctx, String text) {
-        ctx.getSource().getPlayer().sendMessage(Text.literal(text), false);
+        ctx.getSource().getPlayer().displayClientMessage(Component.literal(text), false);
     }
 
     private static void sendEmpty(CommandContext<FabricClientCommandSource> ctx) {
-        ctx.getSource().getPlayer().sendMessage(Text.literal(""), false);
+        ctx.getSource().getPlayer().displayClientMessage(Component.literal(""), false);
     }
 
     public static int executeCalc(CommandContext<FabricClientCommandSource> ctx) {
         CalculatorConfig config = CalculatorConfig.getInstance();
         String expr = StringArgumentType.getString(ctx, "expression");
 
+        String prefix = t("notenoughcalculator.result.prefix").getString();
         try {
-            BigDecimal result = NotEnoughCalculatorClient.getCalculatorManager().calculate(expr);
-            String formatted = ResultFormatter.formatWithUnits(result);
+            ExpressionEvaluator.EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
+            String formatted = ResultFormatter.formatResultWithUnits(evalRes);
+            String cleanResult = evalRes.value.toPlainString();
 
-            sendLiteral(ctx, config.getOperatorColorCode() + expr + " " +
+            net.minecraft.network.chat.MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
                     t("notenoughcalculator.result.equals").getString() +
-                    config.getResultColorCode() + formatted);
+                    config.getChatResultColorCode() + formatted);
+
+            Component tooltip = t("notenoughcalculator.chat.click_to_copy_tooltip");
+            msg.setStyle(msg.getStyle()
+                    .withClickEvent(new net.minecraft.network.chat.ClickEvent.CopyToClipboard(cleanResult))
+                    .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(tooltip)));
+
+            ctx.getSource().getPlayer().displayClientMessage(msg, false);
         } catch (ExpressionEvaluator.EvalException e) {
-            sendLiteral(ctx, config.getErrorColorCode() +
+            sendLiteral(ctx, prefix + config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
         }
 
@@ -82,7 +93,7 @@ public class CalcCommands {
             send(ctx, "notenoughcalculator.history.title");
             sendEmpty(ctx);
 
-            // Show last 10 entries max (hardcoded)
+            // Show last 15 entries max (hardcoded)
             int maxDisplay = Math.min(MAX_HISTORY_DISPLAY, history.size());
             for (int i = Math.max(0, history.size() - maxDisplay); i < history.size(); i++) {
                 sendLiteral(ctx, "§7" + (i + 1) + ". §f" + history.get(i));
@@ -112,13 +123,13 @@ public class CalcCommands {
         String valueExpr = StringArgumentType.getString(ctx, "value");
 
         try {
-            NotEnoughCalculatorClient.getCalculatorManager().setVariable(varName, valueExpr);
             BigDecimal result = NotEnoughCalculatorClient.getCalculatorManager().calculate(valueExpr);
+            NotEnoughCalculatorClient.getCalculatorManager().setVariableDirect(varName, result);
             String formatted = ResultFormatter.formatWithUnits(result);
 
             send(ctx, "notenoughcalculator.variable.set", varName,
                     t("notenoughcalculator.result.equals").getString(),
-                    config.getResultColorCode() + formatted);
+                    config.getChatResultColorCode() + formatted);
         } catch (ExpressionEvaluator.EvalException e) {
             sendLiteral(ctx, config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
@@ -178,25 +189,26 @@ public class CalcCommands {
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.commands");
-        sendLiteral(ctx, "§e/calc <expression> §7- " + t("notenoughcalculator.command.calc.description").getString());
-        sendLiteral(ctx, "§e/calchist §7- " + t("notenoughcalculator.command.calchist.description").getString());
-        sendLiteral(ctx, "§e/calcclear §7- " + t("notenoughcalculator.command.calcclear.description").getString());
-        sendLiteral(ctx, "§e/calcset <var> <value> §7- " + t("notenoughcalculator.command.calcset.description").getString());
-        sendLiteral(ctx, "§e/calcconfig §7- " + t("notenoughcalculator.command.calcconfig.description").getString());
+        send(ctx, "notenoughcalculator.help.main.cmd_calc");
+        send(ctx, "notenoughcalculator.help.main.cmd_calchist");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcclear");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcset");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcconfig");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.help_pages");
-        sendLiteral(ctx, "§e/calchelp operators §7- Learn about +, -, *, /, ^, %");
-        sendLiteral(ctx, "§e/calchelp functions §7- Learn about sqrt, abs, floor, etc.");
-        sendLiteral(ctx, "§e/calchelp units §7- Learn Skyblock units (k, m, b, s, e, h)");
-        sendLiteral(ctx, "§e/calchelp variables §7- Learn about ans, $custom variables");
-        sendLiteral(ctx, "§e/calchelp examples §7- See practical examples");
-        sendLiteral(ctx, "§e/calchelp config §7- Learn about configuration");
+        send(ctx, "notenoughcalculator.help.main.page_operators");
+        send(ctx, "notenoughcalculator.help.main.page_functions");
+        send(ctx, "notenoughcalculator.help.main.page_units");
+        send(ctx, "notenoughcalculator.help.main.page_variables");
+        send(ctx, "notenoughcalculator.help.main.page_examples");
+        send(ctx, "notenoughcalculator.help.main.page_config");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_1");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_2");
+        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_3");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.footer");
@@ -213,6 +225,13 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.operators.divide");
         send(ctx, "notenoughcalculator.help.operators.power");
         send(ctx, "notenoughcalculator.help.operators.modulo");
+        send(ctx, "notenoughcalculator.help.operators.factorial");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.operators.literals");
+        send(ctx, "notenoughcalculator.help.operators.binary");
+        send(ctx, "notenoughcalculator.help.operators.hex");
+        send(ctx, "notenoughcalculator.help.operators.octal");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.operators.parentheses");
@@ -263,8 +282,43 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.functions.round_example_2");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.functions.log");
+        send(ctx, "notenoughcalculator.help.functions.log_example_1");
+        send(ctx, "notenoughcalculator.help.functions.log_example_2");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.ln");
+        send(ctx, "notenoughcalculator.help.functions.ln_example_1");
+        send(ctx, "notenoughcalculator.help.functions.ln_example_2");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.sin");
+        send(ctx, "notenoughcalculator.help.functions.sin_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.cos");
+        send(ctx, "notenoughcalculator.help.functions.cos_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.tan");
+        send(ctx, "notenoughcalculator.help.functions.tan_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.min");
+        send(ctx, "notenoughcalculator.help.functions.min_example_1");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.max");
+        send(ctx, "notenoughcalculator.help.functions.max_example_1");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.functions.combining");
         send(ctx, "notenoughcalculator.help.functions.combining_example");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.factorial");
+        send(ctx, "notenoughcalculator.help.functions.factorial_example_1");
+        send(ctx, "notenoughcalculator.help.functions.factorial_example_2");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.back");
@@ -315,6 +369,8 @@ public class CalcCommands {
 
         send(ctx, "notenoughcalculator.help.variables.builtin");
         send(ctx, "notenoughcalculator.help.variables.builtin_ans");
+        send(ctx, "notenoughcalculator.help.variables.builtin_pi");
+        send(ctx, "notenoughcalculator.help.variables.builtin_e");
         send(ctx, "notenoughcalculator.help.variables.builtin_example_1");
         send(ctx, "notenoughcalculator.help.variables.builtin_example_2");
         sendEmpty(ctx);
@@ -423,40 +479,11 @@ public class CalcCommands {
     }
 
     public static int executeConfig(CommandContext<FabricClientCommandSource> ctx) {
-        CalculatorConfig config = CalculatorConfig.getInstance();
-
-        send(ctx, "notenoughcalculator.config.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.display_settings");
-        send(ctx, "notenoughcalculator.config.inline_results",
-                config.showInlineResults ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        send(ctx, "notenoughcalculator.config.unit_suggestions",
-                config.showUnitSuggestions ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        send(ctx, "notenoughcalculator.config.comma_formatting",
-                config.enableCommaFormatting ?
-                        t("notenoughcalculator.config.yes").getString() :
-                        t("notenoughcalculator.config.no").getString());
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.calculation_settings");
-        send(ctx, "notenoughcalculator.config.decimal_precision", config.decimalPrecision);
-        // Removed max_history line since it's now hardcoded at 15
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.features");
-        send(ctx, "notenoughcalculator.config.history_navigation",
-                config.enableHistoryNavigation ?
-                        t("notenoughcalculator.config.enabled").getString() :
-                        t("notenoughcalculator.config.disabled").getString());
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.config.edit_file");
-
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> {
+            Screen currentScreen = NotEnoughCalculatorClient.getCurrentScreen(client);
+            CalculatorConfigScreen.openScreen(client, new CalculatorConfigScreen(currentScreen));
+        });
         return 1;
     }
 }

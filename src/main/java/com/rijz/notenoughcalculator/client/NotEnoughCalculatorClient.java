@@ -261,7 +261,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         } catch (Exception ignored) {}
     }
 
-    // Safely enable scissor clipping on GuiGraphics / GuiGraphics
+    // Safely enable scissor clipping on GuiGraphics
     private static void enableScissor(GuiGraphics context, int minX, int minY, int maxX, int maxY) {
         try {
             if (!scissorReflectionInitialized) {
@@ -565,7 +565,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     }
                 }
 
-                // Handle Ctrl+Z / Cmd+Z and Ctrl+Y / Cmd+Y (these don't need to be canceled)
+                // Handle Ctrl+Z / Cmd+Z and Ctrl+Y / Cmd+Y (these don't need to be cancelled)
                 boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
                 if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlOrCmd) {
                     calcManager.handleKeyPress(key, modifiers);
@@ -635,7 +635,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                 && CalculatorConfig.getInstance().showInlineResults;
     }
 
-    // This method is not required before 26.2, but it's here in 1.21 for parity between the codebases
+    // This method is not needed before 26.2, but it's here in 1.21 for parity between the branches
     public static Screen getCurrentScreen(Minecraft mc) {
         return mc.screen;
     }

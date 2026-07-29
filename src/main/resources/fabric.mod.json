@@ -40,14 +40,14 @@
       "environment": "client"
     }
   ],
-  "depends": {
-    "fabricloader": ">=0.19.3",
-    "fabric-api": ">=0.144.0",
-    "minecraft": ">=26.1 <=26.2",
-    "roughlyenoughitems": ">=26.1.818"
+"depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": ">=${min_fabric_api_version}",
+    "minecraft": ">=${min_minecraft_version} <=${max_minecraft_version}",
+    "roughlyenoughitems": ">=${min_rei_version}"
   },
   "suggests": {
-    "modmenu": ">=18.0.0"
+    "modmenu": ">=${min_modmenu_version}"
   },
   "custom": {
     "modmenu": {

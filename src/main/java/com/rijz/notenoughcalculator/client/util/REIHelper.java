@@ -38,7 +38,7 @@ public class REIHelper {
     private static void init() {
         if (initialized) return;
         initialized = true;
-        LOGGER.info("REIHelper initialized - will use runtime reflection");
+        LOGGER.info("REIHelper reflection cache initialized");
     }
 
     // Get the position and size of REI's search field using reflection.
@@ -53,12 +53,12 @@ public class REIHelper {
         try {
             Class<?> implClass = searchField.getClass();
 
-            // Try calling a getBounds method first (cleanest approach)
+            // Try getBounds() method first
             if (getBoundsMethod == null) {
                 try {
                     getBoundsMethod = implClass.getMethod("getBounds");
                     getBoundsMethod.setAccessible(true);
-                    LOGGER.debug("Found getBounds method in {}", implClass.getSimpleName());
+                    LOGGER.debug("Found getBounds in {}", implClass.getSimpleName());
                 } catch (NoSuchMethodException ignored) {}
             }
 
@@ -66,11 +66,11 @@ public class REIHelper {
                 try {
                     return (Rectangle) getBoundsMethod.invoke(searchField);
                 } catch (Exception e) {
-                    LOGGER.debug("getBounds method failed: {}", e.getMessage());
+                    LOGGER.debug("getBounds invoke failed: {}", e.getMessage());
                 }
             }
 
-            // Fallback: try to access a bounds field directly
+            // Fall back to field reflection
             if (boundsField == null) {
                 boundsField = findBoundsField(implClass);
                 if (boundsField != null) {
@@ -87,7 +87,7 @@ public class REIHelper {
             }
 
         } catch (Exception e) {
-            LOGGER.debug("Failed to get bounds via reflection: {}", e.getMessage());
+            LOGGER.debug("Reflection bounds fetch failed: {}", e.getMessage());
         }
 
         return null;

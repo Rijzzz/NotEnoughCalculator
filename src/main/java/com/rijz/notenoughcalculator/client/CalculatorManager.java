@@ -31,92 +31,92 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * Manages calculator state and handles live calculation display in REI search bar.
- *
- * Responsibilities:
- * - Real-time expression evaluation as user types
- * - Equation-level history for Ctrl+Z/Y navigation (whole equations, not keystrokes)
- * - Completed calculation history for /calchist command
- * - Detecting whether input is a calculation vs item search
- */
+// Manages live calculation tracking in the REI search bar.
+// Keeps track of history for both the /calchist display and Ctrl+Z/Y search box undo/redo.
 public class CalculatorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorManager.class);
 
-    // Hardcoded limit: store max 15 equations
+    // Hard limit: store up to 15 calculations
     private static final int MAX_EQUATIONS = 15;
 
     private final ExpressionEvaluator evaluator;
     private String lastSearchInput = "";
     private String lastFormattedResult = null;
-    private String lastErrorMessage = null;
 
-    // Two separate history systems:
-    // - reiSearchHistory: completed equations for Ctrl+Z/Y (e.g., "100+50", "200*3")
-    // - completedHistory: finished calculations for /calchist display
+    // Separate history tracking:
+    // - reiSearchHistory: full expressions for Ctrl+Z/Y search bar undo/redo
+    // - completedHistory: fully evaluated results for /calchist command
     private final List<String> reiSearchHistory = new ArrayList<>();
     private final List<String> completedHistory = new ArrayList<>();
-    private int reiHistoryIndex = -1;  // -1 means not navigating history
-    private String savedCurrentInput = "";  // What user was typing before first Ctrl+Z
+    private int reiHistoryIndex = -1;  // -1 means active typing
+    private String savedCurrentInput = ""; // Stores text field content before history traversal
 
-    // Track the current equation being typed (to know when to save it)
     private String currentEquation = "";
 
-    // Track uncommitted calculations (shown in real-time but not saved yet)
+    // Uncommitted calculations (rendered on screen but not permanently saved yet)
     private String lastCompletedExpression = null;
     private BigDecimal lastCompletedResult = null;
     private boolean hasUncommittedCalculation = false;
 
-    private boolean sessionResetNotified = false;
 
-    // Precompiled regex patterns (compiled once for performance)
-    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*[+\\-*/^%xX].*");
+    // Precompiled patterns to avoid GC pressure on every keystroke
+    private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor|bz|ah|ahbin|fmt|rad|deg)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
+    // Binary (0b), Hex (0x), or Octal (0o) number literal prefix
+    private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
-    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*[+\\-*/^%xX]\\s*$");
+    private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*(?:[+\\-*/^%xX&|~]|<<|>>)\\s*$");
     private static final Pattern MINECRAFT_ITEM = Pattern.compile("(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
 
     public CalculatorManager() {
         this.evaluator = new ExpressionEvaluator();
+        loadPersistentVariables();
     }
 
-    /**
-     * Heuristic check: is this a calculation or an item search?
-     *
-     * Tricky cases:
-     * - "64" could be just a number OR a stack
-     * - "diamond" is an item, not a calculation
-     * - "diamond*2" is a calculation (even though it has "diamond" in it)
-     */
-    public boolean looksLikeCalculation(String input) {
+    private void loadPersistentVariables() {
+        try {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+            if (config.customVariables != null) {
+                for (var entry : config.customVariables.entrySet()) {
+                    try {
+                        evaluator.setVariable(entry.getKey(), new BigDecimal(entry.getValue()));
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Heuristics to determine if the query is a math equation or a standard item search
+    public static boolean looksLikeCalculation(String input) {
         if (input == null || input.trim().isEmpty()) {
             return false;
         }
 
         String trimmed = input.trim();
 
-        // Plain number with no operators? Probably searching for items
+        // Single number (e.g. "64") is usually an item count search, not math
         if (NUMBER_ONLY.matcher(trimmed).matches()) {
             return false;
         }
 
-        // Item name without operators? Definitely a search
+        // Search contains item keyword with no operators (e.g. "diamond sword")
         if (MINECRAFT_ITEM.matcher(trimmed).matches() && !OPERATOR_PATTERN.matcher(trimmed).matches()) {
             return false;
         }
 
-        // Now check for calculation indicators
+        // Check features indicating a calculation
         if (OPERATOR_PATTERN.matcher(trimmed).matches()) return true;
         if (PAREN_PATTERN.matcher(trimmed).matches()) return true;
         if (FUNCTION_PATTERN.matcher(trimmed).matches()) return true;
         if (VARIABLE_PATTERN.matcher(trimmed).matches()) return true;
         if (UNIT_PATTERN.matcher(trimmed).matches()) return true;
         if (STORAGE_UNIT_PATTERN.matcher(trimmed).matches()) return true;
+        if (LOOSE_LITERAL_PATTERN.matcher(trimmed).matches()) return true;
 
         return false;
     }
@@ -152,7 +152,7 @@ public class CalculatorManager {
         if (parenCount != 0) return false;  // Unmatched parens
 
         // Can't end with incomplete function call
-        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round)\\s*\\([^)]*$")) {
+        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\([^)]*$")) {
             return false;
         }
 
@@ -203,11 +203,9 @@ public class CalculatorManager {
                 } else {
                     // Still typing, don't show anything
                     lastFormattedResult = null;
-                    lastErrorMessage = null;
                 }
             } else {
                 lastFormattedResult = null;
-                lastErrorMessage = null;
             }
         }
 
@@ -248,27 +246,23 @@ public class CalculatorManager {
     private void calculateForDisplay(String input) {
         if (input == null || input.trim().isEmpty()) {
             lastFormattedResult = null;
-            lastErrorMessage = null;
             return;
         }
 
         try {
-            BigDecimal result = evaluator.evaluateQuiet(input);
-            lastFormattedResult = ResultFormatter.formatWithCommas(result);
-            lastErrorMessage = null;
+            ExpressionEvaluator.EvalResult evalRes = evaluator.evaluateQuietResult(input);
+            lastFormattedResult = ResultFormatter.formatResult(evalRes);
 
             // Mark as uncommitted (will be committed when user clears search)
             lastCompletedExpression = input;
-            lastCompletedResult = result;
+            lastCompletedResult = evalRes.value;
             hasUncommittedCalculation = true;
 
         } catch (ExpressionEvaluator.EvalException e) {
             // Silently ignore errors during live typing
             lastFormattedResult = null;
-            lastErrorMessage = null;
         } catch (Exception e) {
             lastFormattedResult = null;
-            lastErrorMessage = null;
         }
     }
 
@@ -356,7 +350,7 @@ public class CalculatorManager {
             return;
         }
 
-        boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
+        boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
 
         // Ctrl+Z: Undo (go back to previous equation)
         if (keyCode == GLFW.GLFW_KEY_Z && isCtrlPressed) {
@@ -426,7 +420,11 @@ public class CalculatorManager {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
                 String historyText = reiSearchHistory.get(index);
-                REIRuntime.getInstance().getSearchTextField().setText(historyText);
+                me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
+                if (searchField != null) {
+                    searchField.setText(historyText);
+                    NotEnoughCalculatorClient.clampSearchField(searchField);
+                }
 
                 // Update internal state without triggering history save
                 lastSearchInput = historyText;
@@ -448,7 +446,11 @@ public class CalculatorManager {
      */
     private void restoreSavedInput() {
         try {
-            REIRuntime.getInstance().getSearchTextField().setText(savedCurrentInput);
+            me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
+            if (searchField != null) {
+                searchField.setText(savedCurrentInput);
+                NotEnoughCalculatorClient.clampSearchField(searchField);
+            }
             lastSearchInput = savedCurrentInput;
             currentEquation = savedCurrentInput;  // Resume tracking this equation
 
@@ -464,8 +466,33 @@ public class CalculatorManager {
         }
     }
 
+    public ExpressionEvaluator.EvalResult calculateResult(String input) throws ExpressionEvaluator.EvalException {
+        String cleanInput = ResultFormatter.cleanInput(input);
+        ExpressionEvaluator.EvalResult result = evaluator.evaluateResult(cleanInput);
+        addToCompletedHistory(cleanInput, result.value);
+        return result;
+    }
+
     public void setVariable(String name, String valueExpr) throws ExpressionEvaluator.EvalException {
         evaluator.setVariable(name, valueExpr);
+        BigDecimal val = evaluator.evaluateQuiet(valueExpr);
+        saveVariableToConfig(name, val);
+    }
+
+    public void setVariableDirect(String name, BigDecimal value) {
+        evaluator.setVariable(name, value);
+        saveVariableToConfig(name, value);
+    }
+
+    private void saveVariableToConfig(String name, BigDecimal value) {
+        try {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+            if (config.customVariables == null) {
+                config.customVariables = new java.util.LinkedHashMap<>();
+            }
+            config.customVariables.put(name.toLowerCase(), value.toPlainString());
+            config.save();
+        } catch (Exception ignored) {}
     }
 
     public List<String> getHistory() {
@@ -489,11 +516,9 @@ public class CalculatorManager {
         currentEquation = "";
         lastSearchInput = "";
         lastFormattedResult = null;
-        lastErrorMessage = null;
         lastCompletedExpression = null;
         lastCompletedResult = null;
         hasUncommittedCalculation = false;
-        sessionResetNotified = false;
         LOGGER.info("Cleared all history");
     }
 
@@ -512,7 +537,6 @@ public class CalculatorManager {
     public void reset() {
         lastSearchInput = "";
         lastFormattedResult = null;
-        lastErrorMessage = null;
         reiSearchHistory.clear();
         completedHistory.clear();
         reiHistoryIndex = -1;
@@ -521,16 +545,7 @@ public class CalculatorManager {
         lastCompletedExpression = null;
         lastCompletedResult = null;
         hasUncommittedCalculation = false;
-        sessionResetNotified = false;
         evaluator.clearHistory();
         LOGGER.info("Calculator reset (session ended)");
-    }
-
-    public boolean isSessionResetNotified() {
-        return sessionResetNotified;
-    }
-
-    public void markSessionReset() {
-        sessionResetNotified = true;
     }
 }

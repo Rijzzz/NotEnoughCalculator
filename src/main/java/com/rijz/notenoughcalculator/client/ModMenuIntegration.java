@@ -16,20 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rijz.notenoughcalculator;
+package com.rijz.notenoughcalculator.client;
 
-import net.fabricmc.api.ModInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 
-public class NotEnoughCalculator implements ModInitializer {
-
-    public static final String MOD_ID = "notenoughcalculator";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+// Hooks into ModMenu so users get a "Configure" button in the mod list
+public class ModMenuIntegration implements ModMenuApi {
 
     @Override
-    public void onInitialize() {
-        LOGGER.info("Not Enough Calculator initialized");
-        // Client-side initialization happens in NotEnoughCalculatorClient
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        return CalculatorConfigScreen::new;
     }
 }

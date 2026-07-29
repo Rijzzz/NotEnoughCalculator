@@ -18,12 +18,16 @@
 
 package com.rijz.notenoughcalculator.client;
 
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ResultFormatter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +35,19 @@ import static org.junit.jupiter.api.Assertions.*;
 // Tests the static looksLikeCalculation() heuristic used to distinguish
 // math expressions from item searches in the REI search bar.
 class CalculatorManagerTest {
+
+    @BeforeEach
+    void resetConfigDefaults() {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        config.showInlineResults = true;
+        config.showUnitSuggestions = true;
+        config.enableCommaFormatting = true;
+        config.enableHistoryNavigation = true;
+        config.enableShorthandResults = false;
+        config.decimalPrecision = 10;
+        config.bazaarFlipperLevel = 0;
+        config.save();
+    }
 
     @Nested
     @DisplayName("looksLikeCalculation - Should trigger calculator")
@@ -110,11 +127,97 @@ class CalculatorManagerTest {
     }
 
     @Nested
+    @DisplayName("Config Options Compliance Test")
+    class ConfigOptionsCompliance {
+        private CalculatorManager manager;
+
+        @BeforeEach
+        void setUp() {
+            manager = new CalculatorManager();
+        }
+
+        @Test
+        void respectsBazaarFlipperLevelPerk() throws Exception {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+
+            config.bazaarFlipperLevel = 0; // 1.25%
+            config.save();
+            assertEquals(0, new BigDecimal("98750000").compareTo(manager.calculate("bz(100m)")));
+
+            config.bazaarFlipperLevel = 1; // 1.125%
+            config.save();
+            assertEquals(0, new BigDecimal("98875000").compareTo(manager.calculate("bz(100m)")));
+
+            config.bazaarFlipperLevel = 2; // 1.0%
+            config.save();
+            assertEquals(0, new BigDecimal("99000000").compareTo(manager.calculate("bz(100m)")));
+        }
+
+        @Test
+        void respectsEnableShorthandResults() throws Exception {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+
+            config.enableShorthandResults = false;
+            config.save();
+            ExpressionEvaluator.EvalResult eval1 = manager.calculateResult("1000000 + 500000");
+            assertEquals("1,500,000", ResultFormatter.formatResult(eval1));
+
+            config.enableShorthandResults = true;
+            config.save();
+            ExpressionEvaluator.EvalResult eval2 = manager.calculateResult("1000000 + 500000");
+            assertEquals("1.5m", ResultFormatter.formatResult(eval2));
+        }
+
+        @Test
+        void respectsEnableCommaFormatting() {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+
+            config.enableCommaFormatting = true;
+            config.enableShorthandResults = false;
+            config.save();
+            assertEquals("1,000,000", ResultFormatter.formatWithCommas(new BigDecimal("1000000")));
+
+            config.enableCommaFormatting = false;
+            config.save();
+            assertEquals("1000000", ResultFormatter.formatWithCommas(new BigDecimal("1000000")));
+        }
+
+        @Test
+        void respectsDecimalPrecision() {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+
+            config.decimalPrecision = 2;
+            config.save();
+            BigDecimal divVal = new BigDecimal("10").divide(new BigDecimal("3"), 50, RoundingMode.HALF_UP);
+            assertEquals("3.33", ResultFormatter.formatWithCommas(divVal));
+
+            config.decimalPrecision = 5;
+            config.save();
+            assertEquals("3.33333", ResultFormatter.formatWithCommas(divVal));
+        }
+
+        @Test
+        void respectsShowUnitSuggestions() {
+            CalculatorConfig config = CalculatorConfig.getInstance();
+
+            config.showUnitSuggestions = true;
+            config.save();
+            String withUnits = ResultFormatter.formatResultWithUnits(new ExpressionEvaluator.EvalResult(new BigDecimal("1728")));
+            assertTrue(withUnits.contains("("));
+
+            config.showUnitSuggestions = false;
+            config.save();
+            String withoutUnits = ResultFormatter.formatResultWithUnits(new ExpressionEvaluator.EvalResult(new BigDecimal("1728")));
+            assertFalse(withoutUnits.contains("("));
+        }
+    }
+
+    @Nested
     @DisplayName("CalculatorManager Instance Operations")
     class InstanceOperations {
         private CalculatorManager manager;
 
-        @org.junit.jupiter.api.BeforeEach
+        @BeforeEach
         void setUp() {
             manager = new CalculatorManager();
         }
@@ -170,6 +273,28 @@ class CalculatorManagerTest {
             assertEquals("10 + 20", clean);
             assertTrue(manager.hasResult());
             assertEquals("30", manager.getLastFormattedResult());
+        }
+
+        @Test
+        void taxAndAngleHeuristics() {
+            assertTrue(CalculatorManager.looksLikeCalculation("bz(100m)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("ah(50m)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("ahbin(50m, 24)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("rad(180)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("deg(pi)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("fmt(1500000)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("bz(10m) + ahbin(5m)"));
+        }
+
+        @Test
+        void formatSearchBarLiveEvaluationSkyBlockFeatures() {
+            assertEquals("bz(100m)", manager.formatSearchBar("bz(100m)"));
+            assertTrue(manager.hasResult());
+            assertEquals("98,750,000", manager.getLastFormattedResult());
+
+            assertEquals("fmt(1500000)", manager.formatSearchBar("fmt(1500000)"));
+            assertTrue(manager.hasResult());
+            assertEquals("1.5m", manager.getLastFormattedResult());
         }
     }
 }

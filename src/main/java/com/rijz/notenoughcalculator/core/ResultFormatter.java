@@ -39,8 +39,8 @@ public class ResultFormatter {
         if (value == null) return "0";
         CalculatorConfig config = CalculatorConfig.getInstance();
 
-        BigDecimal stripped = value.stripTrailingZeros();
-        String plain = stripped.toPlainString();
+        BigDecimal scaled = value.setScale(config.decimalPrecision, RoundingMode.HALF_UP).stripTrailingZeros();
+        String plain = scaled.toPlainString();
 
         if (!config.enableCommaFormatting) {
             return plain;
@@ -83,6 +83,10 @@ public class ResultFormatter {
         if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
         }
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        if (config.enableShorthandResults) {
+            return toShorthand(evalResult.value);
+        }
         return formatWithCommas(evalResult.value);
     }
 
@@ -104,6 +108,7 @@ public class ResultFormatter {
                 case OCT -> bi.compareTo(java.math.BigInteger.ZERO) < 0
                         ? "-0o" + bi.abs().toString(8)
                         : "0o" + bi.toString(8);
+                case SHORTHAND -> toShorthand(value);
                 default -> formatWithCommas(value);
             };
         } catch (Exception e) {
@@ -126,10 +131,14 @@ public class ResultFormatter {
         CalculatorConfig config = CalculatorConfig.getInstance();
 
         StringBuilder result = new StringBuilder();
-        result.append(formatWithCommas(value));
+        if (config.enableShorthandResults) {
+            result.append(toShorthand(value));
+        } else {
+            result.append(formatWithCommas(value));
+        }
 
         // Add helpful unit suggestions if enabled
-        if (config.showUnitSuggestions) {
+        if (config.showUnitSuggestions && !config.enableShorthandResults) {
             String unitSuggestion = suggestUnit(value);
             if (unitSuggestion != null) {
                 result.append(" (").append(unitSuggestion).append(")");
@@ -137,6 +146,30 @@ public class ResultFormatter {
         }
 
         return result.toString();
+    }
+
+    // Convert value to Skyblock shorthand (1,500,000 -> 1.5m)
+    public static String toShorthand(BigDecimal value) {
+        if (value == null) return "0";
+        BigDecimal abs = value.abs();
+
+        if (abs.compareTo(new BigDecimal("1000000000000")) >= 0) {
+            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+            return t.toPlainString() + "t";
+        }
+        if (abs.compareTo(new BigDecimal("1000000000")) >= 0) {
+            BigDecimal b = value.divide(new BigDecimal("1000000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+            return b.toPlainString() + "b";
+        }
+        if (abs.compareTo(new BigDecimal("1000000")) >= 0) {
+            BigDecimal m = value.divide(new BigDecimal("1000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+            return m.toPlainString() + "m";
+        }
+        if (abs.compareTo(new BigDecimal("1000")) >= 0) {
+            BigDecimal k = value.divide(new BigDecimal("1000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+            return k.toPlainString() + "k";
+        }
+        return formatWithCommas(value);
     }
 
     // Suggest a Skyblock unit that matches this number

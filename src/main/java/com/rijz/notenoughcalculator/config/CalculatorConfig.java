@@ -55,10 +55,12 @@ public class CalculatorConfig {
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
+    public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
+    public boolean enableShorthandResults = false;
     public java.util.Map<String, String> customVariables = new java.util.LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {
-        // Live-reload config if the file was modified (check at most every 2 seconds)
+        // Poll for external config file edits every 2 seconds
         long now = System.currentTimeMillis();
         if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
             lastChecked = now;
@@ -69,9 +71,7 @@ public class CalculatorConfig {
                         LOGGER.info("Config file changed, reloading...");
                         INSTANCE = load();
                     }
-                } catch (IOException e) {
-                    // Ignore failure and stick to the current instance
-                }
+                } catch (IOException ignored) {}
             }
         }
 
@@ -126,5 +126,10 @@ public class CalculatorConfig {
 
     public String getOperatorColorCode() {
         return "§f"; // White
+    }
+
+    public double getBazaarTaxRate() {
+        int level = Math.max(0, Math.min(2, bazaarFlipperLevel));
+        return 1.25 - (level * 0.125);
     }
 }

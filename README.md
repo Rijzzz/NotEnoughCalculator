@@ -39,7 +39,8 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
 - Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
 - Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`
+- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `rad()`, `deg()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`, `fmt()`
+- SkyBlock Tax Calculators: `bz(price)` (Bazaar net profit accounting for Bazaar Flipper perk level), `ah(price, [hrs])` / `ahbin(price, [hrs])` (AH BIN net profit after listing fee & collection claim tax)
 
 </details>
 
@@ -66,9 +67,10 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <details>
 <summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
-- Press `Ctrl+Z` in REI search to recall previous calculations (undo)
-- Press `Ctrl+Y` to redo/go forward in history
-- Press `Ctrl+C` in REI search to copy calculation result to clipboard
+- Press `Ctrl+Z` / `Cmd+Z` in REI search to recall previous calculations (undo)
+- Press `Ctrl+Y` / `Cmd+Y` to redo/go forward in history
+- Press `Ctrl+C` / `Cmd+C` in REI search to copy unformatted calculation result directly to system clipboard
+- Full Numpad Enter support (`GLFW_KEY_KP_ENTER`)
 - Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
 - View full history with `/calchist` (shows last 15 entries)
 - Session-based: REI search history clears automatically when you leave a world/server
@@ -76,19 +78,23 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 </details>
 
 <details>
-<summary><strong>Customization</strong></summary>
+<summary><strong>Customization & Settings GUI</strong></summary>
 
+- Open in-game settings GUI screen via `/calcconfig` or ModMenu
+- Native Minecraft hover tooltips on all settings
+- Bazaar Flipper Perk selector pills (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%)
+- Shorthand Results toggle to convert default calculation results to SkyBlock units (`1.5m`)
 - Configurable decimal precision (default: 10 digits)
-- Toggle features on/off via config file
-- Comma formatting for large numbers
+- Toggle inline results, unit suggestions, comma formatting, and history navigation
+- All settings persist automatically in `config/notenoughcalculator.json`
 
 </details>
 
 ---
 
 **Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api) (0.144.0 or newer)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.818 or newer according to the Minecraft version you play on)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (0.155.2 or newer according to the Minecraft version you play on)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.819 or newer according to the Minecraft version you play on)
 - Minecraft (26.1.x, 26.x)
 
 *Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1.x and 26.x!*
@@ -295,6 +301,16 @@ ans + 100 = 400                   (chain calculations)
 10x5x2 = 100                      (chained multiplication)
 ```
 
+### SkyBlock Tax & Shorthand Calculators
+```
+bz(100m) = 98,750,000              (net Bazaar payout after tax)
+ah(50m) = 46,999,955               (net Auction payout after 5% fee + 1% claim tax + 6h duration fee)
+ahbin(50m, 24) = 48,499,650        (net BIN payout after 2% fee + 1% claim tax + 24h duration fee)
+fmt(1500000) = 1.5m                (shorthand number formatter)
+rad(180) = 3.14159...              (degrees to radians)
+deg(pi) = 180                      (radians to degrees)
+```
+
 </details>
 
 ---
@@ -315,7 +331,7 @@ ans + 100 = 400                   (chain calculations)
 ### Help Commands
 - `/calchelp` - Show main help menu
 - `/calchelp operators` - Learn about +, -, *, x, /, ^, %, !, &, |, ~, <<, >>, literals (0b, 0x, 0o)
-- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, hex, bin, oct, pct, gcd, lcm, clamp, avg, xor
+- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, hex, bin, oct, pct, gcd, lcm, clamp, avg, xor, bz, ah, ahbin, fmt, rad, deg
 - `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
 - `/calchelp variables` - Learn about ans and custom variables
 - `/calchelp examples` - See practical examples
@@ -340,7 +356,9 @@ ans + 100 = 400                   (chain calculations)
   "showUnitSuggestions": true,
   "enableHistoryNavigation": true,
   "showInlineResults": true,
-  "enableCommaFormatting": true
+  "enableCommaFormatting": true,
+  "enableShorthandResults": false,
+  "bazaarFlipperLevel": 0
 }
 ```
 
@@ -351,6 +369,8 @@ ans + 100 = 400                   (chain calculations)
 - **enableHistoryNavigation** (Default: true) - Enable Ctrl+Z/Y shortcuts
 - **showInlineResults** (Default: true) - Show results in REI search
 - **enableCommaFormatting** (Default: true) - Format large numbers with commas
+- **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
+- **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
 
 </details>
 
@@ -359,13 +379,14 @@ ans + 100 = 400                   (chain calculations)
 <details>
 <summary>Keybinds</summary>
 
-### History Navigation
-- **`Ctrl + Z`** in REI search - Recall previous calculation (undo)
-- **`Ctrl + Y`** in REI search - Go forward in history (redo)
-- **`Ctrl + C`** in REI search - Copy calculation result to clipboard
+### Search Bar Shortcuts
+- **`Ctrl + Z` / `Cmd + Z`** in REI search - Recall previous calculation (undo)
+- **`Ctrl + Y` / `Cmd + Y`** in REI search - Go forward in history (redo)
+- **`Ctrl + C` / `Cmd + C`** in REI search - Copy calculation result to clipboard
+- **`Enter` / `Numpad Enter`** in REI search - Commit calculation into history and keep focus
 
 ### Notes
-- History is session-based and automatically clears when you leave a world or server
+- History is session-based and automatically clears when you leave a world/server
 - This ensures a fresh start each time you play!
 - Use `/calchist` to view your calculation history in chat
 
@@ -517,10 +538,10 @@ See the full license text here:
 
 ---
 
-**Created and maintained by Laze & Rijz**
+**Maintained by Laze & Rijz**
 
 **Type. Calculate. Profit.**
 
 ---
 
-*Last updated: 27-07-2026*
+*Last updated: 29-07-2026*

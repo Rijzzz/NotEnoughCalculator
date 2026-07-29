@@ -32,43 +32,45 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.client.resources.language.I18n;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-// Main client-side initialization for the calculator mod
-// Sets up rendering, commands, and world state tracking
+// Client setup. Registers listeners, render hooks, and chat commands.
 public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotEnoughCalculatorClient.class);
     private static final CalculatorManager calcManager = new CalculatorManager();
 
-    // Track whether player is in a world for session-based history management
+    // Track world state for session-based history resets
     private static boolean wasInWorld = false;
     private static boolean shouldRender = false;
-    private static boolean wasREIVisible = false; // Track REI visibility state
+    private static boolean wasREIVisible = false;
 
-    // Cached reflection fields/methods for TextField cursor and selection
+    // Cache reflection lookups for TextField cursor position, text selection, and setters
     private static Field cursorField = null;
     private static Field selectionEndField = null;
     private static Method getCursorMethod = null;
     private static Method getSelectionEndMethod = null;
+    private static Method setCursorMethod = null;
+    private static Method setSelectionEndMethod = null;
     private static boolean reflectionInitialized = false;
 
     @Override
     public void onInitializeClient() {
         LOGGER.info("Not Enough Calculator initializing...");
 
-        // Load user settings from config file
         CalculatorConfig config = CalculatorConfig.getInstance();
         LOGGER.info("Configuration loaded: precision={}", config.decimalPrecision);
 
@@ -79,158 +81,229 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         LOGGER.info("Not Enough Calculator initialized successfully!");
     }
 
-    // Monitor when player joins/leaves worlds to reset history each session
+    // Wipes session history when leaving a world/server
     private void registerWorldStateTracking() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            boolean isInWorld = client.world != null && client.player != null;
+            boolean isInWorld = client.level != null && client.player != null;
 
-            // Player just left a world or server - clear everything for next session
             if (wasInWorld && !isInWorld) {
                 LOGGER.info("Player left world - resetting calculator session");
                 calcManager.reset();
                 calcManager.clearHistory();
                 shouldRender = false;
-
-                // Wipe the REI search bar too
                 clearREISearchField();
             }
 
-            // Update tracking state
             wasInWorld = isInWorld;
 
-            // Check if REI overlay state changed
             boolean isREIVisibleNow = isREIVisible();
 
-            // If REI just closed (was visible, now not visible), commit any pending calculation
+            // Commit the current calculation when closing the inventory/REI overlay
             if (wasREIVisible && !isREIVisibleNow) {
                 LOGGER.debug("REI overlay closed - committing pending calculation");
                 calcManager.commitPendingCalculationPublic();
             }
 
             wasREIVisible = isREIVisibleNow;
-
-            // Only render calculator when in-game with REI open
             shouldRender = isInWorld && isREIVisibleNow;
         });
     }
 
-    // Hook into screen rendering to draw our calculator overlay
+    // Handles overlay rendering hooks and keyboard events
     private void registerScreenRendering() {
         ScreenEvents.BEFORE_INIT.register((client, screen, sw, sh) -> {
-            // Draw calculator results over the REI search bar
             ScreenEvents.afterRender(screen).register(this::renderCalculatorOverlay);
 
-            // Listen for Ctrl+Z and Ctrl+Y to navigate history (and intercept Enter)
-            // Use allowKeyPress to be able to cancel the event
+            // Intercept Enter to commit, Ctrl+Z/Y for history undo/redo
             ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
                 return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(), keyInput.modifiers());
             });
         });
     }
 
-    // Initialize reflection once for TextField cursor/selection access
+    // Cache scissor methods
+    private static Method enableScissorMethod = null;
+    private static Method disableScissorMethod = null;
+    private static boolean scissorReflectionInitialized = false;
+
+    // Set up reflection for text field cursor/selection access and modification
     private static void initReflection(TextField searchField) {
         if (reflectionInitialized) return;
         reflectionInitialized = true;
 
         if (searchField == null) return;
-
         Class<?> fieldClass = searchField.getClass();
 
-        // Try to find cursor position field/method
+        // Get cursor position method or field
         try {
             getCursorMethod = fieldClass.getMethod("getCursor");
             getCursorMethod.setAccessible(true);
-            LOGGER.debug("Found getCursor() method");
         } catch (NoSuchMethodException e) {
-            // Try field access
             String[] cursorNames = {"cursor", "cursorPosition", "cursorPos", "caretPosition"};
             for (String name : cursorNames) {
                 try {
                     cursorField = findFieldInHierarchy(fieldClass, name);
                     if (cursorField != null) {
                         cursorField.setAccessible(true);
-                        LOGGER.debug("Found cursor field: {}", name);
                         break;
                     }
                 } catch (Exception ignored) {}
             }
         }
 
-        // Try to find selection end field/method
+        // Get selection end method or field
         try {
             getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
             getSelectionEndMethod.setAccessible(true);
-            LOGGER.debug("Found getSelectionEnd() method");
         } catch (NoSuchMethodException e) {
-            // Try field access
             String[] selectionNames = {"selectionEnd", "selectionEndPos", "selectionStart", "highlightPos"};
             for (String name : selectionNames) {
                 try {
                     selectionEndField = findFieldInHierarchy(fieldClass, name);
                     if (selectionEndField != null) {
                         selectionEndField.setAccessible(true);
-                        LOGGER.debug("Found selection field: {}", name);
                         break;
                     }
                 } catch (Exception ignored) {}
             }
         }
+
+        // Setters for cursor position
+        String[] setCursorNames = {"setCursor", "setCursorPosition", "setCaretPosition"};
+        for (String name : setCursorNames) {
+            try {
+                setCursorMethod = fieldClass.getMethod(name, int.class);
+                setCursorMethod.setAccessible(true);
+                break;
+            } catch (NoSuchMethodException ignored) {}
+        }
+
+        // Setters for selection
+        String[] setSelectionNames = {"setSelectionEnd", "setSelectionStart", "setHighlightPos"};
+        for (String name : setSelectionNames) {
+            try {
+                setSelectionEndMethod = fieldClass.getMethod(name, int.class);
+                setSelectionEndMethod.setAccessible(true);
+                break;
+            } catch (NoSuchMethodException ignored) {}
+        }
     }
 
-    // Get cursor position from TextField using reflection
-    private static int getCursorPosition(TextField searchField) {
-        if (searchField == null) return 0;
+    // Clamp REI's search field cursor and selection pointers to prevent StringIndexOutOfBoundsException crashes
+    public static void clampSearchField(TextField searchField) {
+        if (searchField == null) return;
+        initReflection(searchField);
+        String text = searchField.getText();
+        int len = text != null ? text.length() : 0;
 
+        try {
+            int cursor = getRawCursor(searchField);
+            if (cursor > len || cursor < 0) {
+                setRawCursor(searchField, len);
+            }
+
+            int selection = getRawSelection(searchField);
+            if (selection > len || selection < 0) {
+                setRawSelection(searchField, len);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private static int getRawCursor(TextField searchField) {
         try {
             if (getCursorMethod != null) {
                 Object result = getCursorMethod.invoke(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
-
             if (cursorField != null) {
                 Object result = cursorField.get(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
-        } catch (Exception e) {
-            LOGGER.debug("Failed to get cursor position: {}", e.getMessage());
-        }
-
-        // Fallback: cursor at end of text
-        return searchField.getText().length();
+        } catch (Exception ignored) {}
+        return 0;
     }
 
-    // Get selection end position from TextField using reflection
-    private static int getSelectionEnd(TextField searchField) {
-        if (searchField == null) return 0;
-
+    private static int getRawSelection(TextField searchField) {
         try {
             if (getSelectionEndMethod != null) {
                 Object result = getSelectionEndMethod.invoke(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
-
             if (selectionEndField != null) {
                 Object result = selectionEndField.get(searchField);
-                if (result instanceof Integer) {
-                    return (Integer) result;
-                }
+                if (result instanceof Integer) return (Integer) result;
             }
-        } catch (Exception e) {
-            LOGGER.debug("Failed to get selection end: {}", e.getMessage());
-        }
-
-        // Fallback: no selection
-        return getCursorPosition(searchField);
+        } catch (Exception ignored) {}
+        return 0;
     }
 
-    // Find field in class hierarchy
+    private static void setRawCursor(TextField searchField, int pos) {
+        try {
+            if (setCursorMethod != null) {
+                setCursorMethod.invoke(searchField, pos);
+                return;
+            }
+            if (cursorField != null) {
+                cursorField.set(searchField, pos);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private static void setRawSelection(TextField searchField, int pos) {
+        try {
+            if (setSelectionEndMethod != null) {
+                setSelectionEndMethod.invoke(searchField, pos);
+                return;
+            }
+            if (selectionEndField != null) {
+                selectionEndField.set(searchField, pos);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Safely enable scissor clipping on GuiGraphics
+    private static void enableScissor(GuiGraphics context, int minX, int minY, int maxX, int maxY) {
+        try {
+            if (!scissorReflectionInitialized) {
+                scissorReflectionInitialized = true;
+                try {
+                    enableScissorMethod = context.getClass().getMethod("enableScissor", int.class, int.class, int.class, int.class);
+                    disableScissorMethod = context.getClass().getMethod("disableScissor");
+                } catch (NoSuchMethodException ignored) {}
+            }
+            if (enableScissorMethod != null) {
+                enableScissorMethod.invoke(context, minX, minY, maxX, maxY);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private static void disableScissor(GuiGraphics context) {
+        try {
+            if (disableScissorMethod != null) {
+                disableScissorMethod.invoke(context);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    // Get cursor index safely bounded by string length
+    private static int getCursorPosition(TextField searchField) {
+        if (searchField == null) return 0;
+        String text = searchField.getText();
+        int len = text != null ? text.length() : 0;
+        int raw = getRawCursor(searchField);
+        return Math.min(Math.max(0, raw), len);
+    }
+
+    // Get selection end index safely bounded by string length
+    private static int getSelectionEnd(TextField searchField) {
+        if (searchField == null) return 0;
+        String text = searchField.getText();
+        int len = text != null ? text.length() : 0;
+        int raw = getRawSelection(searchField);
+        return Math.min(Math.max(0, raw), len);
+    }
+
+    // Lookup field traversing superclasses
     private static Field findFieldInHierarchy(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
@@ -243,57 +316,44 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         return null;
     }
 
-    // Draw calculation results next to the user's input in REI search
-    private void renderCalculatorOverlay(Screen screen, DrawContext context, int mouseX, int mouseY, float delta) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+    // Main render callback for drawing results in REI search overlay
+    private void renderCalculatorOverlay(Screen screen, GuiGraphics context, int mouseX, int mouseY, float delta) {
+        Minecraft mc = Minecraft.getInstance();
 
-        // Bunch of safety checks before we try to render anything
-        if (!shouldRenderCalculator(screen, mc)) {
-            return;
-        }
+        if (!shouldRenderCalculator(screen, mc)) return;
 
         try {
             REIRuntime runtime = REIRuntime.getInstance();
-            if (runtime == null || !runtime.isOverlayVisible()) {
-                return;
-            }
+            if (runtime == null || !runtime.isOverlayVisible()) return;
 
             ScreenOverlay overlay = runtime.getOverlay().orElse(null);
-            if (overlay == null) {
-                return;
-            }
+            if (overlay == null) return;
 
             TextField searchField = runtime.getSearchTextField();
-            if (searchField == null) {
-                return;
-            }
+            if (searchField == null) return;
 
-            // Initialize reflection once
             initReflection(searchField);
+            clampSearchField(searchField);
 
             String searchText = searchField.getText();
             calcManager.formatSearchBar(searchText);
 
-            // Only show results if this is actually a calculation with a valid answer
             if (!calcManager.looksLikeCalculation(searchText) || !calcManager.hasResult()) {
                 return;
             }
 
-            // All checks passed - draw the calculator UI
-            renderCalculatorUI(context, overlay, searchField, searchText, mc.textRenderer);
-
+            renderCalculatorUI(context, overlay, searchField, searchText, mc.font);
         } catch (Exception e) {
-            // If anything goes wrong, just silently skip this frame
+            // Silently swallow errors to avoid crashing Minecraft on render tick
         }
     }
 
-    // Actually draw all the calculator UI elements
-    private void renderCalculatorUI(DrawContext context, ScreenOverlay overlay, TextField searchField,
-                                    String searchText, TextRenderer textRenderer) {
+    // Performs the actual overlay component drawing with horizontal scrolling and scissor clipping
+    private void renderCalculatorUI(GuiGraphics context, ScreenOverlay overlay, TextField searchField,
+                                    String searchText, Font font) {
         Rectangle overlayBounds = overlay.getBounds();
         Rectangle searchBounds = REIHelper.getSearchFieldBounds(searchField);
 
-        // If we couldn't get the real bounds, estimate where the search bar should be
         if (searchBounds == null) {
             searchBounds = new Rectangle(
                     overlayBounds.x + 2,
@@ -303,191 +363,174 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             );
         }
 
-        // Get the matrix stack (compatible with both 1.21.5 and 1.21.6)
-        MatrixStack matrices = getMatrixStack(context);
+        clampSearchField(searchField);
 
-        // Move to top layer (z-index 1000) so we draw over everything else
-        matrices.push();
-        matrices.translate(0, 0, 1000);
+        Matrix3x2fStack pose = context.pose();
+        pose.pushMatrix();
 
-        // Draw the search field background
+        // Draw search field background
         drawSearchFieldBackground(context, searchBounds);
 
-        // Figure out where to draw text
-        int textX = searchBounds.x + 4;
+        // Calculate horizontal text scroll offset based on cursor position
+        int innerWidth = searchBounds.width - 8;
+        int cursorPos = getCursorPosition(searchField);
+        String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length())) : "";
+        int cursorXOffset = font.width(textBeforeCursor);
+
+        int scrollOffset = 0;
+        if (cursorXOffset > innerWidth - 10) {
+            scrollOffset = cursorXOffset - innerWidth + 10;
+        }
+
+        int textX = searchBounds.x + 4 - scrollOffset;
         int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
-        // Get cursor and selection info
-        int cursorPos = getCursorPosition(searchField);
         int selectionEnd = getSelectionEnd(searchField);
         int selectionStart = Math.min(cursorPos, selectionEnd);
         int selectionEndPos = Math.max(cursorPos, selectionEnd);
         boolean hasSelection = selectionStart != selectionEndPos;
 
-        // Draw text with selection highlight
+        // Clip text rendering strictly inside search bar box
+        enableScissor(context, searchBounds.x + 2, searchBounds.y + 1, searchBounds.getMaxX() - 2, searchBounds.getMaxY() - 1);
+
         if (hasSelection) {
-            drawTextWithSelection(context, textRenderer, searchText, textX, textY,
-                    selectionStart, selectionEndPos);
+            drawTextWithSelection(context, font, searchText, textX, textY, selectionStart, selectionEndPos);
         } else {
-            drawText(context, textRenderer, searchText, textX, textY, 0xFFFFFFFF, true);
+            context.drawString(font, searchText, textX, textY, 0xFFFFFFFF, true);
         }
 
-        // Show the calculation result (moves to next line if overflow)
+        boolean resultFitsInline = false;
         if (calcManager.hasResult()) {
-            drawCalculationResult(context, textRenderer, searchText, searchBounds, textX, textY);
+            String result = calcManager.getLastFormattedResult();
+            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+                    CalculatorConfig.getInstance().getResultColorCode() + result;
+            int queryWidth = font.width(searchText);
+            int resultX = textX + queryWidth;
+            int resultWidth = font.width(resultDisplay);
+
+            if (resultX + resultWidth <= searchBounds.getMaxX() - 4) {
+                // Fits inline inside search bar
+                context.drawString(font, resultDisplay, resultX, textY, 0xFFFFFFFF, true);
+                resultFitsInline = true;
+            }
         }
 
-        // Draw the blinking text cursor (only if no selection)
         if (!hasSelection) {
-            drawCursor(context, searchBounds, searchText, textRenderer, textX, textY, cursorPos);
+            drawCursor(context, searchBounds, searchText, font, textX, textY, cursorPos);
         }
 
-        // Done - restore the matrix state
-        matrices.pop();
+        disableScissor(context);
+
+        // If result overflowed search bar line, draw in clean floating box above search bar
+        if (calcManager.hasResult() && !resultFitsInline) {
+            String result = calcManager.getLastFormattedResult();
+            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+                    CalculatorConfig.getInstance().getResultColorCode() + result;
+
+            int aboveY = searchBounds.y - 14;
+            int resultWidth = font.width(resultDisplay);
+
+            int maxBoxWidth = overlayBounds.width - 12;
+            int bgHeight = 12;
+            int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
+
+            int aboveX = searchBounds.x + 4;
+            if (aboveX + bgWidth > overlayBounds.getMaxX() - 4) {
+                aboveX = Math.max(overlayBounds.x + 4, overlayBounds.getMaxX() - bgWidth - 4);
+            }
+
+            int resultScroll = 0;
+            int visibleWidth = bgWidth - 8;
+            if (resultWidth > visibleWidth) {
+                int overflowPixels = resultWidth - visibleWidth;
+                long time = System.currentTimeMillis();
+                // Smooth 4-second ping-pong marquee scroll back and forth
+                double cycle = (time % 4000) / 4000.0;
+                double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
+                resultScroll = (int) (overflowPixels * normalized);
+            }
+
+            context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
+
+            // Clip floating box text within floating box bounds
+            enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2);
+            context.drawString(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
+            disableScissor(context);
+        }
+
+        pose.popMatrix();
     }
 
     // Draw text with selection highlight
-    private void drawTextWithSelection(DrawContext context, TextRenderer textRenderer,
+    private void drawTextWithSelection(GuiGraphics context, Font font,
                                        String text, int x, int y, int selStart, int selEnd) {
-        if (text.isEmpty()) return;
+        if (text == null || text.isEmpty()) return;
 
-        // Split text into three parts: before selection, selected, after selection
+        int len = text.length();
+        selStart = Math.min(Math.max(0, selStart), len);
+        selEnd = Math.min(Math.max(0, selEnd), len);
+        if (selStart > selEnd) {
+            int temp = selStart;
+            selStart = selEnd;
+            selEnd = temp;
+        }
+
         String beforeSelection = selStart > 0 ? text.substring(0, selStart) : "";
         String selectedText = selEnd > selStart ? text.substring(selStart, selEnd) : "";
-        String afterSelection = selEnd < text.length() ? text.substring(selEnd) : "";
+        String afterSelection = selEnd < len ? text.substring(selEnd) : "";
 
         int currentX = x;
 
-        // Draw text before selection
         if (!beforeSelection.isEmpty()) {
-            drawText(context, textRenderer, beforeSelection, currentX, y, 0xFFFFFFFF, true);
-            currentX += textRenderer.getWidth(beforeSelection);
+            context.drawString(font, beforeSelection, currentX, y, 0xFFFFFFFF, true);
+            currentX += font.width(beforeSelection);
         }
 
-        // Draw selection highlight and selected text
         if (!selectedText.isEmpty()) {
-            int selectionWidth = textRenderer.getWidth(selectedText);
-
-            // Draw blue highlight background
+            int selectionWidth = font.width(selectedText);
             context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, 0xFF0066CC);
-
-            // Draw selected text in white
-            drawText(context, textRenderer, selectedText, currentX, y, 0xFFFFFFFF, true);
+            context.drawString(font, selectedText, currentX, y, 0xFFFFFFFF, true);
             currentX += selectionWidth;
         }
 
-        // Draw text after selection
         if (!afterSelection.isEmpty()) {
-            drawText(context, textRenderer, afterSelection, currentX, y, 0xFFFFFFFF, true);
+            context.drawString(font, afterSelection, currentX, y, 0xFFFFFFFF, true);
         }
     }
 
-    // Get MatrixStack in a way that works for both 1.21.5 and 1.21.6
-    private MatrixStack getMatrixStack(DrawContext context) {
-        try {
-            // Try 1.21.6 method first
-            return (MatrixStack) context.getClass().getMethod("getMatrices").invoke(context);
-        } catch (Exception e) {
-            try {
-                // Fall back to 1.21.5 method
-                return (MatrixStack) context.getClass().getMethod("method_51448").invoke(context);
-            } catch (Exception ex) {
-                // If both fail, create a new one (fallback)
-                LOGGER.warn("Could not get MatrixStack, using new instance");
-                return new MatrixStack();
-            }
-        }
-    }
-
-    // Draw text with version compatibility
-    private void drawText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
-        try {
-            // Try 1.21.6 method signature (returns int)
-            context.getClass()
-                    .getMethod("drawText", TextRenderer.class, String.class, int.class, int.class, int.class, boolean.class)
-                    .invoke(context, textRenderer, text, x, y, color, shadow);
-        } catch (Exception e) {
-            try {
-                // Try 1.21.5 method signature (returns int, different method name)
-                context.getClass()
-                        .getMethod("method_51433", TextRenderer.class, String.class, int.class, int.class, int.class, boolean.class)
-                        .invoke(context, textRenderer, text, x, y, color, shadow);
-            } catch (Exception ex) {
-                // Ultimate fallback - just skip drawing this text
-                LOGGER.warn("Could not draw text, incompatible Minecraft version");
-            }
-        }
-    }
-
-    // Draw the gray border and black background for the search field
-    private void drawSearchFieldBackground(DrawContext context, Rectangle bounds) {
-        // Gray border (matches REI's normal style)
+    // Draw search field background box
+    private void drawSearchFieldBackground(GuiGraphics context, Rectangle bounds) {
         context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), 0xFF8B8B8B);
-        // Black inside
         context.fill(bounds.x + 1, bounds.y + 1, bounds.getMaxX() - 1, bounds.getMaxY() - 1, 0xFF000000);
     }
 
-    // Show the calculation result
-    // NEW APPROACH: If result doesn't fit on same line, show it ABOVE the search bar
-    private void drawCalculationResult(DrawContext context, TextRenderer textRenderer, String searchText,
-                                       Rectangle searchBounds, int textX, int textY) {
-        String result = calcManager.getLastFormattedResult();
-        int queryWidth = textRenderer.getWidth(searchText);
-        String resultDisplay = " = " + result;
-
-        int resultX = textX + queryWidth;
-        int maxX = searchBounds.getMaxX() - 4;
-        int displayWidth = textRenderer.getWidth(resultDisplay);
-
-        // Check if result fits on the same line
-        if (resultX + displayWidth <= maxX) {
-            // Result fits - draw on same line
-            drawText(context, textRenderer, resultDisplay, resultX, textY, 0xFFFFFFFF, true);
-        } else {
-            // Result doesn't fit - draw ABOVE the search bar
-            int aboveY = searchBounds.y - 12; // 12 pixels above search bar
-            int aboveX = searchBounds.x + 4;
-
-            // Draw a background for the result above
-            int bgHeight = 12;
-            int bgWidth = Math.min(displayWidth + 8, searchBounds.width - 4);
-            context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xCC000000);
-
-            // Draw the result text
-            drawText(context, textRenderer, resultDisplay, aboveX, aboveY, 0xFFFFFFFF, true);
-        }
-    }
-
-    // Draw a blinking cursor at the correct position
-    private void drawCursor(DrawContext context, Rectangle bounds, String text,
-                            TextRenderer tr, int textX, int textY, int cursorPos) {
+    // Draw blinking text cursor
+    private void drawCursor(GuiGraphics context, Rectangle bounds, String text,
+                            Font font, int textX, int textY, int cursorPos) {
         try {
-            long time = System.currentTimeMillis();
-            if ((time / 500) % 2 == 0) { // Blink every half second
-                // Calculate cursor X position based on cursor position in text
-                String textBeforeCursor = cursorPos > 0 && cursorPos <= text.length()
-                        ? text.substring(0, cursorPos)
-                        : "";
+            if (text == null) text = "";
+            int len = text.length();
+            cursorPos = Math.min(Math.max(0, cursorPos), len);
 
-                int cursorX = textX + tr.getWidth(textBeforeCursor);
+            long time = System.currentTimeMillis();
+            if ((time / 500) % 2 == 0) {
+                String textBeforeCursor = cursorPos > 0 ? text.substring(0, cursorPos) : "";
+                int cursorX = textX + font.width(textBeforeCursor);
                 int cursorY = textY - 1;
 
-                // Make sure cursor stays within bounds
-                if (cursorX >= bounds.x + 4 && cursorX < bounds.getMaxX() - 4) {
+                if (cursorX >= bounds.x + 2 && cursorX <= bounds.getMaxX() - 3) {
                     context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
                 }
             }
-        } catch (Exception ignored) {
-            // Don't crash if cursor rendering fails
-        }
+        } catch (Exception ignored) {}
     }
 
     // Listen for key presses and handle Enter, Ctrl+Z, Ctrl+Y
     private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Make sure we're actually on the right screen and in-game
-        if (mc.currentScreen != screen || mc.world == null || mc.player == null) {
+        if (getCurrentScreen(mc) != screen || mc.level == null || mc.player == null) {
             return true; // Allow the key press
         }
 
@@ -504,8 +547,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     boolean isCalculation = calcManager.looksLikeCalculation(searchText);
                     boolean hasResult = calcManager.hasResult();
 
-                    // If Enter is pressed on a calculation with a result
-                    if (key == GLFW.GLFW_KEY_ENTER && isCalculation && hasResult) {
+                    // If Enter or Numpad Enter is pressed on a calculation with a result
+                    if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && isCalculation && hasResult) {
                         calcManager.commitPendingCalculationPublic();
 
                         // Put the result into the search bar so user can continue calculating
@@ -514,6 +557,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                             // Remove commas from result before inserting (e.g., "1,000" -> "1000")
                             String cleanResult = result.replace(",", "");
                             searchField.setText(cleanResult);
+                            clampSearchField(searchField);
                             LOGGER.debug("Enter pressed - result '{}' inserted into search bar", cleanResult);
                         }
 
@@ -521,10 +565,25 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     }
                 }
 
-                // Handle Ctrl+Z and Ctrl+Y (these don't need to be cancelled)
-                boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0;
-                if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlPressed) {
+                // Handle Ctrl+Z / Cmd+Z and Ctrl+Y / Cmd+Y (these don't need to be cancelled)
+                boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
+                if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlOrCmd) {
                     calcManager.handleKeyPress(key, modifiers);
+                }
+
+                // Ctrl+C / Cmd+C on a calculation copies the result to clipboard
+                if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd) {
+                    if (searchField != null) {
+                        String text = searchField.getText();
+                        if (calcManager.looksLikeCalculation(text) && calcManager.hasResult()) {
+                            String result = calcManager.getLastFormattedResult();
+                            if (result != null && !result.isEmpty()) {
+                                String cleanResult = result.replace(",", "");
+                                Minecraft.getInstance().keyboardHandler.setClipboard(cleanResult);
+                                LOGGER.debug("Copied result '{}' to clipboard", cleanResult);
+                            }
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -567,21 +626,26 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
     }
 
     // Should we render the calculator right now?
-    private boolean shouldRenderCalculator(Screen screen, MinecraftClient mc) {
+    private boolean shouldRenderCalculator(Screen screen, Minecraft mc) {
         return !isNonGameplayScreen(screen)
-                && mc.currentScreen == screen
-                && mc.world != null
+                && getCurrentScreen(mc) == screen
+                && mc.level != null
                 && mc.player != null
                 && shouldRender
                 && CalculatorConfig.getInstance().showInlineResults;
     }
 
+    // This method is not needed before 26.2, but it's here in 1.21 for parity between the branches
+    public static Screen getCurrentScreen(Minecraft mc) {
+        return mc.screen;
+    }
+
     // Only allow calculator in actual gameplay screens (not menus, loading screens, etc)
-    // HandledScreen = inventory, chest, furnace, etc - all the in-game GUIs
+    // AbstractContainerScreen = inventory, chest, furnace, etc - all the in-game GUIs
     // Also allow REI recipe screens and other REI-related screens
     private static boolean isNonGameplayScreen(Screen screen) {
-        if (screen instanceof HandledScreen) {
-            return false; // Allow HandledScreen (inventories, chests, etc.)
+        if (screen instanceof AbstractContainerScreen) {
+            return false; // Allow AbstractContainerScreen (inventories, chests, etc.)
         }
 
         // Allow REI screens (recipe viewing, etc.)

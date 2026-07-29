@@ -1,9 +1,9 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom-remap' version '1.17-SNAPSHOT'
     id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.mod_version}"
 group = project.maven_group
 
 base {
@@ -13,38 +13,70 @@ base {
 repositories {
     maven { url = "https://maven.fabricmc.net/" }
     maven { url = "https://maven.shedaniel.me" }
+    maven {
+        url "https://api.modrinth.com/maven"
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
     gradlePluginPortal()
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
 
     // REI
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
+
+    // REI transitive math dependency
+    modCompileOnly "me.shedaniel.cloth:basic-math:0.6.1"
+
+    // ModMenu (optional - config screen button in mod list)
+    modCompileOnly  "maven.modrinth:modmenu:${project.modmenu_version}"
+    modLocalRuntime "maven.modrinth:modmenu:${project.modmenu_version}"
+
+    // Unit tests
+    testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "loader_version", project.loader_version
+    inputs.property "fabric_version", project.fabric_version
+    inputs.property "min_fabric_api_version", project.min_fabric_api_version
     inputs.property "rei_version", project.rei_version
+    inputs.property "min_rei_version", project.min_rei_version
+    inputs.property "modmenu_version", project.modmenu_version
+    inputs.property "min_modmenu_version", project.min_modmenu_version
+    inputs.property "min_minecraft_version", project.min_minecraft_version
+    inputs.property "max_minecraft_version", project.max_minecraft_version
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
                 "loader_version": project.loader_version,
-                "rei_version": project.rei_version
+                "fabric_version": project.fabric_version,
+                "min_fabric_api_version": project.min_fabric_api_version,
+                "rei_version": project.rei_version,
+                "min_rei_version": project.min_rei_version,
+                "modmenu_version": project.modmenu_version,
+                "min_modmenu_version": project.min_modmenu_version,
+                "min_minecraft_version": project.min_minecraft_version,
+                "max_minecraft_version": project.max_minecraft_version
     }
 }
+
 
 def targetJavaVersion = 21
 
@@ -58,8 +90,12 @@ java {
     withSourcesJar()
 }
 
+test {
+    useJUnitPlatform()
+}
+
 jar {
-    from("LICENSE") {
+    from("LICENSE.txt") {
         rename { "${it}_${project.archives_base_name}" }
     }
 }

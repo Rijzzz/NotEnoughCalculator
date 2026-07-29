@@ -28,45 +28,50 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * User settings for the calculator mod.
- * Config file auto-reloads when changed, no restart needed.
- *
- * Note: History size is hardcoded at 15 equations and not configurable.
- */
+// User configuration class. Supports live reloading on file changes without game restarts.
 public class CalculatorConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance()
-            .getConfigDir()
-            .resolve("notenoughcalculator.json");
+    private static final Path CONFIG_PATH = getConfigPath();
+
+    private static Path getConfigPath() {
+        try {
+            if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
+                return FabricLoader.getInstance().getConfigDir().resolve("notenoughcalculator.json");
+            }
+        } catch (Throwable ignored) {}
+        return Path.of("build", "tmp", "notenoughcalculator.json");
+    }
 
     private static CalculatorConfig INSTANCE;
     private static long lastModified = 0;
+    private static long lastChecked = 0;
+    private static final long CHECK_INTERVAL_MS = 2000;
 
-    // User-configurable settings
+    // Config options
     public int decimalPrecision = 10;
     public boolean showUnitSuggestions = true;
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
-    public boolean enableAutoComplete = false;
-    public String language = "en_us";
-
-    // Note: maxHistorySize is NOT here - it's hardcoded at 15 in CalculatorManager
+    public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
+    public boolean enableShorthandResults = false;
+    public java.util.Map<String, String> customVariables = new java.util.LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {
-        // Hot reload: check if config file changed and reload if needed
-        if (INSTANCE != null && Files.exists(CONFIG_PATH)) {
-            try {
-                long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-                if (currentModified > lastModified) {
-                    LOGGER.info("Config file changed, reloading...");
-                    INSTANCE = load();
-                }
-            } catch (IOException e) {
-                // Can't check mod time, just keep current config
+        // Poll for external config file edits every 2 seconds
+        long now = System.currentTimeMillis();
+        if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
+            lastChecked = now;
+            if (Files.exists(CONFIG_PATH)) {
+                try {
+                    long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
+                    if (currentModified > lastModified) {
+                        LOGGER.info("Config file changed, reloading...");
+                        INSTANCE = load();
+                    }
+                } catch (IOException ignored) {}
             }
         }
 
@@ -86,10 +91,10 @@ public class CalculatorConfig {
                 return config;
             }
         } catch (IOException e) {
-            LOGGER.warn("Failed to load config, using defaults: {}", e.getMessage());
+            LOGGER.warn("Failed to load config, falling back to defaults: {}", e.getMessage());
         }
 
-        // No config file yet, create default
+        // File doesn't exist, create it with defaults
         CalculatorConfig config = new CalculatorConfig();
         config.save();
         return config;
@@ -108,7 +113,11 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return "§f"; // White
+        return "§f"; // White for REI search bar
+    }
+
+    public String getChatResultColorCode() {
+        return "§a"; // Green for chat output (NEU style)
     }
 
     public String getErrorColorCode() {
@@ -117,5 +126,10 @@ public class CalculatorConfig {
 
     public String getOperatorColorCode() {
         return "§f"; // White
+    }
+
+    public double getBazaarTaxRate() {
+        int level = Math.max(0, Math.min(2, bazaarFlipperLevel));
+        return 1.25 - (level * 0.125);
     }
 }

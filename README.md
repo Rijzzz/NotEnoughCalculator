@@ -3,10 +3,11 @@
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C&style=for-the-badge)](https://modrinth.com/mod/notenoughcalculator)
 [![CurseForge Downloads](https://img.shields.io/curseforge/dt/1431725?logo=curseforge&label=CurseForge&color=F16436&style=for-the-badge)](https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator)
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/1389631948359598220)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/tree/1.21.9-1.21.11?tab=License-1-ov-file)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.x-26.x.x/LICENSE.txt)
 
-**A powerful calculator mod that brings NEU-style calculator functionality to Roughly Enough Items (REI).**
+**A NEU-style calculator mod for Roughly Enough Items (REI). Type calculations directly into REI's search bar.**
 
 > Inspired by [NotEnoughUpdates's](https://modrinth.com/mod/notenoughupdates) calculator, recreated for newer Minecraft versions where NEU isn't available.
 
@@ -27,12 +28,19 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 ## Key Features
 
 <details>
-<summary><strong>Basic Math</strong></summary>
+<summary><strong>Basic Math & Functions</strong></summary>
 
 - Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
 - Exponents and modulo (`^`, `%`)
-- Parentheses for complex expressions
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`
+- Bitwise operators: `&` (AND), `|` (OR), `~` (NOT), `<<` (Left Shift), `>>` (Right Shift), `xor(a, b)`
+- Factorial: `5!` = 120, `10!` = 3,628,800
+- Number Literals: Binary (`0b1010` = 10), Hexadecimal (`0xFF` = 255), Octal (`0o77` = 63)
+- Base Conversions: `hex(255)` = `0xFF`, `bin(10)` = `0b1010`, `oct(63)` = `0o77`
+- Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
+- Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
+- Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
+- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `rad()`, `deg()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`, `fmt()`
+- SkyBlock Tax Calculators: `bz(price)` (Bazaar net profit accounting for Bazaar Flipper perk level), `ah(price, [hrs])` / `ahbin(price, [hrs])` (AH BIN net profit after listing fee & collection claim tax)
 
 </details>
 
@@ -46,38 +54,54 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 </details>
 
 <details>
-<summary><strong>Variables</strong></summary>
+<summary><strong>Variables (Persistent)</strong></summary>
 
 - `ans` – Automatically stores last calculation result
-- Custom variables with `/calcset` command
+- `pi` – Pi constant (3.14159265...)
+- `e` – Euler's number (2.71828182...) when standalone; enchanted unit (160) after a number
+- Custom variables with `/calcset <name> <value>` (saved automatically to config & persist across restarts)
 - Chain calculations easily with `ans`
 
 </details>
 
 <details>
-<summary><strong>History & Shortcuts</strong></summary>
+<summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
-- Press `Ctrl+Z` in REI search to recall previous calculations
-- Press `Ctrl+Y` to redo/go forward in history
+- Press `Ctrl+Z` / `Cmd+Z` in REI search to recall previous calculations (undo)
+- Press `Ctrl+Y` / `Cmd+Y` to redo/go forward in history
+- Press `Ctrl+C` / `Cmd+C` in REI search to copy unformatted calculation result directly to system clipboard
+- Full Numpad Enter support (`GLFW_KEY_KP_ENTER`)
+- Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
 - View full history with `/calchist` (shows last 15 entries)
-- Session-based: History clears automatically when you leave a world/server
+- Session-based: REI search history clears automatically when you leave a world/server
 
 </details>
 
 <details>
-<summary><strong>Customization</strong></summary>
+<summary><strong>Customization & Settings GUI</strong></summary>
 
+- Open in-game settings GUI screen via `/calcconfig` or ModMenu
+- Native Minecraft hover tooltips on all settings
+- Bazaar Flipper Perk selector pills (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%)
+- Shorthand Results toggle to convert default calculation results to SkyBlock units (`1.5m`)
 - Configurable decimal precision (default: 10 digits)
-- Toggle features on/off via config file
-- Comma formatting for large numbers
+- Toggle inline results, unit suggestions, comma formatting, and history navigation
+- All settings persist automatically in `config/notenoughcalculator.json`
 
 </details>
 
 ---
 
 **Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (0.134.1 or newer according to the Minecraft version you play on)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on)
+- Minecraft (1.21.11, 26.1.x, 26.x)
+
+*Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1.x and 26.x!*
+*Note: All features introduced in versions 2.0.1–2.5.0 (previously available only for Minecraft 26.1.x & 26.2) can now be used on Minecraft 1.21.11!*
+
+**Dependencies (Optional / Recommended):**
+- [ModMenu](https://modrinth.com/mod/modmenu) (16.0.0 or newer according to the Minecraft version you play on)
 
 ---
 
@@ -85,6 +109,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 1. Download the required mods and place them into your Minecraft `mods/` folder:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
     - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+    - [ModMenu](https://modrinth.com/mod/modmenu) *(Optional)*
     - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Press your inventory key to open REI
@@ -142,15 +167,59 @@ dc / 333 = 10.38                  (hours to fill double chest)
 50m * 30 = 1,500,000,000          (bulk buying)
 ```
 
-### Advanced Math
+### Advanced Math & Functions
 ```
 sqrt(144) = 12                    (square root)
 2^10 = 1,024                      (exponents)
 100 % 7 = 2                       (modulo)
+5! = 120                          (factorial)
 abs(-50) = 50                     (absolute value)
 floor(3.9) = 3                    (round down)
 ceil(3.1) = 4                     (round up)
 round(3.5) = 4                    (round nearest)
+log(100) = 2                      (base-10 logarithm)
+ln(e) = 1                         (natural logarithm)
+sin(90) = 1                       (sine, degrees)
+cos(0) = 1                        (cosine, degrees)
+tan(45) = 1                       (tangent, degrees)
+min(10, 5) = 5                    (minimum)
+max(10, 5) = 10                   (maximum)
+pi * 2 = 6.283...                 (using pi constant)
+e^2 = 7.389...                    (using Euler's number)
+```
+
+### Base Conversions
+```
+hex(255) = 0xFF                   (decimal to hexadecimal wrapper)
+bin(10) = 0b1010                  (decimal to binary wrapper)
+oct(63) = 0o77                    (decimal to octal wrapper)
+hex(0b1010 + 0o10) = 0x12         (expression base conversion)
+0b1010 = 10                       (binary literal input)
+0xFF = 255                        (hexadecimal literal input)
+0o77 = 63                         (octal literal input)
+0b10 + 0xA = 12                   (arithmetic with literals)
+```
+
+### Bitwise Operators & Functions
+```
+0b1010 & 0b1100 = 8               (bitwise AND)
+0b1010 | 0b0101 = 15              (bitwise OR)
+~0 = -1                           (bitwise NOT)
+~5 = -6                           (bitwise NOT value)
+1 << 4 = 16                       (bitwise left shift)
+16 >> 2 = 4                       (bitwise right shift)
+0x0F << 4 = 240                   (hex bitwise left shift)
+xor(0b1010, 0b1100) = 6           (bitwise XOR function)
+```
+
+### Math Helpers
+```
+avg(10, 20, 30) = 20              (variadic average)
+pct(50, 200) = 25                 (ratio percentage: 50 is 25% of 200)
+gcd(12, 18) = 6                   (greatest common divisor)
+lcm(12, 18) = 36                  (least common multiple)
+clamp(15, 0, 10) = 10             (clamp value to maximum bound)
+clamp(-5, 0, 10) = 0              (clamp value to minimum bound)
 ```
 
 ### Compound Calculations
@@ -233,6 +302,16 @@ ans + 100 = 400                   (chain calculations)
 10x5x2 = 100                      (chained multiplication)
 ```
 
+### SkyBlock Tax & Shorthand Calculators
+```
+bz(100m) = 98,750,000              (net Bazaar payout after tax)
+ah(50m) = 46,999,955               (net Auction payout after 5% fee + 1% claim tax + 6h duration fee)
+ahbin(50m, 24) = 48,499,650        (net BIN payout after 2% fee + 1% claim tax + 24h duration fee)
+fmt(1500000) = 1.5m                (shorthand number formatter)
+rad(180) = 3.14159...              (degrees to radians)
+deg(pi) = 180                      (radians to degrees)
+```
+
 </details>
 
 ---
@@ -252,15 +331,15 @@ ans + 100 = 400                   (chain calculations)
 
 ### Help Commands
 - `/calchelp` - Show main help menu
-- `/calchelp operators` - Learn about +, -, *, x, /, ^, %
-- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round
+- `/calchelp operators` - Learn about +, -, *, x, /, ^, %, !, &, |, ~, <<, >>, literals (0b, 0x, 0o)
+- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, hex, bin, oct, pct, gcd, lcm, clamp, avg, xor, bz, ah, ahbin, fmt, rad, deg
 - `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
 - `/calchelp variables` - Learn about ans and custom variables
 - `/calchelp examples` - See practical examples
 - `/calchelp config` - Learn about configuration
 
 ### Configuration Commands
-- `/calcconfig` - View current configuration
+- `/calcconfig` - Open settings screen
 
 </details>
 
@@ -278,7 +357,9 @@ ans + 100 = 400                   (chain calculations)
   "showUnitSuggestions": true,
   "enableHistoryNavigation": true,
   "showInlineResults": true,
-  "enableCommaFormatting": true
+  "enableCommaFormatting": true,
+  "enableShorthandResults": false,
+  "bazaarFlipperLevel": 0
 }
 ```
 
@@ -289,6 +370,8 @@ ans + 100 = 400                   (chain calculations)
 - **enableHistoryNavigation** (Default: true) - Enable Ctrl+Z/Y shortcuts
 - **showInlineResults** (Default: true) - Show results in REI search
 - **enableCommaFormatting** (Default: true) - Format large numbers with commas
+- **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
+- **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
 
 </details>
 
@@ -297,12 +380,14 @@ ans + 100 = 400                   (chain calculations)
 <details>
 <summary>Keybinds</summary>
 
-### History Navigation
-- **`Ctrl + Z`** in REI search - Recall previous calculation (undo)
-- **`Ctrl + Y`** in REI search - Go forward in history (redo)
+### Search Bar Shortcuts
+- **`Ctrl + Z` / `Cmd + Z`** in REI search - Recall previous calculation (undo)
+- **`Ctrl + Y` / `Cmd + Y`** in REI search - Go forward in history (redo)
+- **`Ctrl + C` / `Cmd + C`** in REI search - Copy calculation result to clipboard
+- **`Enter` / `Numpad Enter`** in REI search - Commit calculation into history and keep focus
 
 ### Notes
-- History is session-based and automatically clears when you leave a world or server
+- History is session-based and automatically clears when you leave a world/server
 - This ensures a fresh start each time you play!
 - Use `/calchist` to view your calculation history in chat
 
@@ -389,10 +474,8 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 <summary>Common Issues</summary>
 
 - **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
-- **Red text in search bar?** This is a cosmetic issue that doesn't affect functionality
 - **History not working?** Make sure `enableHistoryNavigation` is `true` in config
 - **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
-- **Text selection not highlighted in search field?** Ctrl+A correctly selects all text, but the selection highlight is not visible. The text *is* selected; it’s just not visually indicated. This is a temporary issue closing and reopening your inventory will fix it.
 
 </details>
 
@@ -452,14 +535,14 @@ Under the following conditions:
 * You must state any changes you make
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/tree/1.21.9-1.21.11?tab=License-1-ov-file)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.x-26.x.x/LICENSE.txt)
 
 ---
 
-**Created and maintained by Laze & Rijz**
+**Maintained by Laze & Rijz**
 
 **Type. Calculate. Profit.**
 
 ---
 
-*Last updated: February 2026*
+*Last updated: 29-07-2026*

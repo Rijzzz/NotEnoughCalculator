@@ -19,9 +19,10 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
@@ -29,9 +30,12 @@ import java.util.*;
 /**
  * Expression evaluator with support for:
  * - Basic math operators (+, -, *, x, /, ^, %)
- * - Functions (sqrt, abs, floor, ceil, round)
+ * - Functions (sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max)
+ * - Smart percentage (10% = 0.1, 100 + 10% = 110)
+ * - Implicit multiplication (2(3+4), (3)(4))
  * - Skyblock units (k, m, b, t, s, e, h, sc, dc, eb)
  * - Variables (ans, $custom)
+ * - Literals (0b, 0x, 0o)
  */
 public class ExpressionEvaluator {
 
@@ -53,6 +57,14 @@ public class ExpressionEvaluator {
         this.lastAnswer = BigDecimal.ZERO;
     }
 
+    // Package-private constructor for unit tests (no Minecraft dependencies needed)
+    ExpressionEvaluator(int precision) {
+        this.mc = new MathContext(Math.max(precision, 50), RoundingMode.HALF_UP);
+        this.variables = new HashMap<>();
+        this.history = new ArrayList<>();
+        this.lastAnswer = BigDecimal.ZERO;
+    }
+
     public static class EvalException extends Exception {
         private final int position;
 
@@ -64,14 +76,22 @@ public class ExpressionEvaluator {
         public int getPosition() { return position; }
     }
 
-    // Helper for translation
+    // Helper for translation (falls back to key + args if I18n is unavailable in tests)
     private static String tr(String key, Object... args) {
-        return I18n.translate(key, args);
+        try {
+            return I18n.get(key, args);
+        } catch (Exception | NoClassDefFoundError e) {
+            // Outside Minecraft (unit tests) - return key with formatted args
+            if (args.length > 0) {
+                return String.format(key.replace("%s", "%s").replace("%d", "%s"), args);
+            }
+            return key;
+        }
     }
 
     // Token types recognized by the parser
     private enum TokenKind {
-        NUM, OP, LPAREN, RPAREN, FUNC, VAR, UNIT, EOF
+        NUM, OP, LPAREN, RPAREN, COMMA, PERCENT, FACTORIAL, FUNC, VAR, UNIT, EOF
     }
 
     private static class Token {
@@ -104,38 +124,71 @@ public class ExpressionEvaluator {
         UNITS = Collections.unmodifiableMap(units);
     }
 
+    public enum RadixMode {
+        DEFAULT, HEX, BIN, OCT, SHORTHAND
+    }
+
+    public static class EvalResult {
+        public final BigDecimal value;
+        public final RadixMode radixMode;
+
+        public EvalResult(BigDecimal value, RadixMode radixMode) {
+            this.value = value;
+            this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
+        }
+
+        public EvalResult(BigDecimal value) {
+            this(value, RadixMode.DEFAULT);
+        }
+    }
+
     // Supported math functions
-    private static final Set<String> FUNCTIONS = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("sqrt", "abs", "floor", "ceil", "round"))
+    private static final Set<String> FUNCTIONS = Set.of(
+            "sqrt", "abs", "floor", "ceil", "round",
+            "log", "ln", "sin", "cos", "tan",
+            "min", "max", "hex", "bin", "oct",
+            "pct", "gcd", "lcm", "clamp", "avg", "xor",
+            "bz", "ah", "ahbin", "fmt", "rad", "deg"
     );
+
+    // Functions that take two comma-separated arguments
+    private static final Set<String> MULTI_ARG_FUNCTIONS = Set.of("min", "max", "pct", "gcd", "lcm", "xor");
 
     /**
      * Evaluate without adding to history (for live display).
      */
-    public BigDecimal evaluateQuiet(String expr) throws EvalException {
+    public EvalResult evaluateQuietResult(String expr) throws EvalException {
         if (expr == null || expr.trim().isEmpty()) {
             throw new EvalException(tr("notenoughcalculator.error.empty_expression"), 0);
         }
 
         List<Token> tokens = tokenize(expr);
-        BigDecimal result = parseExpression(tokens, 0).value;
+        tokens = insertImplicitMultiplication(tokens);
+        ParseResult parseRes = parseExpression(tokens, 0);
+        BigDecimal result = parseRes.value;
 
         // Update lastAnswer but don't add to history
         lastAnswer = result;
 
-        return result;
+        return new EvalResult(result, parseRes.radixMode);
+    }
+
+    public BigDecimal evaluateQuiet(String expr) throws EvalException {
+        return evaluateQuietResult(expr).value;
     }
 
     /**
      * Evaluate and add to history (for /calc command).
      */
-    public BigDecimal evaluate(String expr) throws EvalException {
+    public EvalResult evaluateResult(String expr) throws EvalException {
         if (expr == null || expr.trim().isEmpty()) {
             throw new EvalException(tr("notenoughcalculator.error.empty_expression"), 0);
         }
 
         List<Token> tokens = tokenize(expr);
-        BigDecimal result = parseExpression(tokens, 0).value;
+        tokens = insertImplicitMultiplication(tokens);
+        ParseResult parseRes = parseExpression(tokens, 0);
+        BigDecimal result = parseRes.value;
 
         // Update lastAnswer and add to history
         lastAnswer = result;
@@ -149,7 +202,11 @@ public class ExpressionEvaluator {
             }
         }
 
-        return result;
+        return new EvalResult(result, parseRes.radixMode);
+    }
+
+    public BigDecimal evaluate(String expr) throws EvalException {
+        return evaluateResult(expr).value;
     }
 
     /**
@@ -203,10 +260,132 @@ public class ExpressionEvaluator {
                 continue;
             }
 
-            // Operators
-            if ("+-*/^%".indexOf(c) != -1) {
+            // Comma separator (for multi-arg functions like min, max)
+            if (c == ',') {
+                tokens.add(new Token(TokenKind.COMMA, ",", i));
+                i++;
+                continue;
+            }
+
+            // Percentage vs modulo disambiguation
+            // Adjacent to number (no space) = percentage: 10% -> 0.1
+            // Spaced from number = modulo operator: 10 % 3 -> 1
+            if (c == '%') {
+                boolean isPercentage = false;
+                if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
+                    Token prevNum = tokens.get(tokens.size() - 1);
+                    int numEndPos = prevNum.pos + prevNum.value.length();
+                    if (numEndPos == i) {
+                        isPercentage = true;
+                    }
+                }
+                tokens.add(new Token(isPercentage ? TokenKind.PERCENT : TokenKind.OP, "%", i));
+                i++;
+                continue;
+            }
+
+            // Factorial
+            if (c == '!') {
+                tokens.add(new Token(TokenKind.FACTORIAL, "!", i));
+                i++;
+                continue;
+            }
+
+            // Bitwise operators & << >> ~
+            if (c == '&' || c == '|' || c == '~') {
                 tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
                 i++;
+                continue;
+            }
+
+            if (c == '<' && i + 1 < expr.length() && expr.charAt(i + 1) == '<') {
+                tokens.add(new Token(TokenKind.OP, "<<", i));
+                i += 2;
+                continue;
+            }
+
+            if (c == '>' && i + 1 < expr.length() && expr.charAt(i + 1) == '>') {
+                tokens.add(new Token(TokenKind.OP, ">>", i));
+                i += 2;
+                continue;
+            }
+
+            // Standard Math Operators
+            if ("+-*/^".indexOf(c) != -1) {
+                tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
+                i++;
+                continue;
+            }
+
+            parseLiteral:
+            {
+                if (tokens.isEmpty())
+                    break parseLiteral;
+
+                Token previous = tokens.get(tokens.size() - 1);
+
+                // Enforce adjacency: previous "0" token must directly touch this character (no space)
+                if (previous.kind != TokenKind.NUM || !previous.value.equals("0") || previous.pos + previous.value.length() != i)
+                    break parseLiteral;
+
+                char prefix = c;
+
+                int radix;
+                switch (prefix) {
+                    case 'x', 'X' -> radix = 16;
+                    case 'b', 'B' -> radix = 2;
+                    case 'o', 'O' -> radix = 8;
+                    default -> {
+                        break parseLiteral;
+                    }
+                }
+
+                int start = i;
+                i++; // skip 'b', 'x', or 'o'
+
+                StringBuilder num = new StringBuilder();
+                boolean lastWasUnderscore = false;
+
+                while (i < expr.length()) {
+                    char ch = expr.charAt(i);
+
+                    if (ch == '_') {
+                        // Underscore must follow a digit and cannot follow another underscore
+                        if (num.isEmpty() || lastWasUnderscore) {
+                            break;
+                        }
+                        lastWasUnderscore = true;
+                        i++;
+                        continue;
+                    }
+
+                    int digit = Character.digit(ch, radix);
+                    if (digit == -1) {
+                        // If it's an out-of-range digit for this base (e.g. '2' in 0b102, '8' in 0o78), fail immediately
+                        if (Character.isDigit(ch)) {
+                            throw new EvalException(tr("notenoughcalculator.error.invalid_number"), i);
+                        }
+                        break;
+                    }
+
+                    num.append(ch);
+                    lastWasUnderscore = false;
+                    i++;
+                }
+
+                // If literal ended on an underscore, backtrack that underscore
+                if (lastWasUnderscore) {
+                    i--;
+                }
+
+                if (num.isEmpty()) {
+                    i = start;
+                    break parseLiteral;
+                }
+
+                String literal = num.toString();
+                previous.value += prefix + literal;
+                previous.number = new BigDecimal(new BigInteger(literal, radix));
                 continue;
             }
 
@@ -229,10 +408,6 @@ public class ExpressionEvaluator {
                     // If we just parsed a unit token, it's multiplication (e.g., "10kx50k")
                     else if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.UNIT) {
                         isMultiplication = true;
-                    }
-                    // Don't treat as multiplication if preceded by '0' (hex like 0x123)
-                    else if (prevChar == '0') {
-                        isMultiplication = false;
                     }
                 }
 
@@ -280,8 +455,11 @@ public class ExpressionEvaluator {
                             i++;
                             continue;
                         }
-                        // Otherwise, we've read a unit/function name and hit 'x' - treat as multiplication
-                        break;
+                        // Only break if what we've read so far is a valid unit (e.g., "10bx50k")
+                        // This allows "max(10, 5)" to be parsed correctly as "max"
+                        if (UNITS.containsKey(name.toString().toLowerCase())) {
+                            break;
+                        }
                     }
 
                     name.append(current);
@@ -293,6 +471,21 @@ public class ExpressionEvaluator {
                 // Determine token type
                 if (FUNCTIONS.contains(nameStr)) {
                     tokens.add(new Token(TokenKind.FUNC, nameStr, start));
+                } else if (nameStr.equals("pi")) {
+                    // Pi constant
+                    Token tok = new Token(TokenKind.NUM, "pi", start);
+                    tok.number = new BigDecimal("3.14159265358979323846");
+                    tokens.add(tok);
+                } else if (nameStr.equals("e")) {
+                    // 'e' after a number = Skyblock enchanted unit (2e = 320)
+                    // 'e' standalone or after operator = Euler's number (2.718...)
+                    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
+                        tokens.add(new Token(TokenKind.UNIT, nameStr, start));
+                    } else {
+                        Token tok = new Token(TokenKind.NUM, "e", start);
+                        tok.number = new BigDecimal("2.71828182845904523536");
+                        tokens.add(tok);
+                    }
                 } else if (UNITS.containsKey(nameStr)) {
                     // Units only make sense after numbers
                     if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
@@ -318,22 +511,146 @@ public class ExpressionEvaluator {
         return tokens;
     }
 
+    // Insert implicit multiplication tokens where multiplication is implied
+    // Examples: 2(3+4) -> 2*(3+4), (3)(4) -> (3)*(4), 2sqrt(4) -> 2*sqrt(4)
+    private List<Token> insertImplicitMultiplication(List<Token> tokens) {
+        List<Token> result = new ArrayList<>();
+        for (int i = 0; i < tokens.size(); i++) {
+            result.add(tokens.get(i));
+            if (i + 1 < tokens.size()) {
+                Token cur = tokens.get(i);
+                Token next = tokens.get(i + 1);
+                boolean insert = false;
+
+                // NUM followed by LPAREN: 2(3+4)
+                if (cur.kind == TokenKind.NUM && next.kind == TokenKind.LPAREN) insert = true;
+                // NUM followed by FUNC: 2sqrt(4)
+                if (cur.kind == TokenKind.NUM && next.kind == TokenKind.FUNC) insert = true;
+                // RPAREN followed by NUM: (3+4)2
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.NUM) insert = true;
+                // RPAREN followed by LPAREN: (3)(4)
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.LPAREN) insert = true;
+                // RPAREN followed by FUNC: (3)sqrt(4)
+                if (cur.kind == TokenKind.RPAREN && next.kind == TokenKind.FUNC) insert = true;
+                // UNIT followed by LPAREN: 10k(5)
+                if (cur.kind == TokenKind.UNIT && next.kind == TokenKind.LPAREN) insert = true;
+                // PERCENT followed by NUM/LPAREN/FUNC: 10%(5+3) -> 0.1*(5+3)
+                if (cur.kind == TokenKind.PERCENT && (next.kind == TokenKind.NUM || next.kind == TokenKind.LPAREN || next.kind == TokenKind.FUNC)) insert = true;
+
+                if (insert) {
+                    result.add(new Token(TokenKind.OP, "*", cur.pos));
+                }
+            }
+        }
+        return result;
+    }
+
     // Helper class for parser results
     private static class ParseResult {
         BigDecimal value;
         int nextPos;
+        boolean isPercentage;
+        RadixMode radixMode;
 
         ParseResult(BigDecimal v, int p) {
+            this(v, p, RadixMode.DEFAULT);
+        }
+
+        ParseResult(BigDecimal v, int p, RadixMode radixMode) {
             value = v;
             nextPos = p;
+            isPercentage = false;
+            this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
         }
     }
 
     private ParseResult parseExpression(List<Token> tokens, int pos) throws EvalException {
-        return parseAddSub(tokens, pos);
+        return parseBitwiseOr(tokens, pos);
     }
 
-    // Addition and subtraction (lowest precedence)
+    // Bitwise OR (lowest precedence)
+    private ParseResult parseBitwiseOr(List<Token> tokens, int pos) throws EvalException {
+        ParseResult left = parseBitwiseAnd(tokens, pos);
+
+        while (left.nextPos < tokens.size()) {
+            Token tok = tokens.get(left.nextPos);
+            if (tok.kind != TokenKind.OP || !tok.value.equals("|")) {
+                break;
+            }
+
+            if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+            }
+
+            ParseResult right = parseBitwiseAnd(tokens, left.nextPos + 1);
+            BigInteger b1 = left.value.toBigInteger();
+            BigInteger b2 = right.value.toBigInteger();
+            RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
+            left = new ParseResult(new BigDecimal(b1.or(b2)), right.nextPos, mode);
+        }
+
+        return left;
+    }
+
+    // Bitwise AND
+    private ParseResult parseBitwiseAnd(List<Token> tokens, int pos) throws EvalException {
+        ParseResult left = parseShift(tokens, pos);
+
+        while (left.nextPos < tokens.size()) {
+            Token tok = tokens.get(left.nextPos);
+            if (tok.kind != TokenKind.OP || !tok.value.equals("&")) {
+                break;
+            }
+
+            if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+            }
+
+            ParseResult right = parseShift(tokens, left.nextPos + 1);
+            BigInteger b1 = left.value.toBigInteger();
+            BigInteger b2 = right.value.toBigInteger();
+            RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
+            left = new ParseResult(new BigDecimal(b1.and(b2)), right.nextPos, mode);
+        }
+
+        return left;
+    }
+
+    // Bitwise Shifts (<<, >>)
+    private ParseResult parseShift(List<Token> tokens, int pos) throws EvalException {
+        ParseResult left = parseAddSub(tokens, pos);
+
+        while (left.nextPos < tokens.size()) {
+            Token tok = tokens.get(left.nextPos);
+            if (tok.kind != TokenKind.OP || (!tok.value.equals("<<") && !tok.value.equals(">>"))) {
+                break;
+            }
+
+            String op = tok.value;
+
+            if (left.nextPos + 1 >= tokens.size() || tokens.get(left.nextPos + 1).kind == TokenKind.EOF) {
+                throw new EvalException(tr("notenoughcalculator.error.unfinished_expression"), tok.pos);
+            }
+
+            ParseResult right = parseAddSub(tokens, left.nextPos + 1);
+            BigInteger b1 = left.value.toBigInteger();
+            int shiftAmount;
+            try {
+                shiftAmount = right.value.intValueExact();
+            } catch (ArithmeticException e) {
+                throw new EvalException(tr("notenoughcalculator.error.exponent_too_large"), tok.pos);
+            }
+
+            BigInteger res = op.equals("<<") ? b1.shiftLeft(shiftAmount) : b1.shiftRight(shiftAmount);
+            RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
+            left = new ParseResult(new BigDecimal(res), right.nextPos, mode);
+        }
+
+        return left;
+    }
+
+    // Addition and subtraction (lowest math precedence)
+    // Supports smart percentage: 100 + 10% = 110, 200 - 25% = 150
     private ParseResult parseAddSub(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseMulDiv(tokens, pos);
 
@@ -350,12 +667,23 @@ public class ExpressionEvaluator {
             }
 
             ParseResult right = parseMulDiv(tokens, left.nextPos + 1);
+            RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
 
-            // Use unlimited precision for add/subtract
-            if (op.equals("+")) {
-                left = new ParseResult(left.value.add(right.value), right.nextPos);
+            if (right.isPercentage) {
+                // Smart percentage: 100 + 10% means "add 10% of 100"
+                BigDecimal percentOfLeft = left.value.multiply(right.value);
+                if (op.equals("+")) {
+                    left = new ParseResult(left.value.add(percentOfLeft), right.nextPos, mode);
+                } else {
+                    left = new ParseResult(left.value.subtract(percentOfLeft), right.nextPos, mode);
+                }
             } else {
-                left = new ParseResult(left.value.subtract(right.value), right.nextPos);
+                // Normal add/subtract
+                if (op.equals("+")) {
+                    left = new ParseResult(left.value.add(right.value), right.nextPos, mode);
+                } else {
+                    left = new ParseResult(left.value.subtract(right.value), right.nextPos, mode);
+                }
             }
         }
 
@@ -379,20 +707,21 @@ public class ExpressionEvaluator {
             }
 
             ParseResult right = parsePower(tokens, left.nextPos + 1);
+            RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
 
             if (op.equals("*")) {
-                left = new ParseResult(left.value.multiply(right.value), right.nextPos);
+                left = new ParseResult(left.value.multiply(right.value), right.nextPos, mode);
             } else if (op.equals("/")) {
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
                     throw new EvalException(tr("notenoughcalculator.error.division_by_zero"), tok.pos);
                 }
                 // Only use MathContext for division
-                left = new ParseResult(left.value.divide(right.value, mc).stripTrailingZeros(), right.nextPos);
+                left = new ParseResult(left.value.divide(right.value, mc).stripTrailingZeros(), right.nextPos, mode);
             } else { // modulo
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
                     throw new EvalException(tr("notenoughcalculator.error.modulo_by_zero"), tok.pos);
                 }
-                left = new ParseResult(left.value.remainder(right.value), right.nextPos);
+                left = new ParseResult(left.value.remainder(right.value), right.nextPos, mode);
             }
         }
 
@@ -411,6 +740,7 @@ public class ExpressionEvaluator {
                 }
 
                 ParseResult right = parsePower(tokens, left.nextPos + 1);
+                RadixMode mode = left.radixMode != RadixMode.DEFAULT ? left.radixMode : right.radixMode;
 
                 // Don't allow crazy huge exponents
                 if (right.value.abs().compareTo(new BigDecimal("1000")) > 0) {
@@ -425,7 +755,7 @@ public class ExpressionEvaluator {
                 try {
                     int exp = right.value.intValueExact();
                     BigDecimal result = left.value.pow(exp, mc);
-                    left = new ParseResult(result, right.nextPos);
+                    left = new ParseResult(result, right.nextPos, mode);
                 } catch (ArithmeticException e) {
                     throw new EvalException(tr("notenoughcalculator.error.negative_power"), tok.pos);
                 }
@@ -435,7 +765,7 @@ public class ExpressionEvaluator {
         return left;
     }
 
-    // Unary operators (negative signs)
+    // Unary operators (negative signs, bitwise NOT ~)
     private ParseResult parseUnary(List<Token> tokens, int pos) throws EvalException {
         if (pos >= tokens.size()) {
             throw new EvalException(tr("notenoughcalculator.error.unexpected_end"), pos);
@@ -445,25 +775,66 @@ public class ExpressionEvaluator {
 
         if (tok.kind == TokenKind.OP && tok.value.equals("-")) {
             ParseResult result = parseUnary(tokens, pos + 1);
-            return new ParseResult(result.value.negate(), result.nextPos);
+            return new ParseResult(result.value.negate(), result.nextPos, result.radixMode);
         }
 
         if (tok.kind == TokenKind.OP && tok.value.equals("+")) {
             return parseUnary(tokens, pos + 1);
         }
 
+        if (tok.kind == TokenKind.OP && tok.value.equals("~")) {
+            ParseResult result = parseUnary(tokens, pos + 1);
+            BigInteger bi = result.value.toBigInteger();
+            return new ParseResult(new BigDecimal(bi.not()), result.nextPos, result.radixMode);
+        }
+
         return parsePostfix(tokens, pos);
     }
 
-    // Unit suffixes (like "100m")
+    // Unit suffixes (like "100m") and percentage postfix (like "10%")
     private ParseResult parsePostfix(List<Token> tokens, int pos) throws EvalException {
         ParseResult result = parsePrimary(tokens, pos);
 
+        // Handle unit suffixes
         if (result.nextPos < tokens.size()) {
             Token tok = tokens.get(result.nextPos);
             if (tok.kind == TokenKind.UNIT) {
                 BigDecimal multiplier = UNITS.get(tok.value);
-                result = new ParseResult(result.value.multiply(multiplier), result.nextPos + 1);
+                result = new ParseResult(result.value.multiply(multiplier), result.nextPos + 1, result.radixMode);
+            }
+        }
+
+        // Handle percentage postfix: 10% = 0.1
+        if (result.nextPos < tokens.size()) {
+            Token tok = tokens.get(result.nextPos);
+            if (tok.kind == TokenKind.PERCENT) {
+                BigDecimal percentValue = result.value.divide(BigDecimal.valueOf(100), mc);
+                result = new ParseResult(percentValue, result.nextPos + 1, result.radixMode);
+                result.isPercentage = true;
+            }
+        }
+
+        // Handle factorial postfix: 5! = 120
+        if (result.nextPos < tokens.size()) {
+            Token tok = tokens.get(result.nextPos);
+            if (tok.kind == TokenKind.FACTORIAL) {
+                if (result.value.compareTo(BigDecimal.ZERO) < 0 || !isInteger(result.value)) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_non_integer"), tok.pos);
+                }
+                int n;
+                try {
+                    n = result.value.intValueExact();
+                } catch (ArithmeticException e) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_too_large"), tok.pos);
+                }
+                if (n > 1000) {
+                    throw new EvalException(tr("notenoughcalculator.error.factorial_too_large"), tok.pos);
+                }
+                BigDecimal factResult = BigDecimal.ONE;
+                for (int i = 2; i <= n; i++) {
+                    factResult = factResult.multiply(BigDecimal.valueOf(i));
+                }
+                result = new ParseResult(factResult, result.nextPos + 1, result.radixMode);
             }
         }
 
@@ -494,14 +865,142 @@ public class ExpressionEvaluator {
                 throw new EvalException(tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
             }
 
+            // Variadic avg(a, b, c, ...) function
+            if (tok.value.equals("avg")) {
+                int curPos = pos + 2;
+                List<BigDecimal> args = new ArrayList<>();
+                RadixMode mode = RadixMode.DEFAULT;
+
+                while (curPos < tokens.size()) {
+                    ParseResult arg = parseExpression(tokens, curPos);
+                    args.add(arg.value);
+                    if (arg.radixMode != RadixMode.DEFAULT) mode = arg.radixMode;
+                    curPos = arg.nextPos;
+
+                    if (curPos < tokens.size() && tokens.get(curPos).kind == TokenKind.COMMA) {
+                        curPos++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (curPos >= tokens.size() || tokens.get(curPos).kind != TokenKind.RPAREN) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
+                }
+
+                if (args.isEmpty()) {
+                    throw new EvalException(tr("notenoughcalculator.error.empty_expression"), tok.pos);
+                }
+
+                BigDecimal sum = BigDecimal.ZERO;
+                for (BigDecimal a : args) {
+                    sum = sum.add(a);
+                }
+                BigDecimal avgResult = sum.divide(BigDecimal.valueOf(args.size()), mc).stripTrailingZeros();
+                return new ParseResult(avgResult, curPos + 1, mode);
+            }
+
+            // 3-argument clamp(val, min, max) function
+            if (tok.value.equals("clamp")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                if (arg1.nextPos >= tokens.size() || tokens.get(arg1.nextPos).kind != TokenKind.COMMA) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_comma", tok.value), tok.pos);
+                }
+                ParseResult arg2 = parseExpression(tokens, arg1.nextPos + 1);
+                if (arg2.nextPos >= tokens.size() || tokens.get(arg2.nextPos).kind != TokenKind.COMMA) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_comma", tok.value), tok.pos);
+                }
+                ParseResult arg3 = parseExpression(tokens, arg2.nextPos + 1);
+                if (arg3.nextPos >= tokens.size() || tokens.get(arg3.nextPos).kind != TokenKind.RPAREN) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
+                }
+                BigDecimal val = arg1.value;
+                BigDecimal min = arg2.value;
+                BigDecimal max = arg3.value;
+                BigDecimal result = val.compareTo(min) < 0 ? min : (val.compareTo(max) > 0 ? max : val);
+                return new ParseResult(result, arg3.nextPos + 1, arg1.radixMode);
+            }
+
+            // Multi-argument functions like min, max, pct, gcd, lcm, xor
+            if (MULTI_ARG_FUNCTIONS.contains(tok.value)) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                if (arg1.nextPos >= tokens.size() || tokens.get(arg1.nextPos).kind != TokenKind.COMMA) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_comma", tok.value), tok.pos);
+                }
+                ParseResult arg2 = parseExpression(tokens, arg1.nextPos + 1);
+                if (arg2.nextPos >= tokens.size() || tokens.get(arg2.nextPos).kind != TokenKind.RPAREN) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
+                }
+                BigDecimal result = switch (tok.value) {
+                    case "min" -> arg1.value.min(arg2.value);
+                    case "max" -> arg1.value.max(arg2.value);
+                    case "pct" -> {
+                        if (arg2.value.compareTo(BigDecimal.ZERO) == 0) {
+                            throw new EvalException(tr("notenoughcalculator.error.division_by_zero"), tok.pos);
+                        }
+                        yield arg1.value.divide(arg2.value, mc).multiply(BigDecimal.valueOf(100)).stripTrailingZeros();
+                    }
+                    case "gcd" -> new BigDecimal(arg1.value.toBigInteger().gcd(arg2.value.toBigInteger()));
+                    case "lcm" -> {
+                        BigInteger b1 = arg1.value.toBigInteger();
+                        BigInteger b2 = arg2.value.toBigInteger();
+                        if (b1.equals(BigInteger.ZERO) || b2.equals(BigInteger.ZERO)) yield BigDecimal.ZERO;
+                        BigInteger gcd = b1.gcd(b2);
+                        BigInteger lcm = b1.multiply(b2).abs().divide(gcd);
+                        yield new BigDecimal(lcm);
+                    }
+                    case "xor" -> new BigDecimal(arg1.value.toBigInteger().xor(arg2.value.toBigInteger()));
+                    default -> throw new EvalException(tr("notenoughcalculator.error.unknown_function", tok.value), tok.pos);
+                };
+                RadixMode mode = arg1.radixMode != RadixMode.DEFAULT ? arg1.radixMode : arg2.radixMode;
+                return new ParseResult(result, arg2.nextPos + 1, mode);
+            }
+
+            // Optional 2-argument functions ah(price, [hours]) and ahbin(price, [hours])
+            if (tok.value.equals("ah") || tok.value.equals("ahbin")) {
+                boolean isBin = tok.value.equals("ahbin");
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                double durationHours = 6.0;
+                int endPos = arg1.nextPos;
+                if (arg1.nextPos < tokens.size() && tokens.get(arg1.nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, arg1.nextPos + 1);
+                    durationHours = arg2.value.doubleValue();
+                    endPos = arg2.nextPos;
+                }
+                if (endPos >= tokens.size() || tokens.get(endPos).kind != TokenKind.RPAREN) {
+                    throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
+                }
+                BigDecimal result = calculateAhPayout(arg1.value, durationHours, isBin);
+                return new ParseResult(result, endPos + 1, arg1.radixMode);
+            }
+
+            // Single-argument functions
             ParseResult arg = parseExpression(tokens, pos + 2);
 
             if (arg.nextPos >= tokens.size() || tokens.get(arg.nextPos).kind != TokenKind.RPAREN) {
                 throw new EvalException(tr("notenoughcalculator.error.expected_closing_paren"), tok.pos);
             }
 
+            if (tok.value.equals("hex")) {
+                return new ParseResult(arg.value, arg.nextPos + 1, RadixMode.HEX);
+            }
+            if (tok.value.equals("bin")) {
+                return new ParseResult(arg.value, arg.nextPos + 1, RadixMode.BIN);
+            }
+            if (tok.value.equals("oct")) {
+                return new ParseResult(arg.value, arg.nextPos + 1, RadixMode.OCT);
+            }
+            if (tok.value.equals("bz")) {
+                double taxRate = CalculatorConfig.getInstance().getBazaarTaxRate();
+                BigDecimal result = calculateBzPayout(arg.value, taxRate);
+                return new ParseResult(result, arg.nextPos + 1, arg.radixMode);
+            }
+            if (tok.value.equals("fmt")) {
+                return new ParseResult(arg.value, arg.nextPos + 1, RadixMode.SHORTHAND);
+            }
+
             BigDecimal result = applyFunction(tok.value, arg.value, tok.pos);
-            return new ParseResult(result, arg.nextPos + 1);
+            return new ParseResult(result, arg.nextPos + 1, arg.radixMode);
         }
 
         if (tok.kind == TokenKind.LPAREN) {
@@ -511,20 +1010,20 @@ public class ExpressionEvaluator {
                 throw new EvalException(tr("notenoughcalculator.error.unmatched_parenthesis"), tok.pos);
             }
 
-            return new ParseResult(inner.value, inner.nextPos + 1);
+            return new ParseResult(inner.value, inner.nextPos + 1, inner.radixMode);
         }
 
         throw new EvalException(tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);
     }
 
-    // Apply math functions
+    // Apply single-argument math functions
     private BigDecimal applyFunction(String func, BigDecimal arg, int pos) throws EvalException {
         switch (func) {
             case "sqrt":
                 if (arg.compareTo(BigDecimal.ZERO) < 0) {
                     throw new EvalException(tr("notenoughcalculator.error.negative_sqrt"), pos);
                 }
-                return new BigDecimal(Math.sqrt(arg.doubleValue()), mc);
+                return arg.sqrt(mc);
 
             case "abs":
                 return arg.abs();
@@ -538,9 +1037,126 @@ public class ExpressionEvaluator {
             case "round":
                 return arg.setScale(0, RoundingMode.HALF_UP);
 
+            case "log":
+                if (arg.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new EvalException(tr("notenoughcalculator.error.log_non_positive"), pos);
+                }
+                return BigDecimal.valueOf(Math.log10(arg.doubleValue()));
+
+            case "ln":
+                if (arg.compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new EvalException(tr("notenoughcalculator.error.log_non_positive"), pos);
+                }
+                return BigDecimal.valueOf(Math.log(arg.doubleValue()));
+
+            case "sin":
+                return BigDecimal.valueOf(Math.sin(Math.toRadians(arg.doubleValue())));
+
+            case "cos":
+                return BigDecimal.valueOf(Math.cos(Math.toRadians(arg.doubleValue())));
+
+            case "tan":
+                return BigDecimal.valueOf(Math.tan(Math.toRadians(arg.doubleValue())));
+
+            case "rad":
+                return BigDecimal.valueOf(Math.toRadians(arg.doubleValue()));
+
+            case "deg":
+                return BigDecimal.valueOf(Math.toDegrees(arg.doubleValue()));
+
             default:
                 throw new EvalException(tr("notenoughcalculator.error.unknown_function", func), pos);
         }
+    }
+
+    public static BigDecimal calculateBzPayout(BigDecimal price, double taxRatePct) {
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        // Base Bazaar tax rate (1.25% default, reduced by Bazaar Flipper perk)
+        double multiplier = 1.0 - (taxRatePct / 100.0);
+        return price.multiply(BigDecimal.valueOf(multiplier)).stripTrailingZeros();
+    }
+
+    public static BigDecimal calculateAhPayout(BigDecimal price, double durationHours, boolean isBin) {
+        if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        // Creation / Listing Fee
+        double listingFeePct;
+        if (isBin) {
+            // BIN listing fee brackets: 1% (<10m), 2% (10m-100m), 2.5% (>100m)
+            if (price.compareTo(new BigDecimal("100000000")) > 0) {
+                listingFeePct = 0.025;
+            } else if (price.compareTo(new BigDecimal("10000000")) >= 0) {
+                listingFeePct = 0.020;
+            } else {
+                listingFeePct = 0.010;
+            }
+        } else {
+            // Standard auction listing fee: 5% of starting price
+            listingFeePct = 0.050;
+        }
+        BigDecimal listingFee = price.multiply(BigDecimal.valueOf(listingFeePct));
+
+        // Collection claim fee (1% above 1m, capped to avoid dropping under 1m)
+        BigDecimal collectionTax = BigDecimal.ZERO;
+        if (price.compareTo(new BigDecimal("1000000")) > 0) {
+            BigDecimal rawTax = price.multiply(new BigDecimal("0.01"));
+            BigDecimal afterTax = price.subtract(rawTax);
+            if (afterTax.compareTo(new BigDecimal("1000000")) < 0) {
+                collectionTax = price.subtract(new BigDecimal("1000000"));
+            } else {
+                collectionTax = rawTax;
+            }
+        }
+
+        // AH listing duration fee (6h is standard default = 0 coins)
+        BigDecimal durationFee = BigDecimal.valueOf(calculateAhDurationFee(durationHours));
+
+        BigDecimal net = price.subtract(listingFee).subtract(collectionTax).subtract(durationFee);
+        return net.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : net.stripTrailingZeros();
+    }
+
+    public static double calculateAhDurationFee(double hours) {
+        if (hours <= 0) return 0;
+        // 5 Minutes to 59 Minutes: +50 coins
+        if (hours < 1.0) {
+            return 50;
+        }
+        // Hours 1 to 7: Starts at 20 coins (+5 coins/hour)
+        if (hours <= 7) {
+            return 20 + Math.round((hours - 1) * 5);
+        }
+        // Hours 7 to 12: Adds +10 coins/hour (12h = 100)
+        if (hours <= 12) {
+            return 50 + Math.round((hours - 7) * 10);
+        }
+        // Hours 12 to 24: Adds +20 coins/hour (24h = 350)
+        if (hours < 24) {
+            return 100 + Math.round((hours - 12) * 20);
+        }
+        if (hours == 24) {
+            return 350;
+        }
+        // Daily scaling up to Day 5 (120h)
+        if (hours <= 48) {
+            return 350 + Math.round((hours - 24) * ((1200.0 - 350.0) / 24.0));
+        }
+        if (hours <= 72) {
+            return 1200 + Math.round((hours - 48) * ((3000.0 - 1200.0) / 24.0));
+        }
+        if (hours <= 96) {
+            return 3000 + Math.round((hours - 72) * ((7200.0 - 3000.0) / 24.0));
+        }
+        if (hours <= 120) {
+            return 7200 + Math.round((hours - 96) * ((12000.0 - 7200.0) / 24.0));
+        }
+        // Day 5 (120h) through Day 14 (336h): linear +4,800 coins/day (+200 coins/hour)
+        double extraHours = hours - 120;
+        double fee = 12000 + (extraHours * 200);
+        return Math.min(55200, Math.round(fee));
     }
 
     private boolean isInteger(BigDecimal value) {

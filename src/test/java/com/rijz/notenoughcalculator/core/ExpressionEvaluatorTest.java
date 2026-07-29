@@ -507,4 +507,53 @@ class ExpressionEvaluatorTest {
         @Test void clampExactMin() throws Exception { assertCalc("clamp(0, 0, 10)", "0"); }
         @Test void clampExactMax() throws Exception { assertCalc("clamp(10, 0, 10)", "10"); }
     }
+
+    @Nested
+    @DisplayName("SkyBlock Tax Functions & Angle Helpers")
+    class TaxAndAngleFunctions {
+        @Test void bzTaxDefault() throws Exception { assertCalc("bz(100m)", "98750000"); }
+        @Test void bzTaxZero() throws Exception { assertCalc("bz(0)", "0"); }
+        @Test void ahStandardAuction() throws Exception { assertCalc("ah(50m)", "46999955"); }
+        @Test void ahBinUnder10m() throws Exception { assertCalc("ahbin(5m)", "4899955"); }
+        @Test void ahBin10mTo100m() throws Exception { assertCalc("ahbin(50m)", "48499955"); }
+        @Test void ahBinOver100m() throws Exception { assertCalc("ahbin(200m)", "192999955"); }
+        @Test void ahBinWith30mDuration() throws Exception { assertCalc("ahbin(50m, 0.5)", "48499950"); }
+        @Test void ahBinWith59mFraction() throws Exception { assertCalc("ahbin(50m, 59/60)", "48499950"); }
+        @Test void ahBinWith09hDuration() throws Exception { assertCalc("ahbin(50m, 0.9)", "48499950"); }
+        @Test void ahBinWith1hDuration() throws Exception { assertCalc("ahbin(50m, 1)", "48499980"); }
+        @Test void ahBinWith24hDuration() throws Exception { assertCalc("ahbin(50m, 24)", "48499650"); }
+        @Test void ahBinWith7dDuration() throws Exception { assertCalc("ahbin(50m, 168)", "48478400"); }
+
+        @Test
+        void bzFlipperPerkLevels() {
+            // Level 0: 1.25% tax
+            assertEquals(0, new BigDecimal("98750000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.25)));
+            // Level 1: 1.125% tax
+            assertEquals(0, new BigDecimal("98875000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.125)));
+            // Level 2: 1.0% tax
+            assertEquals(0, new BigDecimal("99000000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.0)));
+        }
+
+        @Test
+        void ahCollectionClaimTaxCapping() {
+            // Price = 1,005,000 -> 1% listing fee (10,050) -> claim tax 5,000 (capped so payout doesn't drop under 1m)
+            BigDecimal net = ExpressionEvaluator.calculateAhPayout(new BigDecimal("1005000"), 6.0, true);
+            // 1,005,000 - 10,050 (listing) - 5,000 (claim tax cap) - 45 (6h fee) = 989,905
+            assertEquals(0, new BigDecimal("989905").compareTo(net));
+        }
+
+        @Test void rad180() throws Exception { assertCalcApprox("rad(180)", Math.PI, 0.0001); }
+        @Test void degPi() throws Exception { assertCalcApprox("deg(pi)", 180.0, 0.0001); }
+        @Test void fmtPassThrough() throws Exception { assertCalcResult("fmt(1500000)", "1500000", ExpressionEvaluator.RadixMode.SHORTHAND); }
+
+        @Test
+        void verifyAllAhDurationFeeMilestones() {
+            int[] hours = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336};
+            double[] expectedFees = {20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 350, 1200, 3000, 7200, 12000, 16800, 21600, 26400, 31200, 36000, 40800, 45600, 50400, 55200};
+
+            for (int i = 0; i < hours.length; i++) {
+                assertEquals(expectedFees[i], ExpressionEvaluator.calculateAhDurationFee(hours[i]), "Failed for hour " + hours[i]);
+            }
+        }
+    }
 }

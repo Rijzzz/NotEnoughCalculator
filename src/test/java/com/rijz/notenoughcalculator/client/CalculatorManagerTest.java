@@ -171,5 +171,27 @@ class CalculatorManagerTest {
             assertTrue(manager.hasResult());
             assertEquals("30", manager.getLastFormattedResult());
         }
+
+        @Test
+        void taxAndAngleHeuristics() {
+            assertTrue(CalculatorManager.looksLikeCalculation("bz(100m)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("ah(50m)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("ahbin(50m, 24)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("rad(180)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("deg(pi)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("fmt(1500000)"));
+            assertTrue(CalculatorManager.looksLikeCalculation("bz(10m) + ahbin(5m)"));
+        }
+
+        @Test
+        void formatSearchBarLiveEvaluationSkyBlockFeatures() {
+            assertEquals("bz(100m)", manager.formatSearchBar("bz(100m)"));
+            assertTrue(manager.hasResult());
+            assertEquals("98,750,000", manager.getLastFormattedResult());
+
+            assertEquals("fmt(1500000)", manager.formatSearchBar("fmt(1500000)"));
+            assertTrue(manager.hasResult());
+            assertEquals("1.5m", manager.getLastFormattedResult());
+        }
     }
 }

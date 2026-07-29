@@ -64,7 +64,7 @@ public class CalculatorManager {
     private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor|bz|ah|ahbin|fmt|rad|deg)\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     // Binary (0b), Hex (0x), or Octal (0o) number literal prefix

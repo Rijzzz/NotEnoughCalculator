@@ -312,6 +312,16 @@ public class CalcCommands {
         send(ctx, "notenoughcalculator.help.functions.max_example_1");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.functions.tax");
+        send(ctx, "notenoughcalculator.help.functions.tax_bz");
+        send(ctx, "notenoughcalculator.help.functions.tax_ah");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.shorthand_angle");
+        send(ctx, "notenoughcalculator.help.functions.fmt");
+        send(ctx, "notenoughcalculator.help.functions.rad_deg");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.functions.combining");
         send(ctx, "notenoughcalculator.help.functions.combining_example");
         sendEmpty(ctx);

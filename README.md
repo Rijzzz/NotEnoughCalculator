@@ -98,6 +98,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - Minecraft (1.21.11, 26.1.x, 26.x)
 
 *Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1.x and 26.x!*
+
 *Note: All features introduced in versions 2.0.1–2.5.0 (previously available only for Minecraft 26.1.x & 26.2) can now be used on Minecraft 1.21.11!*
 
 **Dependencies (Optional / Recommended):**

@@ -39,8 +39,8 @@ public class ResultFormatter {
         if (value == null) return "0";
         CalculatorConfig config = CalculatorConfig.getInstance();
 
-        BigDecimal stripped = value.stripTrailingZeros();
-        String plain = stripped.toPlainString();
+        BigDecimal scaled = value.setScale(config.decimalPrecision, RoundingMode.HALF_UP).stripTrailingZeros();
+        String plain = scaled.toPlainString();
 
         if (!config.enableCommaFormatting) {
             return plain;
@@ -82,6 +82,10 @@ public class ResultFormatter {
         if (evalResult == null) return "0";
         if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
+        }
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        if (config.enableShorthandResults) {
+            return toShorthand(evalResult.value);
         }
         return formatWithCommas(evalResult.value);
     }

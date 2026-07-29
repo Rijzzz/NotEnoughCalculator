@@ -67,9 +67,10 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <details>
 <summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
-- Press `Ctrl+Z` in REI search to recall previous calculations (undo)
-- Press `Ctrl+Y` to redo/go forward in history
-- Press `Ctrl+C` in REI search to copy calculation result to clipboard
+- Press `Ctrl+Z` / `Cmd+Z` in REI search to recall previous calculations (undo)
+- Press `Ctrl+Y` / `Cmd+Y` to redo/go forward in history
+- Press `Ctrl+C` / `Cmd+C` in REI search to copy unformatted calculation result directly to system clipboard
+- Full Numpad Enter support (`GLFW_KEY_KP_ENTER`)
 - Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
 - View full history with `/calchist` (shows last 15 entries)
 - Session-based: REI search history clears automatically when you leave a world/server
@@ -378,10 +379,11 @@ deg(pi) = 180                      (radians to degrees)
 <details>
 <summary>Keybinds</summary>
 
-### History Navigation
-- **`Ctrl + Z`** in REI search - Recall previous calculation (undo)
-- **`Ctrl + Y`** in REI search - Go forward in history (redo)
-- **`Ctrl + C`** in REI search - Copy calculation result to clipboard
+### Search Bar Shortcuts
+- **`Ctrl + Z` / `Cmd + Z`** in REI search - Recall previous calculation (undo)
+- **`Ctrl + Y` / `Cmd + Y`** in REI search - Go forward in history (redo)
+- **`Ctrl + C` / `Cmd + C`** in REI search - Copy calculation result to clipboard
+- **`Enter` / `Numpad Enter`** in REI search - Commit calculation into history and keep focus
 
 ### Notes
 - History is session-based and automatically clears when you leave a world/server

@@ -153,6 +153,15 @@ class ResultFormatterTest {
     }
 
     @Test
+    @DisplayName("Format toShorthand values")
+    void formatToShorthand() {
+        assertEquals("1.5m", ResultFormatter.toShorthand(new BigDecimal("1500000")));
+        assertEquals("2.5b", ResultFormatter.toShorthand(new BigDecimal("2500000000")));
+        assertEquals("100k", ResultFormatter.toShorthand(new BigDecimal("100000")));
+        assertEquals("500", ResultFormatter.toShorthand(new BigDecimal("500")));
+    }
+
+    @Test
     @DisplayName("Format null value with commas returns 0")
     void formatNullCommas() {
         assertEquals("0", ResultFormatter.formatWithCommas(null));
@@ -169,5 +178,31 @@ class ResultFormatterTest {
     void formatNullEvalResult() {
         assertEquals("0", ResultFormatter.formatResult(null));
         assertEquals("0", ResultFormatter.formatResultWithUnits(null));
+    }
+
+    @Test
+    @DisplayName("Format with Shorthand radix mode")
+    void formatShorthandRadix() {
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("1500000"), ExpressionEvaluator.RadixMode.SHORTHAND);
+        assertEquals("1.5m", formatted);
+    }
+
+    @Test
+    @DisplayName("Format result with units under Shorthand radix mode")
+    void formatResultWithUnitsShorthand() {
+        ExpressionEvaluator.EvalResult res = new ExpressionEvaluator.EvalResult(new BigDecimal("2500000000"), ExpressionEvaluator.RadixMode.SHORTHAND);
+        String formatted = ResultFormatter.formatResultWithUnits(res);
+        assertEquals("2.5b", formatted);
+    }
+
+    @Test
+    @DisplayName("Format toShorthand across k, m, b, t boundaries")
+    void formatToShorthandBoundaries() {
+        assertEquals("999k", ResultFormatter.toShorthand(new BigDecimal("999000")));
+        assertEquals("1.5m", ResultFormatter.toShorthand(new BigDecimal("1500000")));
+        assertEquals("2.5b", ResultFormatter.toShorthand(new BigDecimal("2500000000")));
+        assertEquals("3.1t", ResultFormatter.toShorthand(new BigDecimal("3100000000000")));
+        assertEquals("-1.5m", ResultFormatter.toShorthand(new BigDecimal("-1500000")));
+        assertEquals("-500", ResultFormatter.toShorthand(new BigDecimal("-500")));
     }
 }

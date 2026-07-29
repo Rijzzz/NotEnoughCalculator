@@ -92,8 +92,8 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 ---
 
 **Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api) (0.144.0 or newer)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.818 or newer according to the Minecraft version you play on)
+- [Fabric API](https://modrinth.com/mod/fabric-api) (0.155.2 or newer according to the Minecraft version you play on)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (26.1.819 or newer according to the Minecraft version you play on)
 - Minecraft (26.1.x, 26.x)
 
 *Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1.x and 26.x!*
@@ -536,7 +536,7 @@ See the full license text here:
 
 ---
 
-**Created and maintained by Laze & Rijz**
+**Maintained by Laze & Rijz**
 
 **Type. Calculate. Profit.**
 

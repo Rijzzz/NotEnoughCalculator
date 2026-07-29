@@ -21,118 +21,312 @@ package com.rijz.notenoughcalculator.client.gui;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.lang.reflect.Method;
 
-// Custom settings screen built with Minecraft's native widgets.
-// Opens from ModMenu's "Configure" button in the mod list.
 public class CalculatorConfigScreen extends Screen {
 
     private final Screen parent;
 
-    // Mutable copies of config values (applied on Save)
+    // Working state copied from config (only saved when player hits Save)
     private boolean showInlineResults;
     private boolean showUnitSuggestions;
     private boolean enableCommaFormatting;
     private boolean enableHistoryNavigation;
+    private boolean enableShorthandResults;
     private int decimalPrecision;
+    private int bazaarFlipperLevel;
+
+    private Button inlineBtn;
+    private Button unitBtn;
+    private Button commaBtn;
+    private Button shorthandBtn;
+    private Button precisionBtn;
+    private Button bazaarLvl0Btn;
+    private Button bazaarLvl1Btn;
+    private Button bazaarLvl2Btn;
+    private Button historyBtn;
+    private Button saveBtn;
+    private Button cancelBtn;
+
+    private final int[] PRECISION_OPTIONS = {1, 2, 5, 10, 15, 20, 30, 50};
 
     public CalculatorConfigScreen(Screen parent) {
         super(Component.translatable("notenoughcalculator.config.screen.title"));
         this.parent = parent;
 
-        // Snapshot current config so Cancel discards changes
         CalculatorConfig config = CalculatorConfig.getInstance();
         this.showInlineResults = config.showInlineResults;
         this.showUnitSuggestions = config.showUnitSuggestions;
         this.enableCommaFormatting = config.enableCommaFormatting;
         this.enableHistoryNavigation = config.enableHistoryNavigation;
+        this.enableShorthandResults = config.enableShorthandResults;
         this.decimalPrecision = config.decimalPrecision;
+        this.bazaarFlipperLevel = config.bazaarFlipperLevel;
     }
 
     @Override
     protected void init() {
-        int centerX = this.width / 2;
-        int buttonWidth = 200;
-        int buttonHeight = 20;
-        int startY = 40;
-        int spacing = 26;
+        int panelWidth = 310;
+        int panelHeight = 260;
+        int panelX = (this.width - panelWidth) / 2;
+        int panelY = (this.height - panelHeight) / 2;
 
-        // -- Display Settings --
+        int buttonWidth = 270;
+        int buttonHeight = 18;
+        int startY = panelY + 28;
 
-        addRenderableWidget(CycleButton.onOffBuilder(showInlineResults)
-                .create(centerX - buttonWidth / 2, startY, buttonWidth, buttonHeight,
-                        Component.translatable("notenoughcalculator.config.screen.inline_results"),
-                        (btn, val) -> showInlineResults = val));
+        // Display options
+        inlineBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            showInlineResults = !showInlineResults;
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 14, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.inline_results")))
+                .build());
 
-        addRenderableWidget(CycleButton.onOffBuilder(showUnitSuggestions)
-                .create(centerX - buttonWidth / 2, startY + spacing, buttonWidth, buttonHeight,
-                        Component.translatable("notenoughcalculator.config.screen.unit_suggestions"),
-                        (btn, val) -> showUnitSuggestions = val));
+        unitBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            showUnitSuggestions = !showUnitSuggestions;
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 34, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.unit_suggestions")))
+                .build());
 
-        addRenderableWidget(CycleButton.onOffBuilder(enableCommaFormatting)
-                .create(centerX - buttonWidth / 2, startY + spacing * 2, buttonWidth, buttonHeight,
-                        Component.translatable("notenoughcalculator.config.screen.comma_formatting"),
-                        (btn, val) -> enableCommaFormatting = val));
+        commaBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            enableCommaFormatting = !enableCommaFormatting;
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 54, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.comma_formatting")))
+                .build());
 
-        // -- Calculation Settings --
+        shorthandBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            enableShorthandResults = !enableShorthandResults;
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 74, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.shorthand_results")))
+                .build());
 
-        addRenderableWidget(CycleButton.<Integer>builder(val -> Component.literal(String.valueOf(val)), decimalPrecision)
-                .withValues(1, 2, 5, 10, 15, 20, 30, 50)
-                .create(centerX - buttonWidth / 2, startY + spacing * 4, buttonWidth, buttonHeight,
-                        Component.translatable("notenoughcalculator.config.screen.decimal_precision"),
-                        (btn, val) -> decimalPrecision = val));
+        // Calculation precision
+        precisionBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            decimalPrecision = getNextPrecision(decimalPrecision);
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 110, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.decimal_precision")))
+                .build());
 
-        // -- Features --
+        // Bazaar Perk level selector pills (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
+        int pillWidth = 86;
+        int pillGap = 6;
+        int pillsStartX = panelX + (panelWidth - (pillWidth * 3 + pillGap * 2)) / 2;
+        int pillsY = startY + 146;
 
-        addRenderableWidget(CycleButton.onOffBuilder(enableHistoryNavigation)
-                .create(centerX - buttonWidth / 2, startY + spacing * 6, buttonWidth, buttonHeight,
-                        Component.translatable("notenoughcalculator.config.screen.history_navigation"),
-                        (btn, val) -> enableHistoryNavigation = val));
+        Tooltip bazaarTooltip = Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.bazaar_flipper_perk"));
 
-        // -- Save / Cancel buttons --
+        bazaarLvl0Btn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_0"),
+                btn -> selectBazaarLevel(0)).bounds(pillsStartX, pillsY, pillWidth, buttonHeight)
+                .tooltip(bazaarTooltip)
+                .build());
 
-        int bottomY = this.height - 30;
-        int gap = 10;
-        int halfWidth = (buttonWidth - gap) / 2;
+        bazaarLvl1Btn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_1"),
+                btn -> selectBazaarLevel(1)).bounds(pillsStartX + pillWidth + pillGap, pillsY, pillWidth, buttonHeight)
+                .tooltip(bazaarTooltip)
+                .build());
 
-        addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.save"),
+        bazaarLvl2Btn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_2"),
+                btn -> selectBazaarLevel(2)).bounds(pillsStartX + (pillWidth + pillGap) * 2, pillsY, pillWidth, buttonHeight)
+                .tooltip(bazaarTooltip)
+                .build());
+
+        // History navigation shortcut
+        historyBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+            enableHistoryNavigation = !enableHistoryNavigation;
+            updateButtonLabels();
+        }).bounds(panelX + (panelWidth - buttonWidth) / 2, startY + 182, buttonWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.history_navigation")))
+                .build());
+
+        // Save & Cancel
+        int bottomY = panelY + panelHeight - 24;
+        int gap = 12;
+        int saveWidth = (buttonWidth - gap) / 2;
+
+        saveBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.save"),
                 btn -> {
                     saveConfig();
                     closeScreen();
-                }).bounds(centerX - buttonWidth / 2, bottomY, halfWidth, buttonHeight).build());
+                }).bounds(panelX + (panelWidth - buttonWidth) / 2, bottomY, saveWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.save")))
+                .build());
 
-        addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.cancel"),
-                btn -> closeScreen())
-                .bounds(centerX - buttonWidth / 2 + halfWidth + gap, bottomY, halfWidth, buttonHeight).build());
+        cancelBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.cancel"),
+                btn -> closeScreen()).bounds(panelX + (panelWidth - buttonWidth) / 2 + saveWidth + gap, bottomY, saveWidth, buttonHeight)
+                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.cancel")))
+                .build());
+
+        updateButtonLabels();
+    }
+
+    private int getNextPrecision(int current) {
+        for (int i = 0; i < PRECISION_OPTIONS.length; i++) {
+            if (PRECISION_OPTIONS[i] == current) {
+                return PRECISION_OPTIONS[(i + 1) % PRECISION_OPTIONS.length];
+            }
+        }
+        return 10;
+    }
+
+    private void selectBazaarLevel(int level) {
+        this.bazaarFlipperLevel = level;
+        updateButtonLabels();
+    }
+
+    private void updateButtonLabels() {
+        Component onText = Component.translatable("notenoughcalculator.config.screen.on");
+        Component offText = Component.translatable("notenoughcalculator.config.screen.off");
+
+        if (inlineBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.inline_results").copy().append(": ").append(showInlineResults ? onText : offText);
+            inlineBtn.setMessage(label);
+        }
+        if (unitBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.unit_suggestions").copy().append(": ").append(showUnitSuggestions ? onText : offText);
+            unitBtn.setMessage(label);
+        }
+        if (commaBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.comma_formatting").copy().append(": ").append(enableCommaFormatting ? onText : offText);
+            commaBtn.setMessage(label);
+        }
+        if (shorthandBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.shorthand_results").copy().append(": ").append(enableShorthandResults ? onText : offText);
+            shorthandBtn.setMessage(label);
+        }
+        if (precisionBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.decimal_precision").copy().append(": §e§l").append(String.valueOf(decimalPrecision));
+            precisionBtn.setMessage(label);
+        }
+        if (historyBtn != null) {
+            MutableComponent label = Component.translatable("notenoughcalculator.config.screen.history_navigation").copy().append(": ").append(enableHistoryNavigation ? onText : offText);
+            historyBtn.setMessage(label);
+        }
+
+        if (bazaarLvl0Btn != null) {
+            bazaarLvl0Btn.setMessage(bazaarFlipperLevel == 0 ? 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_0_selected") : 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_0"));
+        }
+        if (bazaarLvl1Btn != null) {
+            bazaarLvl1Btn.setMessage(bazaarFlipperLevel == 1 ? 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_1_selected") : 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_1"));
+        }
+        if (bazaarLvl2Btn != null) {
+            bazaarLvl2Btn.setMessage(bazaarFlipperLevel == 2 ? 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_2_selected") : 
+                    Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_lvl_2"));
+        }
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        int panelWidth = 310;
+        int panelHeight = 260;
+        int panelX = (this.width - panelWidth) / 2;
+        int panelY = (this.height - panelHeight) / 2;
 
-        int centerX = this.width / 2;
-        int spacing = 26;
+        // Dark background and glass card frame
+        graphics.fill(0, 0, this.width, this.height, 0xD0040711);
+        graphics.fill(panelX - 2, panelY - 2, panelX + panelWidth + 2, panelY + panelHeight + 2, 0x4006B6D4);
+        graphics.fill(panelX - 1, panelY - 1, panelX + panelWidth + 1, panelY + panelHeight + 1, 0xFF1E293B);
+        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, 0xF50F172A);
 
-        // Title
-        graphics.text(this.font, this.title, centerX - this.font.width(this.title) / 2, 15, 0xFFFFFF, true);
+        // Header title bar
+        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + 22, 0xFF1E293B);
+        graphics.fill(panelX, panelY + 21, panelX + panelWidth, panelY + 22, 0xFF06B6D4);
+
+        Component titleComp = Component.translatable("notenoughcalculator.config.screen.header_title");
+        graphics.text(this.font, titleComp, panelX + (panelWidth - this.font.width(titleComp)) / 2, panelY + 7, 0xFFFFFFFF, true);
 
         // Category headers
-        int startY = 40;
-        graphics.text(this.font,
-                Component.translatable("notenoughcalculator.config.screen.display_header"),
-                centerX - 100, startY - 12, 0xFFAA00, true);
+        int startY = panelY + 28;
+        graphics.text(this.font, Component.translatable("notenoughcalculator.config.screen.display_header"), panelX + 20, startY + 2, 0xFF34D399, true);
+        graphics.text(this.font, Component.translatable("notenoughcalculator.config.screen.calculation_header"), panelX + 20, startY + 98, 0xFF38BDF8, true);
+        graphics.text(this.font, Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_level_label"), panelX + 20, startY + 134, 0xFFCBD5E1, true);
+        graphics.text(this.font, Component.translatable("notenoughcalculator.config.screen.features_header"), panelX + 20, startY + 170, 0xFFFBBF24, true);
 
-        graphics.text(this.font,
-                Component.translatable("notenoughcalculator.config.screen.calculation_header"),
-                centerX - 100, startY + spacing * 3 + 2, 0xFFAA00, true);
+        // Custom widget backgrounds & borders
+        renderGlassButtonBounds(graphics, inlineBtn, mouseX, mouseY, showInlineResults);
+        renderGlassButtonBounds(graphics, unitBtn, mouseX, mouseY, showUnitSuggestions);
+        renderGlassButtonBounds(graphics, commaBtn, mouseX, mouseY, enableCommaFormatting);
+        renderGlassButtonBounds(graphics, shorthandBtn, mouseX, mouseY, enableShorthandResults);
+        renderGlassButtonBounds(graphics, precisionBtn, mouseX, mouseY, true);
 
-        graphics.text(this.font,
-                Component.translatable("notenoughcalculator.config.screen.features_header"),
-                centerX - 100, startY + spacing * 5 + 2, 0xFFAA00, true);
+        renderPillBounds(graphics, bazaarLvl0Btn, mouseX, mouseY, bazaarFlipperLevel == 0);
+        renderPillBounds(graphics, bazaarLvl1Btn, mouseX, mouseY, bazaarFlipperLevel == 1);
+        renderPillBounds(graphics, bazaarLvl2Btn, mouseX, mouseY, bazaarFlipperLevel == 2);
+
+        renderGlassButtonBounds(graphics, historyBtn, mouseX, mouseY, enableHistoryNavigation);
+
+        renderActionButtonBounds(graphics, saveBtn, mouseX, mouseY, 0xFF065F46, 0xFF10B981);
+        renderActionButtonBounds(graphics, cancelBtn, mouseX, mouseY, 0xFF881337, 0xFFF43F5E);
+
+        // Render widget text
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+    }
+
+    private void renderGlassButtonBounds(GuiGraphicsExtractor graphics, Button btn, int mouseX, int mouseY, boolean active) {
+        if (btn == null) return;
+        int x = btn.getX();
+        int y = btn.getY();
+        int w = btn.getWidth();
+        int h = btn.getHeight();
+        boolean hovered = isHovered(btn, mouseX, mouseY);
+
+        int bgColor = active ? (hovered ? 0xFF1E3A8A : 0xFF172554) : (hovered ? 0xFF334155 : 0xFF1E293B);
+        int borderColor = hovered ? 0xFF38BDF8 : (active ? 0xFF3B82F6 : 0xFF475569);
+
+        graphics.fill(x - 1, y - 1, x + w + 1, y + h + 1, borderColor);
+        graphics.fill(x, y, x + w, y + h, bgColor);
+
+        if (active) {
+            graphics.fill(x + w - 4, y + 3, x + w - 2, y + h - 3, 0xFF34D399);
+        }
+    }
+
+    private void renderPillBounds(GuiGraphicsExtractor graphics, Button btn, int mouseX, int mouseY, boolean selected) {
+        if (btn == null) return;
+        int x = btn.getX();
+        int y = btn.getY();
+        int w = btn.getWidth();
+        int h = btn.getHeight();
+        boolean hovered = isHovered(btn, mouseX, mouseY);
+
+        int bgColor = selected ? (hovered ? 0xFF92400E : 0xFF78350F) : (hovered ? 0xFF334155 : 0xFF1E293B);
+        int borderColor = selected ? 0xFFF59E0B : (hovered ? 0xFF38BDF8 : 0xFF475569);
+
+        graphics.fill(x - 1, y - 1, x + w + 1, y + h + 1, borderColor);
+        graphics.fill(x, y, x + w, y + h, bgColor);
+    }
+
+    private void renderActionButtonBounds(GuiGraphicsExtractor graphics, Button btn, int mouseX, int mouseY, int bgBase, int borderBase) {
+        if (btn == null) return;
+        int x = btn.getX();
+        int y = btn.getY();
+        int w = btn.getWidth();
+        int h = btn.getHeight();
+        boolean hovered = isHovered(btn, mouseX, mouseY);
+
+        int borderColor = hovered ? 0xFFFFFFFF : borderBase;
+
+        graphics.fill(x - 1, y - 1, x + w + 1, y + h + 1, borderColor);
+        graphics.fill(x, y, x + w, y + h, bgBase);
+    }
+
+    private boolean isHovered(Button btn, int mouseX, int mouseY) {
+        return btn != null && mouseX >= btn.getX() && mouseX <= btn.getX() + btn.getWidth() &&
+               mouseY >= btn.getY() && mouseY <= btn.getY() + btn.getHeight();
     }
 
     private void saveConfig() {
@@ -141,7 +335,9 @@ public class CalculatorConfigScreen extends Screen {
         config.showUnitSuggestions = this.showUnitSuggestions;
         config.enableCommaFormatting = this.enableCommaFormatting;
         config.enableHistoryNavigation = this.enableHistoryNavigation;
+        config.enableShorthandResults = this.enableShorthandResults;
         config.decimalPrecision = this.decimalPrecision;
+        config.bazaarFlipperLevel = this.bazaarFlipperLevel;
         config.save();
     }
 

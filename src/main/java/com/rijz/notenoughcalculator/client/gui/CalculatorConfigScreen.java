@@ -19,14 +19,14 @@
 package com.rijz.notenoughcalculator.client.gui;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-
-import java.lang.reflect.Method;
+import org.lwjgl.glfw.GLFW;
 
 public class CalculatorConfigScreen extends Screen {
 
@@ -341,24 +341,17 @@ public class CalculatorConfigScreen extends Screen {
         config.save();
     }
 
-    public static void openScreen(net.minecraft.client.Minecraft minecraft, Screen screen) {
+    public static void openScreen(Minecraft minecraft, Screen screen) {
         if (minecraft != null) {
-            minecraft.execute(() -> {
-                try {
-                    Method m = minecraft.getClass().getMethod("setScreenAndShow", Screen.class);
-                    m.invoke(minecraft, screen);
-                } catch (Exception e1) {
-                    try {
-                        Method m = minecraft.getClass().getMethod("setScreen", Screen.class);
-                        m.invoke(minecraft, screen);
-                    } catch (Exception ignored) {}
-                }
-            });
+            minecraft.execute(() -> minecraft.setScreen(screen));
         }
     }
 
     private void closeScreen() {
-        openScreen(this.minecraft, this.parent);
+        if (this.minecraft != null) {
+            Screen target = (this.parent instanceof net.minecraft.client.gui.screens.ChatScreen) ? null : this.parent;
+            this.minecraft.setScreen(target);
+        }
     }
 
     @Override

@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = "${project.mod_version}"
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -58,8 +58,6 @@ processResources {
     inputs.property "min_rei_version", project.min_rei_version
     inputs.property "modmenu_version", project.modmenu_version
     inputs.property "min_modmenu_version", project.min_modmenu_version
-    inputs.property "min_minecraft_version", project.min_minecraft_version
-    inputs.property "max_minecraft_version", project.max_minecraft_version
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
@@ -71,9 +69,7 @@ processResources {
                 "rei_version": project.rei_version,
                 "min_rei_version": project.min_rei_version,
                 "modmenu_version": project.modmenu_version,
-                "min_modmenu_version": project.min_modmenu_version,
-                "min_minecraft_version": project.min_minecraft_version,
-                "max_minecraft_version": project.max_minecraft_version
+                "min_modmenu_version": project.min_modmenu_version
     }
 }
 

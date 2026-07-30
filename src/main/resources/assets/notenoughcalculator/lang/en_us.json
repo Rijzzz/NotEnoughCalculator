@@ -223,7 +223,7 @@
   "notenoughcalculator.help.functions.fmt": "§efmt(x) §7- Format number to Skyblock shorthand (1500000 -> 1.5m)",
   "notenoughcalculator.help.functions.rad_deg": "§erad(x) / deg(x) §7- Degrees <-> Radians angle conversions",
   "notenoughcalculator.config.screen.title": "Not Enough Calculator Settings",
-  "notenoughcalculator.config.screen.header_title": "§6§lNot Enough Calculator §7v2.5.0",
+  "notenoughcalculator.config.screen.header_title": "§6§lNot Enough Calculator §7v2.5.1",
   "notenoughcalculator.config.screen.display_header": "§a§lDISPLAY SETTINGS",
   "notenoughcalculator.config.screen.calculation_header": "§b§lCALCULATION SETTINGS",
   "notenoughcalculator.config.screen.features_header": "§e§lFEATURE TOGGLES",

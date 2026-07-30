@@ -152,7 +152,7 @@ public class CalculatorManager {
         if (parenCount != 0) return false;  // Unmatched parens
 
         // Can't end with incomplete function call
-        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\([^)]*$")) {
+        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor|bz|ah|ahbin|fmt|rad|deg)\\s*\\([^)]*$")) {
             return false;
         }
 

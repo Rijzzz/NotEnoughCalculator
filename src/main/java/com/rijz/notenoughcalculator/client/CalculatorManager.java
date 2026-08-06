@@ -60,11 +60,34 @@ public class CalculatorManager {
     private boolean hasUncommittedCalculation = false;
 
 
+    private static String buildUnitsRegex() {
+        List<String> sortedUnits = new ArrayList<>(com.rijz.notenoughcalculator.core.ExpressionEvaluator.UNITS.keySet());
+        sortedUnits.sort((a, b) -> Integer.compare(b.length(), a.length()));
+        StringBuilder sb = new StringBuilder("(?:");
+        for (int i = 0; i < sortedUnits.size(); i++) {
+            if (i > 0) sb.append("|");
+            sb.append(Pattern.quote(sortedUnits.get(i)));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    private static String buildFunctionsRegex() {
+        List<String> sortedFuncs = new ArrayList<>(com.rijz.notenoughcalculator.core.ExpressionEvaluator.FUNCTIONS);
+        sortedFuncs.sort((a, b) -> Integer.compare(b.length(), a.length()));
+        StringBuilder sb = new StringBuilder("(");
+        for (int i = 0; i < sortedFuncs.size(); i++) {
+            if (i > 0) sb.append("|");
+            sb.append(Pattern.quote(sortedFuncs.get(i)));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     // Precompiled patterns to avoid GC pressure on every keystroke
     private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
-    private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*[kmbtseh](?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern STORAGE_UNIT_PATTERN = Pattern.compile(".*\\d+\\s*(?:sc|dc|eb)(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*(sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max|hex|bin|oct|pct|gcd|lcm|clamp|avg|xor|bz|ah|ahbin|fmt|rad|deg)\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*" + buildUnitsRegex() + "(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*" + buildFunctionsRegex() + "\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     // Binary (0b), Hex (0x), or Octal (0o) number literal prefix
@@ -115,7 +138,6 @@ public class CalculatorManager {
         if (FUNCTION_PATTERN.matcher(trimmed).matches()) return true;
         if (VARIABLE_PATTERN.matcher(trimmed).matches()) return true;
         if (UNIT_PATTERN.matcher(trimmed).matches()) return true;
-        if (STORAGE_UNIT_PATTERN.matcher(trimmed).matches()) return true;
         if (LOOSE_LITERAL_PATTERN.matcher(trimmed).matches()) return true;
 
         return false;

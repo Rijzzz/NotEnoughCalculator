@@ -375,8 +375,10 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         Matrix3x2fStack pose = context.pose();
         pose.pushMatrix();
 
-        // Draw search field background
-        drawSearchFieldBackground(context, searchBounds);
+        boolean isFocused = isFieldFocused(searchField);
+
+        // Draw search field background (Pure White when focused, Unfocused Gray when unfocused)
+        drawSearchFieldBackground(context, searchBounds, isFocused);
 
         // Calculate horizontal text scroll offset based on cursor position
         int innerWidth = searchBounds.width - 8;
@@ -403,7 +405,10 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         if (hasSelection) {
             drawTextWithSelection(context, font, searchText, textX, textY, selectionStart, selectionEndPos);
         } else {
-            context.text(font, searchText, textX, textY, 0xFFFFFFFF, true);
+            String renderText = (CalculatorConfig.getInstance().enableSyntaxHighlighting && calcManager.looksLikeCalculation(searchText))
+                    ? com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.highlight(searchText)
+                    : searchText;
+            context.text(font, renderText, textX, textY, 0xFFFFFFFF, true);
         }
 
         boolean resultFitsInline = false;
@@ -422,7 +427,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             }
         }
 
-        if (!hasSelection) {
+        if (!hasSelection && isFocused) {
             drawCursor(context, searchBounds, searchText, font, textX, textY, cursorPos);
         }
 
@@ -505,9 +510,24 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         }
     }
 
-    // Draw search field background box
-    private void drawSearchFieldBackground(GuiGraphicsExtractor context, Rectangle bounds) {
-        context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), 0xFF8B8B8B);
+    // Check if search field is focused
+    private boolean isFieldFocused(TextField searchField) {
+        if (searchField == null) return false;
+        try {
+            return searchField.isFocused();
+        } catch (Throwable e) {
+            try {
+                java.lang.reflect.Method m = searchField.getClass().getMethod("isFocused");
+                return (boolean) m.invoke(searchField);
+            } catch (Throwable ignored) {}
+        }
+        return true;
+    }
+
+    // Draw search field background box (Pure White border when focused, Unfocused Gray border when unfocused)
+    private void drawSearchFieldBackground(GuiGraphicsExtractor context, Rectangle bounds, boolean isFocused) {
+        int borderColor = isFocused ? 0xFFFFFFFF : 0xFF8B8B8B;
+        context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), borderColor);
         context.fill(bounds.x + 1, bounds.y + 1, bounds.getMaxX() - 1, bounds.getMaxY() - 1, 0xFF000000);
     }
 

@@ -40,7 +40,7 @@
       "environment": "client"
     }
   ],
-"depends": {
+  "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${min_fabric_api_version}",
     "minecraft": ">=${min_minecraft_version} <=${max_minecraft_version}",
@@ -54,7 +54,7 @@
       "links": {
         "modmenu.modrinth": "https://modrinth.com/mod/notenoughcalculator",
         "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator",
-        "modmenu.discord": "https://discord.com/users/1303959182201982989",
+        "modmenu.discord": "https://discord.com/invite/asPJ4qgs8q",
         "modmenu.source": "https://github.com/Rijzzz/NotEnoughCalculator"
       }
     }

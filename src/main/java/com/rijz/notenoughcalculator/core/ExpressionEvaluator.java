@@ -108,21 +108,18 @@ public class ExpressionEvaluator {
     }
 
     // Skyblock unit multipliers
-    private static final Map<String, BigDecimal> UNITS;
-    static {
-        Map<String, BigDecimal> units = new HashMap<>();
-        units.put("k", new BigDecimal("1000"));
-        units.put("m", new BigDecimal("1000000"));
-        units.put("b", new BigDecimal("1000000000"));
-        units.put("t", new BigDecimal("1000000000000"));
-        units.put("s", new BigDecimal("64"));       // Stack
-        units.put("e", new BigDecimal("160"));      // Enchanted
-        units.put("h", new BigDecimal("1728"));     // Shulker (27*64)
-        units.put("sc", new BigDecimal("1728"));    // Small chest
-        units.put("dc", new BigDecimal("3456"));    // Double chest
-        units.put("eb", new BigDecimal("2880"));    // Ender chest (45*64)
-        UNITS = Collections.unmodifiableMap(units);
-    }
+    public static final Map<String, BigDecimal> UNITS = Map.of(
+            "k",  new BigDecimal("1000"),
+            "m",  new BigDecimal("1000000"),
+            "b",  new BigDecimal("1000000000"),
+            "t",  new BigDecimal("1000000000000"),
+            "s",  new BigDecimal("64"),       // Stack
+            "e",  new BigDecimal("160"),      // Enchanted
+            "h",  new BigDecimal("1728"),     // Shulker (27*64)
+            "sc", new BigDecimal("1728"),    // Small chest
+            "dc", new BigDecimal("3456"),    // Double chest
+            "eb", new BigDecimal("2880")     // Ender chest (45*64)
+    );
 
     public enum RadixMode {
         DEFAULT, HEX, BIN, OCT, SHORTHAND
@@ -143,13 +140,16 @@ public class ExpressionEvaluator {
     }
 
     // Supported math functions
-    private static final Set<String> FUNCTIONS = Set.of(
+    public static final Set<String> FUNCTIONS = Set.of(
             "sqrt", "abs", "floor", "ceil", "round",
             "log", "ln", "sin", "cos", "tan",
             "min", "max", "hex", "bin", "oct",
             "pct", "gcd", "lcm", "clamp", "avg", "xor",
             "bz", "ah", "ahbin", "fmt", "rad", "deg"
     );
+
+    // Built-in constants & variables
+    public static final Set<String> BUILTIN_VARIABLES = Set.of("ans", "pi", "e");
 
     // Functions that take two comma-separated arguments
     private static final Set<String> MULTI_ARG_FUNCTIONS = Set.of("min", "max", "pct", "gcd", "lcm", "xor");

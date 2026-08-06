@@ -57,6 +57,7 @@ public class CalculatorConfig {
     public boolean enableCommaFormatting = true;
     public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
     public boolean enableShorthandResults = false;
+    public boolean enableSyntaxHighlighting = true;
     public java.util.Map<String, String> customVariables = new java.util.LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {
@@ -113,19 +114,19 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return "§f"; // White for REI search bar
+        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_NUMBER;
     }
 
     public String getChatResultColorCode() {
-        return "§a"; // Green for chat output (NEU style)
+        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_CHAT_RESULT;
     }
 
     public String getErrorColorCode() {
-        return "§c"; // Red
+        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_ERROR;
     }
 
     public String getOperatorColorCode() {
-        return "§f"; // White
+        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_OP;
     }
 
     public double getBazaarTaxRate() {

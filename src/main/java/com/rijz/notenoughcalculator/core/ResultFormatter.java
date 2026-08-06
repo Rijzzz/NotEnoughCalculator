@@ -153,20 +153,25 @@ public class ResultFormatter {
         if (value == null) return "0";
         BigDecimal abs = value.abs();
 
-        if (abs.compareTo(new BigDecimal("1000000000000")) >= 0) {
-            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+        BigDecimal unitT = ExpressionEvaluator.UNITS.get("t");
+        BigDecimal unitB = ExpressionEvaluator.UNITS.get("b");
+        BigDecimal unitM = ExpressionEvaluator.UNITS.get("m");
+        BigDecimal unitK = ExpressionEvaluator.UNITS.get("k");
+
+        if (abs.compareTo(unitT) >= 0) {
+            BigDecimal t = value.divide(unitT, 4, RoundingMode.HALF_UP).stripTrailingZeros();
             return t.toPlainString() + "t";
         }
-        if (abs.compareTo(new BigDecimal("1000000000")) >= 0) {
-            BigDecimal b = value.divide(new BigDecimal("1000000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+        if (abs.compareTo(unitB) >= 0) {
+            BigDecimal b = value.divide(unitB, 4, RoundingMode.HALF_UP).stripTrailingZeros();
             return b.toPlainString() + "b";
         }
-        if (abs.compareTo(new BigDecimal("1000000")) >= 0) {
-            BigDecimal m = value.divide(new BigDecimal("1000000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+        if (abs.compareTo(unitM) >= 0) {
+            BigDecimal m = value.divide(unitM, 4, RoundingMode.HALF_UP).stripTrailingZeros();
             return m.toPlainString() + "m";
         }
-        if (abs.compareTo(new BigDecimal("1000")) >= 0) {
-            BigDecimal k = value.divide(new BigDecimal("1000"), 4, RoundingMode.HALF_UP).stripTrailingZeros();
+        if (abs.compareTo(unitK) >= 0) {
+            BigDecimal k = value.divide(unitK, 4, RoundingMode.HALF_UP).stripTrailingZeros();
             return k.toPlainString() + "k";
         }
         return formatWithCommas(value);
@@ -176,49 +181,58 @@ public class ResultFormatter {
     private static String suggestUnit(BigDecimal value) {
         BigDecimal abs = value.abs();
 
+        BigDecimal unitEB = ExpressionEvaluator.UNITS.get("eb");
+        BigDecimal unitDC = ExpressionEvaluator.UNITS.get("dc");
+        BigDecimal unitH = ExpressionEvaluator.UNITS.get("h");
+        BigDecimal unitT = ExpressionEvaluator.UNITS.get("t");
+        BigDecimal unitB = ExpressionEvaluator.UNITS.get("b");
+        BigDecimal unitM = ExpressionEvaluator.UNITS.get("m");
+        BigDecimal unitK = ExpressionEvaluator.UNITS.get("k");
+        BigDecimal unitS = ExpressionEvaluator.UNITS.get("s");
+
         // Check for exact storage container sizes first
-        if (abs.compareTo(new BigDecimal("2880")) == 0) {
+        if (abs.compareTo(unitEB) == 0) {
             return tr("notenoughcalculator.unit.suggestion.ender_chest");
         }
-        if (abs.compareTo(new BigDecimal("3456")) == 0) {
+        if (abs.compareTo(unitDC) == 0) {
             return tr("notenoughcalculator.unit.suggestion.double_chest");
         }
-        if (abs.compareTo(new BigDecimal("1728")) == 0) {
+        if (abs.compareTo(unitH) == 0) {
             return tr("notenoughcalculator.unit.suggestion.shulker");
         }
 
         // Suggest currency units for large numbers
-        if (abs.compareTo(new BigDecimal("1000000000000")) >= 0) {
-            BigDecimal t = value.divide(new BigDecimal("1000000000000"), 2, RoundingMode.HALF_UP);
+        if (abs.compareTo(unitT) >= 0) {
+            BigDecimal t = value.divide(unitT, 2, RoundingMode.HALF_UP);
             if (t.stripTrailingZeros().scale() <= 2) {
                 return t.stripTrailingZeros().toPlainString() + "t";
             }
         }
 
-        if (abs.compareTo(new BigDecimal("1000000000")) >= 0) {
-            BigDecimal b = value.divide(new BigDecimal("1000000000"), 2, RoundingMode.HALF_UP);
+        if (abs.compareTo(unitB) >= 0) {
+            BigDecimal b = value.divide(unitB, 2, RoundingMode.HALF_UP);
             if (b.stripTrailingZeros().scale() <= 2) {
                 return b.stripTrailingZeros().toPlainString() + "b";
             }
         }
 
-        if (abs.compareTo(new BigDecimal("1000000")) >= 0) {
-            BigDecimal m = value.divide(new BigDecimal("1000000"), 2, RoundingMode.HALF_UP);
+        if (abs.compareTo(unitM) >= 0) {
+            BigDecimal m = value.divide(unitM, 2, RoundingMode.HALF_UP);
             if (m.stripTrailingZeros().scale() <= 2) {
                 return m.stripTrailingZeros().toPlainString() + "m";
             }
         }
 
-        if (abs.compareTo(new BigDecimal("1000")) >= 0) {
-            BigDecimal k = value.divide(new BigDecimal("1000"), 2, RoundingMode.HALF_UP);
+        if (abs.compareTo(unitK) >= 0) {
+            BigDecimal k = value.divide(unitK, 2, RoundingMode.HALF_UP);
             if (k.stripTrailingZeros().scale() <= 2) {
                 return k.stripTrailingZeros().toPlainString() + "k";
             }
         }
 
         // Suggest stacks for smaller numbers that are multiples of 64
-        if (abs.compareTo(new BigDecimal("64")) >= 0 && abs.compareTo(new BigDecimal("10000")) < 0) {
-            BigDecimal stacks = value.divide(new BigDecimal("64"), 10, RoundingMode.HALF_UP);
+        if (abs.compareTo(unitS) >= 0 && abs.compareTo(new BigDecimal("10000")) < 0) {
+            BigDecimal stacks = value.divide(unitS, 10, RoundingMode.HALF_UP);
             if (stacks.stripTrailingZeros().scale() <= 0) {
                 long stackCount = stacks.longValue();
                 if (stackCount == 1) {

@@ -11,9 +11,8 @@
 
 > Inspired by [NotEnoughUpdates's](https://modrinth.com/mod/notenoughupdates) calculator, recreated for newer Minecraft versions where NEU isn't available.
 
-![Showcase](https://cdn.modrinth.com/data/cached_images/45906956cc96974985abed61ad9c769495409b4e_0.webp)
-
-![Showcase 2](https://cdn.modrinth.com/data/cached_images/dcf5816503a635c49cee07b06fb5abda9dd8286a_0.webp)
+![Showcase](https://cdn.modrinth.com/data/cached_images/cda48f37b923f3660dee74af920690281a87b5e2.webp)
+![Showcase 2](https://cdn.modrinth.com/data/cached_images/7f8c27a134d727add7d20fb2bdd8c557f2a5f3c8.webp)
 
 ---
 

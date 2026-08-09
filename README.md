@@ -360,7 +360,8 @@ deg(pi) = 180                      (radians to degrees)
   "showInlineResults": true,
   "enableCommaFormatting": true,
   "enableShorthandResults": false,
-  "bazaarFlipperLevel": 0
+  "bazaarFlipperLevel": 0,
+  "customVariables": {}
 }
 ```
 
@@ -373,6 +374,7 @@ deg(pi) = 180                      (radians to degrees)
 - **enableCommaFormatting** (Default: true) - Format large numbers with commas
 - **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
 - **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
+- **customVariables** (Default: empty) - Stores your saved custom variables (this variable automatically gets created when you add your first variable)
 
 </details>
 
@@ -546,4 +548,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 29-07-2026*
+*Last updated: 09-08-2026*

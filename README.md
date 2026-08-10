@@ -80,7 +80,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <summary><strong>Customization & Settings GUI</strong></summary>
 
 - Open in-game settings GUI screen via `/calcconfig` or ModMenu
-- A Custom Variables tab to add, edit, and manage custom variables directly from the GUI
+- **Custom Variables Manager**: Dedicated tab in `/calcconfig` to easily add, edit, delete, and paginate (`<` / `>`) custom variables directly in-game
 - Native Minecraft hover tooltips on all settings
 - Bazaar Flipper Perk selector pills (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%)
 - Shorthand Results toggle to convert default calculation results to SkyBlock units (`1.5m`)

@@ -92,7 +92,7 @@ public class CalculatorConfig {
                 return config;
             }
         } catch (IOException e) {
-            LOGGER.warn("Failed to load config, falling back to defaults: {}", e.getMessage());
+            LOGGER.warn("Failed to load configuration file from '{}' (falling back to default settings): {}", CONFIG_PATH, e.getMessage());
         }
 
         // File doesn't exist, create it with defaults
@@ -109,7 +109,7 @@ public class CalculatorConfig {
             lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
             LOGGER.info("Saved config to {}", CONFIG_PATH);
         } catch (IOException e) {
-            LOGGER.error("Failed to save config: {}", e.getMessage());
+            LOGGER.error("Failed to save configuration file to '{}': {}", CONFIG_PATH, e.getMessage());
         }
     }
 

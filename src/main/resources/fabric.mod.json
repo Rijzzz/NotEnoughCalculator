@@ -3,7 +3,7 @@
   "id": "notenoughcalculator",
   "version": "${version}",
   "name": "Not Enough Calculator",
-  "description": "A NEU-style calculator, inside REI's search bar.",
+  "description": "A NEU-style calculator, works standalone or inside REI's search bar with instant results!",
   "authors": [
     "Rijz",
     "Laze"
@@ -43,10 +43,10 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${min_fabric_api_version}",
-    "minecraft": ">=${min_minecraft_version} <=${max_minecraft_version}",
-    "roughlyenoughitems": ">=${min_rei_version}"
+    "minecraft": ">=${min_minecraft_version} <=${max_minecraft_version}"
   },
   "suggests": {
+    "roughlyenoughitems": ">=${min_rei_version}",
     "modmenu": ">=${min_modmenu_version}"
   },
   "custom": {

@@ -21,7 +21,6 @@ package com.rijz.notenoughcalculator.client;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
-import me.shedaniel.rei.api.client.REIRuntime;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -379,7 +378,7 @@ public class CalculatorManager {
             // Save current equation before navigating
             if (reiHistoryIndex == -1 && !reiSearchHistory.isEmpty()) {
                 try {
-                    savedCurrentInput = REIRuntime.getInstance().getSearchTextField().getText();
+                    savedCurrentInput = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter().getText();
                     // Also save current equation to history if it's a calculation
                     if (!savedCurrentInput.isEmpty() && looksLikeCalculation(savedCurrentInput)) {
                         currentEquation = savedCurrentInput;
@@ -442,11 +441,9 @@ public class CalculatorManager {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
                 String historyText = reiSearchHistory.get(index);
-                me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
-                if (searchField != null) {
-                    searchField.setText(historyText);
-                    NotEnoughCalculatorClient.clampSearchField(searchField);
-                }
+                com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter adapter = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter();
+                adapter.setText(historyText);
+                adapter.clamp();
 
                 // Update internal state without triggering history save
                 lastSearchInput = historyText;
@@ -458,7 +455,7 @@ public class CalculatorManager {
                     lastFormattedResult = null;
                 }
             } catch (Exception e) {
-                LOGGER.error("Failed to set search field text: ", e);
+                LOGGER.error("Failed to set search field text during history traversal: {}", e.getMessage(), e);
             }
         }
     }
@@ -468,11 +465,9 @@ public class CalculatorManager {
      */
     private void restoreSavedInput() {
         try {
-            me.shedaniel.rei.api.client.gui.widgets.TextField searchField = REIRuntime.getInstance().getSearchTextField();
-            if (searchField != null) {
-                searchField.setText(savedCurrentInput);
-                NotEnoughCalculatorClient.clampSearchField(searchField);
-            }
+            com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter adapter = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter();
+            adapter.setText(savedCurrentInput);
+            adapter.clamp();
             lastSearchInput = savedCurrentInput;
             currentEquation = savedCurrentInput;  // Resume tracking this equation
 
@@ -484,7 +479,7 @@ public class CalculatorManager {
 
             savedCurrentInput = "";
         } catch (Exception e) {
-            LOGGER.error("Failed to restore saved input: ", e);
+            LOGGER.error("Failed to restore saved search input: {}", e.getMessage(), e);
         }
     }
 

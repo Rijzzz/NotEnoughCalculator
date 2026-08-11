@@ -100,7 +100,10 @@ Type calculations directly in the search bar and get instant results! Works with
 - Minecraft (1.21.11, 26.1.x, 26.x)
 
 **Dependencies (Optional / Recommended):**
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on)
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on) 
+
+**Note:** Standalone mode was introduced in v2.7.0. All previous versions from v1.0.0 to v2.6.1 still require REI to be installed.
+
 - [ModMenu](https://modrinth.com/mod/modmenu) (16.0.0 or newer according to the Minecraft version you play on)
 
 ---

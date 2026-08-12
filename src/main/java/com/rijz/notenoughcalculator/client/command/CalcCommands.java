@@ -64,7 +64,7 @@ public class CalcCommands {
         try {
             ExpressionEvaluator.EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
             String formatted = ResultFormatter.formatResultWithUnits(evalRes);
-            String cleanResult = evalRes.value.toPlainString();
+            String fullEquation = expr + " = " + formatted;
 
             net.minecraft.network.chat.MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
                     t("notenoughcalculator.result.equals").getString() +
@@ -72,7 +72,7 @@ public class CalcCommands {
 
             Component tooltip = t("notenoughcalculator.chat.click_to_copy_tooltip");
             msg.setStyle(msg.getStyle()
-                    .withClickEvent(new net.minecraft.network.chat.ClickEvent.CopyToClipboard(cleanResult))
+                    .withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/calccopy " + fullEquation))
                     .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(tooltip)));
 
             ctx.getSource().getPlayer().sendSystemMessage(msg);
@@ -81,6 +81,13 @@ public class CalcCommands {
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
         }
 
+        return 1;
+    }
+
+    public static int executeCopy(CommandContext<FabricClientCommandSource> ctx) {
+        String text = StringArgumentType.getString(ctx, "text");
+        Minecraft.getInstance().keyboardHandler.setClipboard(text);
+        send(ctx, "notenoughcalculator.chat.copied_to_clipboard", text);
         return 1;
     }
 

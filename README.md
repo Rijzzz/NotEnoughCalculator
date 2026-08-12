@@ -501,7 +501,7 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 - **Bazaar / AH tax calculation rate is inaccurate?**
   - Open settings screen (`/calcconfig`) or ModMenu. You can configure your **Bazaar Flipper Perk Level** (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) so `bz()` calculations match your exact profile perk rate.
 - **How to copy the result or full equation?**
-  - Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard, or click any `/calc` result printed in chat to copy just the result number.
+  - Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard, or click any `/calc` result printed in chat to copy the full equation (`1+1 = 2`) with instant chat confirmation.
 - **History navigation (`Ctrl+Z` / `Ctrl+Y`) not recalling calculations?**
   - Make sure `enableHistoryNavigation` is set to `true` in `/calcconfig`. Note that calculation history is **session-based** and resets when joining a new world or server for a fresh start.
 - **Custom variables disappeared after restarting game?**

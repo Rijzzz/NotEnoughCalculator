@@ -3,10 +3,10 @@ name: CI Build and Test
 on:
   pull_request:
     branches:
-      - '26.x-26.x.x'
+      - '26.1.x-26.2-new'
   push:
     branches:
-      - '26.x-26.x.x'
+      - '26.1.x-26.2-new'
 
 jobs:
   compile-and-test:

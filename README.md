@@ -1,4 +1,4 @@
-# 🧮Not Enough Calculator
+# 🧮 Not Enough Calculator
 
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/notenoughcalculator?logo=modrinth&label=Modrinth&color=00AF5C&style=for-the-badge)](https://modrinth.com/mod/notenoughcalculator)
 [![CurseForge Downloads](https://img.shields.io/curseforge/dt/1431725?logo=curseforge&label=CurseForge&color=F16436&style=for-the-badge)](https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator)
@@ -411,51 +411,58 @@ deg(pi) = 180                      (radians to degrees)
 <details>
 <summary>Pro Tips</summary>
 
-### Use `ans` for quick follow-ups
-```
+### Use `ans` for quick follow-up calculations
+```text
 100 + 50 = 150
 ans * 2 = 300
 ans + 1000 = 1,300
 ```
 
-### Save common values as variables
+### SkyBlock Tax Calculators (`bz` & `ah`)
+```text
+bz(50m) = 49,375,000      (Bazaar net profit accounting for your Flipper perk level)
+ah(10m, 24) = 9,600,000    (Auction House BIN net profit after listing fee & claim tax)
 ```
+
+### Hexadecimal, Binary & Octal Conversion (`hex`, `bin`, `oct`)
+```text
+0xFF + 0b1010 = 265       (Mix base prefixes directly in math expressions)
+hex(255) = 0xFF           (Convert decimal result to hex)
+bin(42) = 0b101010        (Convert decimal result to binary)
+```
+
+### Save common values as custom variables
+```text
 /calcset hourly 500k
 /calcset daily $hourly * 24
 $daily * 30 = 360,000,000 (monthly)
 ```
 
-### Results auto-format with commas
-```
-1000000 → 1,000,000
-```
-
-### Mix different units
-```
-100m + 500k = 100,500,000
-2dc + 5h = 18,432
+### Mix SkyBlock units & auto-formatting
+```text
+100m + 500k = 100,500,000  (k, m, b, t, s, e, h, sc, dc, eb multipliers)
+fmt(1500000) = 1.5m        (Format large numbers to SkyBlock shorthand)
+2dc + 5h = 18,432          (Double chest & shulker stack math)
 ```
 
-### Chain complex calculations
+### Clipboard & Equation Shortcuts
+```text
+Ctrl + C / Cmd + C         (Copy full equation e.g. "1+1 = 2" to clipboard; copies snippet if highlighted)
+Ctrl + X / Cmd + X         (Cut full equation to clipboard and clear search bar)
+Ctrl + Z / Ctrl + Y        (Recall previous calculations / redo history)
+Ctrl + Left / Right        (Jump cursor by word)
+Ctrl + Backspace / Delete  (Delete entire word)
 ```
+
+### Chain complex calculations & parentheses
+```text
 (100m - 50m) * 1.1 / 64 = 859,375 (per stack after markup)
-```
-
-### Use parentheses for clarity
-```
 (5 + 3) * 2 = 16  (not 11)
 2^(10-3) = 128    (not 1017)
 ```
 
-### Create calculation workflows
-```
-/calcset items 1000
-/calcset price 50k
-$items * $price = 50,000,000 (total cost)
-```
-
-### Use either * or x for multiplication
-```
+### Flexible multiplication syntax
+```text
 10 * 5 = 50    (traditional)
 10 x 5 = 50    (also works)
 10x5 = 50      (no spaces needed)
@@ -486,9 +493,19 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 <summary>Common Issues</summary>
 
-- **Calculator not showing results?** Make sure REI overlay is visible (press your inventory key)
-- **History not working?** Make sure `enableHistoryNavigation` is `true` in config
-- **Calculator is unresponsive?** Make sure you have clicked on the REI search bar so the calculator is in focus. If you click somewhere else on the screen while typing the query, it will become unresponsive.
+- **Calculator search bar not showing up?**
+  - **Standalone Mode (REI Not Installed)**: Open any inventory screen (chest, crafting table, inventory). The standalone search bar renders automatically at the bottom of the screen.
+  - **REI Integration (REI Installed)**: Click inside REI's search bar at the bottom of your screen to activate calculation parsing.
+- **Calculator is unresponsive or not parsing inputs?**
+  - Make sure the search bar (standalone or REI) is actively in focus (clicked into). If you click elsewhere on the screen, focus is lost.
+- **Bazaar / AH tax calculation rate is inaccurate?**
+  - Open settings screen (`/calcconfig`) or ModMenu. You can configure your **Bazaar Flipper Perk Level** (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) so `bz()` calculations match your exact profile perk rate.
+- **How to copy the result or full equation?**
+  - Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard, or click any `/calc` result printed in chat to copy just the result number.
+- **History navigation (`Ctrl+Z` / `Ctrl+Y`) not recalling calculations?**
+  - Make sure `enableHistoryNavigation` is set to `true` in `/calcconfig`. Note that calculation history is **session-based** and resets when joining a new world or server for a fresh start.
+- **Custom variables disappeared after restarting game?**
+  - Custom variables defined via `/calcconfig` GUI or `/calcset var expr` are saved permanently to `config/notenoughcalculator.json`. Make sure you click **Save** when editing variables in `/calcconfig`.
 
 </details>
 
@@ -558,4 +575,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 11-08-2026*
+*Last updated: 12-08-2026*

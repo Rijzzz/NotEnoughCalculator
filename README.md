@@ -5,7 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/asPJ4qgs8q)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2-new/LICENSE.txt)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2/LICENSE.txt)
 
 **A NEU-style calculator, works completely standalone or hooks into Roughly Enough Items (REI). Type calculations directly in the search bar and get instant results.**
 
@@ -565,7 +565,7 @@ Under the following conditions:
 * You must state any changes you make
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2-new/LICENSE.txt)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2/LICENSE.txt)
 
 ---
 

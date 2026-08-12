@@ -4,10 +4,10 @@
 [![CurseForge Downloads](https://img.shields.io/curseforge/dt/1431725?logo=curseforge&label=CurseForge&color=F16436&style=for-the-badge)](https://www.curseforge.com/minecraft/mc-mods/notenoughcalculator)
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
-[![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/1389631948359598220)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.x-26.x.x/LICENSE.txt)
+[![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/asPJ4qgs8q)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2-new/LICENSE.txt)
 
-**A NEU-style calculator mod for Roughly Enough Items (REI). Type calculations directly into REI's search bar.**
+**A NEU-style calculator, works completely standalone or hooks into Roughly Enough Items (REI). Type calculations directly in the search bar and get instant results.**
 
 > Inspired by [NotEnoughUpdates's](https://modrinth.com/mod/notenoughupdates) calculator, recreated for newer Minecraft versions where NEU isn't available.
 
@@ -18,9 +18,9 @@
 
 ## What does this mod do?
 
-Type calculations directly in the REI search bar and get instant results! Perfect for Hypixel Skyblock players who miss the NEU calculator.
+Type calculations directly in the search bar and get instant results! Works with REI's search bar when installed, or provides its own standalone search bar when REI is not present. Perfect for Hypixel Skyblock players who miss the NEU calculator.
 
-**Example:** Type `100m - 50m` in the REI search → See `= 50,000,000` instantly
+**Example:** Type `100m - 50m` in the search bar → See `= 50,000,000` instantly
 
 ---
 
@@ -38,7 +38,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
 - Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
 - Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `rad()`, `deg()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`, `fmt()`
+- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `rad()`, `deg()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`, `fmt()`, `hex()`, `bin()`, `oct()`
 - SkyBlock Tax Calculators: `bz(price)` (Bazaar net profit accounting for Bazaar Flipper perk level), `ah(price, [hrs])` / `ahbin(price, [hrs])` (AH BIN net profit after listing fee & collection claim tax)
 
 </details>
@@ -66,13 +66,15 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 <details>
 <summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
-- Press `Ctrl+Z` / `Cmd+Z` in REI search to recall previous calculations (undo)
+- Press `Ctrl+Z` / `Cmd+Z` in the search bar to recall previous calculations (undo)
 - Press `Ctrl+Y` / `Cmd+Y` to redo/go forward in history
-- Press `Ctrl+C` / `Cmd+C` in REI search to copy unformatted calculation result directly to system clipboard
+- Press `Ctrl+C` / `Cmd+C` in the search bar to copy the full equation (e.g. `1+1 = 2`) to clipboard
+- Press `Ctrl+X` / `Cmd+X` in the search bar to cut the full equation to clipboard and clear the search bar
+- Partial text selection: if you highlight a specific portion of text, `Ctrl+C` / `Ctrl+X` copies/cuts only the selected snippet
 - Full Numpad Enter support (`GLFW_KEY_KP_ENTER`)
 - Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
 - View full history with `/calchist` (shows last 15 entries)
-- Session-based: REI search history clears automatically when you leave a world/server
+- Session-based: Search history clears automatically when you leave a world/server
 
 </details>
 
@@ -84,6 +86,7 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 - Native Minecraft hover tooltips on all settings
 - Bazaar Flipper Perk selector pills (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%)
 - Shorthand Results toggle to convert default calculation results to SkyBlock units (`1.5m`)
+- Syntax Highlighting toggle to color-code numbers, units, functions, and variables in the search bar
 - Configurable decimal precision (default: 10 digits)
 - Toggle inline results, unit suggestions, comma formatting, and history navigation
 - All settings persist automatically in `config/notenoughcalculator.json`
@@ -94,27 +97,27 @@ Type calculations directly in the REI search bar and get instant results! Perfec
 
 **Dependencies (Required):**
 - [Fabric API](https://modrinth.com/mod/fabric-api) (0.134.1 or newer according to the Minecraft version you play on)
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on)
 - Minecraft (1.21.11, 26.1.x, 26.x)
 
-*Note: All features introduced in versions 2.0.1–2.3.0 (previously available only for Minecraft 26.2) can now be used on Minecraft 26.1.x and 26.x!*
-
-*Note: All features introduced in versions 2.0.1–2.5.0 (previously available only for Minecraft 26.1.x & 26.2) can now be used on Minecraft 1.21.11!*
-
 **Dependencies (Optional / Recommended):**
+- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on) 
+
+**Note:** Standalone mode was introduced in v2.7.0-beta. All previous versions from v1.0.0 to v2.6.1 still require REI to be installed.
+
 - [ModMenu](https://modrinth.com/mod/modmenu) (16.0.0 or newer according to the Minecraft version you play on)
 
 ---
 
-**How to Install:**
+## How to Install
+
 1. Download the required mods and place them into your Minecraft `mods/` folder:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
-    - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei)
+    - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) *(Optional)*
     - [ModMenu](https://modrinth.com/mod/modmenu) *(Optional)*
     - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
-3. Press your inventory key to open REI
-4. Start typing calculations directly into the REI search bar
+3. Open any inventory screen (chest, crafting table, etc.)
+4. Start typing calculations into the search bar (REI's search bar if REI is installed, or the standalone calculator bar at the bottom of the screen)
 
 ---
 
@@ -360,6 +363,7 @@ deg(pi) = 180                      (radians to degrees)
   "showInlineResults": true,
   "enableCommaFormatting": true,
   "enableShorthandResults": false,
+  "enableSyntaxHighlighting": true,
   "bazaarFlipperLevel": 0,
   "customVariables": {}
 }
@@ -370,9 +374,10 @@ deg(pi) = 180                      (radians to degrees)
 - **decimalPrecision** (Default: 10) - Number of decimal places
 - **showUnitSuggestions** (Default: true) - Show unit hints like "(50m)" in commands
 - **enableHistoryNavigation** (Default: true) - Enable Ctrl+Z/Y shortcuts
-- **showInlineResults** (Default: true) - Show results in REI search
+- **showInlineResults** (Default: true) - Show results in the search bar
 - **enableCommaFormatting** (Default: true) - Format large numbers with commas
 - **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
+- **enableSyntaxHighlighting** (Default: true) - Color-code numbers, units, functions, and variables in the search bar
 - **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
 - **customVariables** (Default: empty) - Stores your saved custom variables (this variable automatically gets created when you add your first variable)
 
@@ -384,10 +389,15 @@ deg(pi) = 180                      (radians to degrees)
 <summary>Keybinds</summary>
 
 ### Search Bar Shortcuts
-- **`Ctrl + Z` / `Cmd + Z`** in REI search - Recall previous calculation (undo)
-- **`Ctrl + Y` / `Cmd + Y`** in REI search - Go forward in history (redo)
-- **`Ctrl + C` / `Cmd + C`** in REI search - Copy calculation result to clipboard
-- **`Enter` / `Numpad Enter`** in REI search - Commit calculation into history and keep focus
+- **`Ctrl + Z` / `Cmd + Z`** - Recall previous calculation (undo)
+- **`Ctrl + Y` / `Cmd + Y`** - Go forward in history (redo)
+- **`Ctrl + C` / `Cmd + C`** - Copy full equation to clipboard (e.g. `1+1 = 2`); copies only selected text if a partial selection is active
+- **`Ctrl + X` / `Cmd + X`** - Cut full equation to clipboard and clear the search bar; cuts only selected text if a partial selection is active
+- **`Ctrl + A` / `Cmd + A`** - Select all text in the search bar
+- **`Ctrl + Left` / `Right`** - Jump cursor by word
+- **`Ctrl + Backspace` / `Delete`** - Delete entire word to the left or right
+- **`Home` / `End`** - Jump cursor to start or end of text
+- **`Enter` / `Numpad Enter`** - Commit calculation into history and keep focus
 
 ### Notes
 - History is session-based and automatically clears when you leave a world/server
@@ -461,7 +471,7 @@ $items * $price = 50,000,000 (total cost)
 
 <summary>Important Version Notice:</summary>
 
-- Following Hypixel SkyBlock’s Modern Update, only the latest two major Minecraft versions are supported. This mod will **not receive updates for older versions**. Please ensure you are using a supported version to avoid issues.
+- Following Hypixel SkyBlock's Modern Update, only the latest two major Minecraft versions are supported. This mod will **not receive updates for older versions**. Please ensure you are using a supported version to avoid issues.
 
 </details>
 
@@ -488,7 +498,7 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 [NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) is one of the most popular Hypixel Skyblock mods, and its calculator feature was incredibly useful. However, NEU isn't available for newer Minecraft versions, leaving players without this essential tool.
 
-**Not Enough Calculator** solves this problem by bringing NEU-style calculator functionality to [Roughly Enough Items (REI)](https://modrinth.com/mod/rei), which works on newer Minecraft versions.
+**Not Enough Calculator** solves this problem by bringing NEU-style calculator functionality to newer Minecraft versions. It hooks into [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) when installed, or provides its own standalone search bar when REI is not present.
 
 ---
 
@@ -538,7 +548,7 @@ Under the following conditions:
 * You must state any changes you make
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.x-26.x.x/LICENSE.txt)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2-new/LICENSE.txt)
 
 ---
 
@@ -548,4 +558,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 09-08-2026*
+*Last updated: 11-08-2026*

@@ -74,7 +74,7 @@ Hey! Thanks for checking out Not Enough Calculator 🧮
 
 ## License
 
-By contributing, you agree your code will be licensed under [LGPL-3.0-or-later](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2-new/LICENSE.txt).
+By contributing, you agree your code will be licensed under [LGPL-3.0-or-later](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.x-new/LICENSE.txt).
 
 ---
 

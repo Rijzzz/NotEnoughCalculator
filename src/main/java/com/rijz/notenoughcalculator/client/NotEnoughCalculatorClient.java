@@ -899,6 +899,11 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             // Configuration
             dispatcher.register(ClientCommands.literal("calcconfig")
                     .executes(CalcCommands::executeConfig));
+
+            // Clipboard helper for click-to-copy
+            dispatcher.register(ClientCommands.literal("calccopy")
+                    .then(ClientCommands.argument("text", StringArgumentType.greedyString())
+                            .executes(CalcCommands::executeCopy)));
         });
     }
 

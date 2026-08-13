@@ -50,7 +50,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
                     searchField.setText(text != null ? text : "");
-                    NotEnoughCalculatorClient.clampSearchField(searchField);
+                    com.rijz.notenoughcalculator.client.util.ReflectionUtils.clampSearchField(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -90,7 +90,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    return NotEnoughCalculatorClient.getCursorPosition(searchField);
+                    return com.rijz.notenoughcalculator.client.util.ReflectionUtils.getCursorPosition(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -104,7 +104,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    return NotEnoughCalculatorClient.getSelectionEnd(searchField);
+                    return com.rijz.notenoughcalculator.client.util.ReflectionUtils.getSelectionEnd(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -118,7 +118,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    NotEnoughCalculatorClient.clampSearchField(searchField);
+                    com.rijz.notenoughcalculator.client.util.ReflectionUtils.clampSearchField(searchField);
                 }
             }
         } catch (Exception ignored) {}

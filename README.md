@@ -9,7 +9,7 @@
 
 **A NEU-style calculator, works completely standalone or hooks into Roughly Enough Items (REI). Type calculations directly in the search bar and get instant results.**
 
-> Inspired by [NotEnoughUpdates's](https://modrinth.com/mod/notenoughupdates) calculator, recreated for newer Minecraft versions where NEU isn't available.
+> Inspired by [NotEnoughUpdates](https://modrinth.com/mod/notenoughupdates) calculator. Recreated for newer Minecraft versions where NEU isn't available.
 
 ![Showcase](https://cdn.modrinth.com/data/cached_images/cda48f37b923f3660dee74af920690281a87b5e2.webp)
 ![Showcase 2](https://cdn.modrinth.com/data/cached_images/7f8c27a134d727add7d20fb2bdd8c557f2a5f3c8.webp)
@@ -18,7 +18,7 @@
 
 ## What does this mod do?
 
-Type calculations directly in the search bar and get instant results! Works with REI's search bar when installed, or provides its own standalone search bar when REI is not present. Perfect for Hypixel Skyblock players who miss the NEU calculator.
+Type calculations directly in the search bar and get instant results! If REI is installed it uses REI's search bar, otherwise it shows its own standalone bar at the bottom of inventory screens. If you played with NEU on older versions, you already know how this works.
 
 **Example:** Type `100m - 50m` in the search bar → See `= 50,000,000` instantly
 
@@ -513,15 +513,13 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 ## Why This Mod?
 
-[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) is one of the most popular Hypixel Skyblock mods, and its calculator feature was incredibly useful. However, NEU isn't available for newer Minecraft versions, leaving players without this essential tool.
-
-**Not Enough Calculator** solves this problem by bringing NEU-style calculator functionality to newer Minecraft versions. It hooks into [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) when installed, or provides its own standalone search bar when REI is not present.
+[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) had a great calculator built into its search bar. NEU doesn't exist for newer Minecraft versions though, so this mod fills that gap. Works with [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) if you have it, or runs standalone if you don't.
 
 ---
 
 ## Credits
 
-Special thanks to **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)** for the original calculator inspiration! This mod brings the beloved NEU calculator experience to newer Minecraft versions.
+Original calculator concept from **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)**. This mod recreates that for newer versions.
 
 ---
 
@@ -575,4 +573,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 12-08-2026*
+*Last updated: 14-08-2026*

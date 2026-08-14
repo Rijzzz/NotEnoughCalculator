@@ -39,18 +39,13 @@ import org.joml.Matrix3x2fStack;
 
 import java.lang.reflect.Method;
 
-/**
- * Rendering engine for drawing calculator search field overlays, syntax highlighting, and floating inline result boxes.
- */
+// Overlay renderer for search field calculations, syntax highlighting, and floating result boxes.
 public class CalculatorOverlayRenderer {
 
     private static Method enableScissorMethod = null;
     private static Method disableScissorMethod = null;
     private static boolean scissorReflectionInitialized = false;
 
-    /**
-     * Main overlay render entrypoint called from screen render hooks.
-     */
     public static void renderOverlay(Screen screen, GuiGraphicsExtractor context, CalculatorManager calcManager, boolean shouldRender) {
         Minecraft mc = Minecraft.getInstance();
 
@@ -86,9 +81,7 @@ public class CalculatorOverlayRenderer {
 
                 renderStandaloneCalculatorUI(context, adapter, searchText, mc.font, calcManager);
             }
-        } catch (Exception e) {
-            // Silently swallow errors to avoid crashing Minecraft on render tick
-        }
+        } catch (Exception ignored) {}
     }
 
     private static boolean shouldRenderCalculator(Screen screen, Minecraft mc, boolean shouldRender) {
@@ -104,13 +97,8 @@ public class CalculatorOverlayRenderer {
         if (screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen) {
             return false;
         }
-
         String screenClassName = screen.getClass().getName();
-        if (screenClassName.contains("rei") || screenClassName.contains("REI")) {
-            return false;
-        }
-
-        return true;
+        return !screenClassName.contains("rei") && !screenClassName.contains("REI");
     }
 
     private static void renderREICalculatorUI(GuiGraphicsExtractor context, ScreenOverlay overlay, TextField searchField,
@@ -133,19 +121,14 @@ public class CalculatorOverlayRenderer {
         pose.pushMatrix();
 
         boolean isFocused = isFieldFocused(searchField);
-
-        drawREISearchFieldBackground(context, searchBounds, isFocused);
+        drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(), isFocused);
 
         int innerWidth = searchBounds.width - 8;
         int cursorPos = ReflectionUtils.getCursorPosition(searchField);
         String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length())) : "";
         int cursorXOffset = font.width(textBeforeCursor);
 
-        int scrollOffset = 0;
-        if (cursorXOffset > innerWidth - 10) {
-            scrollOffset = cursorXOffset - innerWidth + 10;
-        }
-
+        int scrollOffset = cursorXOffset > innerWidth - 10 ? cursorXOffset - innerWidth + 10 : 0;
         int textX = searchBounds.x + 4 - scrollOffset;
         int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
@@ -181,43 +164,14 @@ public class CalculatorOverlayRenderer {
         }
 
         if (!hasSelection && isFocused) {
-            drawREICursor(context, searchBounds, searchText, font, textX, textY, cursorPos);
+            drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2, searchBounds.getMaxX() - 3);
         }
 
         disableScissor(context);
 
         if (calcManager.hasResult() && !resultFitsInline) {
-            String result = calcManager.getLastFormattedResult();
-            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
-                    CalculatorConfig.getInstance().getResultColorCode() + result;
-
-            int aboveY = searchBounds.y - 14;
-            int resultWidth = font.width(resultDisplay);
-
-            int maxBoxWidth = overlayBounds.width - 12;
-            int bgHeight = 12;
-            int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
-
-            int aboveX = searchBounds.x + 4;
-            if (aboveX + bgWidth > overlayBounds.getMaxX() - 4) {
-                aboveX = Math.max(overlayBounds.x + 4, overlayBounds.getMaxX() - bgWidth - 4);
-            }
-
-            int resultScroll = 0;
-            int visibleWidth = bgWidth - 8;
-            if (resultWidth > visibleWidth) {
-                int overflowPixels = resultWidth - visibleWidth;
-                long time = System.currentTimeMillis();
-                double cycle = (time % 4000) / 4000.0;
-                double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
-                resultScroll = (int) (overflowPixels * normalized);
-            }
-
-            context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
-
-            enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2);
-            context.text(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
-            disableScissor(context);
+            renderFloatingResultBox(context, overlayBounds.x, overlayBounds.getMaxX(), searchBounds.x, searchBounds.y,
+                    overlayBounds.width, font, calcManager.getLastFormattedResult());
         }
 
         pose.popMatrix();
@@ -234,19 +188,14 @@ public class CalculatorOverlayRenderer {
         pose.pushMatrix();
 
         boolean isFocused = adapter.isFocused();
-
-        drawSearchFieldBackground(context, searchBounds, isFocused);
+        drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(), isFocused);
 
         int innerWidth = searchBounds.width - 8;
         int cursorPos = adapter.getCursorPosition();
         String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length())) : "";
         int cursorXOffset = font.width(textBeforeCursor);
 
-        int scrollOffset = 0;
-        if (cursorXOffset > innerWidth - 10) {
-            scrollOffset = cursorXOffset - innerWidth + 10;
-        }
-
+        int scrollOffset = cursorXOffset > innerWidth - 10 ? cursorXOffset - innerWidth + 10 : 0;
         int textX = searchBounds.x + 4 - scrollOffset;
         int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
@@ -284,7 +233,7 @@ public class CalculatorOverlayRenderer {
         }
 
         if (!hasSelection && isFocused) {
-            drawCursor(context, searchBounds, searchText, font, textX, textY, cursorPos);
+            drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2, searchBounds.getMaxX() - 3);
         }
 
         disableScissor(context);
@@ -320,6 +269,40 @@ public class CalculatorOverlayRenderer {
         }
 
         pose.popMatrix();
+    }
+
+    private static void renderFloatingResultBox(GuiGraphicsExtractor context, int minOverlayX, int maxOverlayX,
+                                                 int searchX, int searchY, int overlayWidth, Font font, String result) {
+        String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+                CalculatorConfig.getInstance().getResultColorCode() + result;
+
+        int aboveY = searchY - 14;
+        int resultWidth = font.width(resultDisplay);
+
+        int maxBoxWidth = overlayWidth - 12;
+        int bgHeight = 12;
+        int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
+
+        int aboveX = searchX + 4;
+        if (aboveX + bgWidth > maxOverlayX - 4) {
+            aboveX = Math.max(minOverlayX + 4, maxOverlayX - bgWidth - 4);
+        }
+
+        int resultScroll = 0;
+        int visibleWidth = bgWidth - 8;
+        if (resultWidth > visibleWidth) {
+            int overflowPixels = resultWidth - visibleWidth;
+            long time = System.currentTimeMillis();
+            double cycle = (time % 4000) / 4000.0;
+            double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
+            resultScroll = (int) (overflowPixels * normalized);
+        }
+
+        context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
+
+        enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2);
+        context.text(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
+        disableScissor(context);
     }
 
     private static void drawTextWithSelection(GuiGraphicsExtractor context, Font font,
@@ -364,21 +347,21 @@ public class CalculatorOverlayRenderer {
             return searchField.isFocused();
         } catch (Throwable e) {
             try {
-                java.lang.reflect.Method m = searchField.getClass().getMethod("isFocused");
+                Method m = searchField.getClass().getMethod("isFocused");
                 return (boolean) m.invoke(searchField);
             } catch (Throwable ignored) {}
         }
         return true;
     }
 
-    private static void drawREISearchFieldBackground(GuiGraphicsExtractor context, Rectangle bounds, boolean isFocused) {
+    private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY, boolean isFocused) {
         int borderColor = isFocused ? 0xFFFFFFFF : 0xFF8B8B8B;
-        context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), borderColor);
-        context.fill(bounds.x + 1, bounds.y + 1, bounds.getMaxX() - 1, bounds.getMaxY() - 1, 0xFF000000);
+        context.fill(minX, minY, maxX, maxY, borderColor);
+        context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, 0xFF000000);
     }
 
-    private static void drawREICursor(GuiGraphicsExtractor context, Rectangle bounds, String text,
-                                Font font, int textX, int textY, int cursorPos) {
+    private static void drawCursor(GuiGraphicsExtractor context, String text, Font font, int textX, int textY,
+                                   int cursorPos, int minX, int maxX) {
         try {
             if (text == null) text = "";
             int len = text.length();
@@ -390,33 +373,7 @@ public class CalculatorOverlayRenderer {
                 int cursorX = textX + font.width(textBeforeCursor);
                 int cursorY = textY - 1;
 
-                if (cursorX >= bounds.x + 2 && cursorX <= bounds.getMaxX() - 3) {
-                    context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
-                }
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private static void drawSearchFieldBackground(GuiGraphicsExtractor context, CalculatorBounds bounds, boolean isFocused) {
-        int borderColor = isFocused ? 0xFFFFFFFF : 0xFF8B8B8B;
-        context.fill(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY(), borderColor);
-        context.fill(bounds.x + 1, bounds.y + 1, bounds.getMaxX() - 1, bounds.getMaxY() - 1, 0xFF000000);
-    }
-
-    private static void drawCursor(GuiGraphicsExtractor context, CalculatorBounds bounds, String text,
-                            Font font, int textX, int textY, int cursorPos) {
-        try {
-            if (text == null) text = "";
-            int len = text.length();
-            cursorPos = Math.min(Math.max(0, cursorPos), len);
-
-            long time = System.currentTimeMillis();
-            if ((time / 500) % 2 == 0) {
-                String textBeforeCursor = cursorPos > 0 ? text.substring(0, cursorPos) : "";
-                int cursorX = textX + font.width(textBeforeCursor);
-                int cursorY = textY - 1;
-
-                if (cursorX >= bounds.x + 2 && cursorX <= bounds.getMaxX() - 3) {
+                if (cursorX >= minX && cursorX <= maxX) {
                     context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
                 }
             }

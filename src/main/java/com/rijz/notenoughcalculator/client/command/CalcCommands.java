@@ -21,20 +21,20 @@ package com.rijz.notenoughcalculator.client.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
+import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
+import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
-import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Command handlers for calculator chat commands.
- */
+// Command handlers for /calc, /calchist, /calcset, /calcclear, /calchelp, /calcconfig.
 public class CalcCommands {
 
     // Hardcoded: show max 15 history entries at once
@@ -162,7 +162,7 @@ public class CalcCommands {
     public static int executeConfig(CommandContext<FabricClientCommandSource> ctx) {
         Minecraft client = Minecraft.getInstance();
         client.execute(() -> {
-            Screen currentScreen = NotEnoughCalculatorClient.getCurrentScreen(client);
+            Screen currentScreen = ReflectionUtils.getCurrentScreen(client);
             CalculatorConfigScreen.openScreen(client, new CalculatorConfigScreen(currentScreen));
         });
         return 1;

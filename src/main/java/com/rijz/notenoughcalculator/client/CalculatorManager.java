@@ -103,17 +103,22 @@ public class CalculatorManager {
         loadPersistentVariables();
     }
 
-    private void loadPersistentVariables() {
+    public void loadPersistentVariables() {
         try {
             CalculatorConfig config = CalculatorConfig.getInstance();
             if (config.customVariables != null) {
                 for (var entry : config.customVariables.entrySet()) {
                     try {
-                        evaluator.setVariable(entry.getKey(), new BigDecimal(entry.getValue()));
+                        evaluator.setVariable(entry.getKey(), entry.getValue());
                     } catch (Exception ignored) {}
                 }
             }
         } catch (Exception ignored) {}
+    }
+
+    public void reloadCustomVariables() {
+        evaluator.clearCustomVariables();
+        loadPersistentVariables();
     }
 
     // Heuristics to determine if the query is a math equation or a standard item search

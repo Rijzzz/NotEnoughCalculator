@@ -34,6 +34,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
 import org.joml.Matrix3x2fStack;
 
@@ -94,7 +95,7 @@ public class CalculatorOverlayRenderer {
     }
 
     public static boolean isNonGameplayScreen(Screen screen) {
-        if (screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen) {
+        if (screen instanceof AbstractContainerScreen) {
             return false;
         }
         String screenClassName = screen.getClass().getName();

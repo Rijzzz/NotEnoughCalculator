@@ -20,6 +20,7 @@ package com.rijz.notenoughcalculator.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 // User configuration class. Supports live reloading on file changes without game restarts.
 public class CalculatorConfig {
@@ -58,7 +61,8 @@ public class CalculatorConfig {
     public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
     public boolean enableShorthandResults = false;
     public boolean enableSyntaxHighlighting = true;
-    public java.util.Map<String, String> customVariables = new java.util.LinkedHashMap<>();
+    public boolean enableFullEquationCopy = true;
+    public Map<String, String> customVariables = new LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {
         // Poll for external config file edits every 2 seconds
@@ -114,19 +118,19 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_NUMBER;
+        return SyntaxHighlighter.COLOR_NUMBER;
     }
 
     public String getChatResultColorCode() {
-        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_CHAT_RESULT;
+        return SyntaxHighlighter.COLOR_CHAT_RESULT;
     }
 
     public String getErrorColorCode() {
-        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_ERROR;
+        return SyntaxHighlighter.COLOR_ERROR;
     }
 
     public String getOperatorColorCode() {
-        return com.rijz.notenoughcalculator.client.util.SyntaxHighlighter.COLOR_OP;
+        return SyntaxHighlighter.COLOR_OP;
     }
 
     public double getBazaarTaxRate() {

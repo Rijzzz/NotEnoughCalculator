@@ -78,7 +78,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 
     private String testClipboard = "";
 
-    private void setClipboardText(String str) {
+    void setClipboardText(String str) {
         try {
             Minecraft mc = Minecraft.getInstance();
             if (mc != null && mc.keyboardHandler != null) {
@@ -89,7 +89,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
         this.testClipboard = str != null ? str : "";
     }
 
-    private String getClipboardText() {
+    String getClipboardText() {
         try {
             Minecraft mc = Minecraft.getInstance();
             if (mc != null && mc.keyboardHandler != null) {
@@ -171,18 +171,18 @@ public class StandaloneSearchField implements SearchFieldAdapter {
             return true;
         }
 
-        // Ctrl+C / Cmd+C: Copy selected text (partial selection only; full or no selection copies full equation)
+        // Ctrl+C / Cmd+C: Copy selected text
         if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd) {
-            if (hasSelection() && !isFullSelection()) {
+            if (hasSelection()) {
                 String selected = getSelectedText();
                 setClipboardText(selected);
                 return true;
             }
         }
 
-        // Ctrl+X / Cmd+X: Cut selected text (partial selection only; full or no selection cuts full equation)
+        // Ctrl+X / Cmd+X: Cut selected text
         if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd) {
-            if (hasSelection() && !isFullSelection()) {
+            if (hasSelection()) {
                 String selected = getSelectedText();
                 setClipboardText(selected);
                 deleteSelection();

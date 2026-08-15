@@ -18,6 +18,8 @@
 
 package com.rijz.notenoughcalculator.client;
 
+import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
+import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -378,7 +381,7 @@ public class CalculatorManager {
             // Save current equation before navigating
             if (reiHistoryIndex == -1 && !reiSearchHistory.isEmpty()) {
                 try {
-                    savedCurrentInput = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter().getText();
+                    savedCurrentInput = IntegrationManager.getActiveAdapter().getText();
                     // Also save current equation to history if it's a calculation
                     if (!savedCurrentInput.isEmpty() && looksLikeCalculation(savedCurrentInput)) {
                         currentEquation = savedCurrentInput;
@@ -441,7 +444,7 @@ public class CalculatorManager {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
                 String historyText = reiSearchHistory.get(index);
-                com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter adapter = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter();
+                SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
                 adapter.setText(historyText);
                 adapter.clamp();
 
@@ -465,7 +468,7 @@ public class CalculatorManager {
      */
     private void restoreSavedInput() {
         try {
-            com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter adapter = com.rijz.notenoughcalculator.client.integration.IntegrationManager.getActiveAdapter();
+            SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
             adapter.setText(savedCurrentInput);
             adapter.clamp();
             lastSearchInput = savedCurrentInput;
@@ -505,7 +508,7 @@ public class CalculatorManager {
         try {
             CalculatorConfig config = CalculatorConfig.getInstance();
             if (config.customVariables == null) {
-                config.customVariables = new java.util.LinkedHashMap<>();
+                config.customVariables = new LinkedHashMap<>();
             }
             config.customVariables.put(name.toLowerCase(), value.toPlainString());
             config.save();

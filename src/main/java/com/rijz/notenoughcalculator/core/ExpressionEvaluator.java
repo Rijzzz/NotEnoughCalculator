@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator;
 import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
@@ -1075,15 +1076,15 @@ public class ExpressionEvaluator {
     }
 
     public static BigDecimal calculateBzPayout(BigDecimal price, double taxRatePct) {
-        return com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator.calculateBzPayout(price, taxRatePct);
+        return SkyblockTaxCalculator.calculateBzPayout(price, taxRatePct);
     }
 
     public static BigDecimal calculateAhPayout(BigDecimal price, double durationHours, boolean isBin) {
-        return com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator.calculateAhPayout(price, durationHours, isBin);
+        return SkyblockTaxCalculator.calculateAhPayout(price, durationHours, isBin);
     }
 
     public static double calculateAhDurationFee(double hours) {
-        return com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator.calculateAhDurationFee(hours);
+        return SkyblockTaxCalculator.calculateAhDurationFee(hours);
     }
 
     private boolean isInteger(BigDecimal value) {

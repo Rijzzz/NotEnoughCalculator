@@ -24,10 +24,12 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -484,11 +486,11 @@ public class CalculatorConfigScreen extends Screen {
         if (minecraft != null) {
             minecraft.execute(() -> {
                 try {
-                    java.lang.reflect.Method m = minecraft.getClass().getMethod("setScreenAndShow", Screen.class);
+                    Method m = minecraft.getClass().getMethod("setScreenAndShow", Screen.class);
                     m.invoke(minecraft, screen);
                 } catch (Exception e1) {
                     try {
-                        java.lang.reflect.Method m = minecraft.getClass().getMethod("setScreen", Screen.class);
+                        Method m = minecraft.getClass().getMethod("setScreen", Screen.class);
                         m.invoke(minecraft, screen);
                     } catch (Exception ignored) {}
                 }
@@ -497,7 +499,7 @@ public class CalculatorConfigScreen extends Screen {
     }
 
     private void closeScreen() {
-        Screen target = (this.parent instanceof net.minecraft.client.gui.screens.ChatScreen) ? null : this.parent;
+        Screen target = (this.parent instanceof ChatScreen) ? null : this.parent;
         openScreen(this.minecraft, target);
     }
 

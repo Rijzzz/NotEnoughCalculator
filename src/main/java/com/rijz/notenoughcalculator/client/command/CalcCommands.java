@@ -29,7 +29,10 @@ import com.rijz.notenoughcalculator.core.ResultFormatter;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -66,14 +69,14 @@ public class CalcCommands {
             String formatted = ResultFormatter.formatResultWithUnits(evalRes);
             String fullEquation = expr + " = " + formatted;
 
-            net.minecraft.network.chat.MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
+            MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
                     t("notenoughcalculator.result.equals").getString() +
                     config.getChatResultColorCode() + formatted);
 
             Component tooltip = t("notenoughcalculator.chat.click_to_copy_tooltip");
             msg.setStyle(msg.getStyle()
-                    .withClickEvent(new net.minecraft.network.chat.ClickEvent.RunCommand("/calccopy " + fullEquation))
-                    .withHoverEvent(new net.minecraft.network.chat.HoverEvent.ShowText(tooltip)));
+                    .withClickEvent(new ClickEvent.RunCommand("/calccopy " + fullEquation))
+                    .withHoverEvent(new HoverEvent.ShowText(tooltip)));
 
             ctx.getSource().getPlayer().sendSystemMessage(msg);
         } catch (ExpressionEvaluator.EvalException e) {

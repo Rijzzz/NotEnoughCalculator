@@ -26,7 +26,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -47,6 +46,7 @@ public class CalculatorConfigScreen extends Screen {
     private boolean enableHistoryNavigation;
     private boolean enableShorthandResults;
     private boolean enableSyntaxHighlighting;
+    private boolean enableFullEquationCopy;
     private int decimalPrecision;
     private int bazaarFlipperLevel;
     private final Map<String, String> workingCustomVariables = new LinkedHashMap<>();
@@ -65,6 +65,7 @@ public class CalculatorConfigScreen extends Screen {
     private Button bazaarLvl1Btn;
     private Button bazaarLvl2Btn;
     private Button historyBtn;
+    private Button fullCopyBtn;
 
     // Variables Tab Widgets
     private EditBox varNameInput;
@@ -92,6 +93,7 @@ public class CalculatorConfigScreen extends Screen {
         this.enableHistoryNavigation = config.enableHistoryNavigation;
         this.enableShorthandResults = config.enableShorthandResults;
         this.enableSyntaxHighlighting = config.enableSyntaxHighlighting;
+        this.enableFullEquationCopy = config.enableFullEquationCopy;
         this.decimalPrecision = config.decimalPrecision;
         this.bazaarFlipperLevel = config.bazaarFlipperLevel;
         if (config.customVariables != null) {
@@ -202,6 +204,13 @@ public class CalculatorConfigScreen extends Screen {
                 updateButtonLabels();
             }).bounds(panelX + 20, startY + 182, buttonWidth, buttonHeight)
                     .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.history_navigation")))
+                    .build());
+
+            fullCopyBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
+                enableFullEquationCopy = !enableFullEquationCopy;
+                updateButtonLabels();
+            }).bounds(panelX + 20, startY + 200, buttonWidth, buttonHeight)
+                    .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.full_equation_copy")))
                     .build());
 
         } else {
@@ -347,6 +356,9 @@ public class CalculatorConfigScreen extends Screen {
             if (historyBtn != null) {
                 historyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.history_navigation").copy().append(": ").append(enableHistoryNavigation ? onText : offText));
             }
+            if (fullCopyBtn != null) {
+                fullCopyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.full_equation_copy").copy().append(": ").append(enableFullEquationCopy ? onText : offText));
+            }
 
             if (bazaarLvl0Btn != null) {
                 bazaarLvl0Btn.setMessage(bazaarFlipperLevel == 0 ?
@@ -457,6 +469,7 @@ public class CalculatorConfigScreen extends Screen {
         config.enableHistoryNavigation = this.enableHistoryNavigation;
         config.enableShorthandResults = this.enableShorthandResults;
         config.enableSyntaxHighlighting = this.enableSyntaxHighlighting;
+        config.enableFullEquationCopy = this.enableFullEquationCopy;
         config.decimalPrecision = this.decimalPrecision;
         config.bazaarFlipperLevel = this.bazaarFlipperLevel;
         if (config.customVariables == null) {

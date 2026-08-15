@@ -18,6 +18,8 @@
 
 package com.rijz.notenoughcalculator.client.util;
 
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,12 +49,12 @@ public class SyntaxHighlighter {
     public static final String COLOR_ERROR = "§c";     
     public static final String COLOR_CHAT_RESULT = "§a";
 
-    private static final Set<String> FUNCTIONS = com.rijz.notenoughcalculator.core.ExpressionEvaluator.FUNCTIONS;
-    private static final Set<String> UNITS = com.rijz.notenoughcalculator.core.ExpressionEvaluator.UNITS.keySet();
-    private static final Set<String> BUILTIN_VARS = com.rijz.notenoughcalculator.core.ExpressionEvaluator.BUILTIN_VARIABLES;
+    private static final Set<String> FUNCTIONS = ExpressionEvaluator.FUNCTIONS;
+    private static final Set<String> UNITS = ExpressionEvaluator.UNITS.keySet();
+    private static final Set<String> BUILTIN_VARS = ExpressionEvaluator.BUILTIN_VARIABLES;
 
     private static String buildUnitsRegex() {
-        List<String> sortedUnits = new ArrayList<>(com.rijz.notenoughcalculator.core.ExpressionEvaluator.UNITS.keySet());
+        List<String> sortedUnits = new ArrayList<>(ExpressionEvaluator.UNITS.keySet());
         sortedUnits.sort((a, b) -> Integer.compare(b.length(), a.length()));
         StringBuilder sb = new StringBuilder("(?:");
         for (int i = 0; i < sortedUnits.size(); i++) {

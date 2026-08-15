@@ -152,7 +152,9 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         }
 
                         boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
-                        if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isFullOrNoSelection(searchField)) {
+                        boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
+
+                        if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
                                 String fullEquation = searchText + " = " + result;
@@ -162,7 +164,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                             }
                         }
 
-                        if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isFullOrNoSelection(searchField)) {
+                        if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
                                 String fullEquation = searchText + " = " + result;
@@ -204,7 +206,9 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     }
 
                     boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
-                    if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isFullOrNoSelection(adapter)) {
+                    boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
+
+                    if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
                             String fullEquation = searchText + " = " + result;
@@ -214,7 +218,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         }
                     }
 
-                    if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isFullOrNoSelection(adapter)) {
+                    if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
                             String fullEquation = searchText + " = " + result;

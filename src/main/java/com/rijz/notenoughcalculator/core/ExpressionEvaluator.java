@@ -1108,8 +1108,12 @@ public class ExpressionEvaluator {
     }
 
     public void setVariable(String name, String expr) throws EvalException {
-        BigDecimal value = evaluate(expr);
+        BigDecimal value = evaluateQuiet(expr);
         variables.put(name.toLowerCase(), value);
+    }
+
+    public void clearCustomVariables() {
+        variables.clear();
     }
 
     public BigDecimal getLastAnswer() {

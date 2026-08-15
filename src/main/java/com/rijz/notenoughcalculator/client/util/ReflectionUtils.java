@@ -168,32 +168,18 @@ public class ReflectionUtils {
         return 0;
     }
 
-    public static boolean isFullOrNoSelection(SearchFieldAdapter adapter) {
+    public static boolean isNoSelection(SearchFieldAdapter adapter) {
         if (adapter == null) return true;
         int cursor = adapter.getCursorPosition();
         int selection = adapter.getSelectionEnd();
-        String text = adapter.getText();
-        if (text == null) text = "";
-        int len = text.length();
-
-        if (cursor == selection) return true;
-        int start = Math.min(cursor, selection);
-        int end = Math.max(cursor, selection);
-        return start == 0 && end >= len;
+        return cursor == selection;
     }
 
-    public static boolean isFullOrNoSelection(TextField searchField) {
+    public static boolean isNoSelection(TextField searchField) {
         if (searchField == null) return true;
         int cursor = getCursorPosition(searchField);
         int selection = getSelectionEnd(searchField);
-        String text = searchField.getText();
-        if (text == null) text = "";
-        int len = text.length();
-
-        if (cursor == selection) return true;
-        int start = Math.min(cursor, selection);
-        int end = Math.max(cursor, selection);
-        return start == 0 && end >= len;
+        return cursor == selection;
     }
 
     private static void setRawCursor(TextField searchField, int pos) {

@@ -22,6 +22,7 @@ import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 
 // Makes numbers look nice with commas and unit suggestions
@@ -97,15 +98,15 @@ public class ResultFormatter {
             return formatWithCommas(value);
         }
         try {
-            java.math.BigInteger bi = value.toBigInteger();
+            BigInteger bi = value.toBigInteger();
             return switch (radixMode) {
-                case HEX -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                case HEX -> bi.compareTo(BigInteger.ZERO) < 0
                         ? "-0x" + bi.abs().toString(16).toUpperCase()
                         : "0x" + bi.toString(16).toUpperCase();
-                case BIN -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                case BIN -> bi.compareTo(BigInteger.ZERO) < 0
                         ? "-0b" + bi.abs().toString(2)
                         : "0b" + bi.toString(2);
-                case OCT -> bi.compareTo(java.math.BigInteger.ZERO) < 0
+                case OCT -> bi.compareTo(BigInteger.ZERO) < 0
                         ? "-0o" + bi.abs().toString(8)
                         : "0o" + bi.toString(8);
                 case SHORTHAND -> toShorthand(value);

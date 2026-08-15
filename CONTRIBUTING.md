@@ -1,6 +1,6 @@
 # Contributing
 
-Hey! Thanks for checking out Not Enough Calculator 🧮
+Thanks for wanting to help out with Not Enough Calculator 🧮
 
 ## Found a Bug?
 
@@ -22,19 +22,20 @@ Hey! Thanks for checking out Not Enough Calculator 🧮
 3. Open in IntelliJ IDEA
 4. Run `./gradlew build` to make sure it works
 
-### Make changes
-1. Create a branch: `git checkout -b fix/your-fix-name`
-2. Make your changes
-3. Test in-game: `./gradlew runClient`
-4. Commit: `git commit -m "Fix: describe what you fixed"`
-5. Push: `git push origin fix/your-fix-name`
-6. Open a Pull Request
+### Making a PR
+
+1. Create a branch off the latest: `git checkout -b fix/your-fix-name`
+2. Make your changes and test them in-game
+3. Commit with a clear message describing what you changed
+4. Push and open a Pull Request
 
 ### Code style
-* Use 4 spaces for indentation
-* Name things clearly (`calculateResult` not `cr`)
-* Add comments for complex stuff
-* Every `.java` file needs the LGPL license header at the top - **keep it intact, don't modify it:**
+
+* 4 spaces, no tabs
+* Clear naming (`calculateResult` not `cr`)
+* Comment anything that isn't obvious
+* All `.java` files need the LGPL header at the top, don't remove or modify it:
+
 ```java
 /*
  * This file is part of Not Enough Calculator.
@@ -55,27 +56,19 @@ Hey! Thanks for checking out Not Enough Calculator 🧮
  */
 ```
 
-### Key files
-* `CalculatorManager.java` - Main logic
-* `ExpressionEvaluator.java` - Math engine
-* `ResultFormatter.java` - Number formatting
-* `CalcCommands.java` - Commands like /calc
+## Translations
 
-## Want to translate?
+Want to add a language?
 
 1. Copy `src/main/resources/assets/notenoughcalculator/lang/en_us.json`
-2. Rename it to your language code (like `de_de.json`, `fr_fr.json`, `en_au.json`)
-3. Translate the values (not the keys!)
-4. Submit a PR
+2. Rename to your language code (e.g. `de_de.json`, `fr_fr.json`)
+3. Translate the values, not the keys
+4. Open a PR
 
-## Need help?
+## Questions?
 
-[Join our Discord](https://discord.gg/asPJ4qgs8q) and ask!
+[Join the Discord](https://discord.gg/asPJ4qgs8q) if you need help or want to discuss something before opening a PR.
 
 ## License
 
 By contributing, you agree your code will be licensed under [LGPL-3.0-or-later](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2/LICENSE.txt).
-
----
-
-That's it! Keep it simple, test your changes, and we'll help if you get stuck!

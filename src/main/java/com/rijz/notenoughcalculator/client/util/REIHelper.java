@@ -33,11 +33,28 @@ public class REIHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(REIHelper.class);
     private static Field boundsField = null;
     private static Method getBoundsMethod = null;
-    private static boolean initialized = false;
+    private static boolean reflectionAttempted = false;
 
-    private static void init() {
-        if (initialized) return;
-        initialized = true;
+    private static void init(TextField searchField) {
+        if (reflectionAttempted) return;
+        reflectionAttempted = true;
+
+        if (searchField == null) return;
+        Class<?> implClass = searchField.getClass();
+
+        try {
+            getBoundsMethod = implClass.getMethod("getBounds");
+            getBoundsMethod.setAccessible(true);
+            LOGGER.debug("Found getBounds in {}", implClass.getSimpleName());
+        } catch (NoSuchMethodException ignored) {}
+
+        if (getBoundsMethod == null) {
+            boundsField = findBoundsField(implClass);
+            if (boundsField != null) {
+                boundsField.setAccessible(true);
+                LOGGER.debug("Found bounds field in {}", implClass.getSimpleName());
+            }
+        }
         LOGGER.info("REIHelper reflection cache initialized");
     }
 
@@ -48,34 +65,14 @@ public class REIHelper {
             return null;
         }
 
-        init();
+        init(searchField);
 
         try {
-            Class<?> implClass = searchField.getClass();
-
-            // Try getBounds() method first
-            if (getBoundsMethod == null) {
-                try {
-                    getBoundsMethod = implClass.getMethod("getBounds");
-                    getBoundsMethod.setAccessible(true);
-                    LOGGER.debug("Found getBounds in {}", implClass.getSimpleName());
-                } catch (NoSuchMethodException ignored) {}
-            }
-
             if (getBoundsMethod != null) {
                 try {
                     return (Rectangle) getBoundsMethod.invoke(searchField);
                 } catch (Exception e) {
                     LOGGER.debug("getBounds invoke failed: {}", e.getMessage());
-                }
-            }
-
-            // Fall back to field reflection
-            if (boundsField == null) {
-                boundsField = findBoundsField(implClass);
-                if (boundsField != null) {
-                    boundsField.setAccessible(true);
-                    LOGGER.debug("Found bounds field in {}", implClass.getSimpleName());
                 }
             }
 

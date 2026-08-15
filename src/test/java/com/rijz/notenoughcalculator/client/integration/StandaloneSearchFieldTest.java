@@ -130,6 +130,19 @@ public class StandaloneSearchFieldTest {
     }
 
     @Test
+    public void testCopyFullSelectionAfterCtrlA() {
+        field.setText("126.855m");
+        field.keyPressed(GLFW.GLFW_KEY_A, 0, GLFW.GLFW_MOD_CONTROL);
+        assertTrue(field.hasSelection());
+        assertTrue(field.isFullSelection());
+
+        // Copying after Ctrl+A should copy selected text ("126.855m"), not pass to full equation copy
+        boolean handled = field.keyPressed(GLFW.GLFW_KEY_C, 0, GLFW.GLFW_MOD_CONTROL);
+        assertTrue(handled);
+        assertEquals("126.855m", field.getClipboardText());
+    }
+
+    @Test
     public void testWordNavigation() {
         field.setText("100 + 200");
         field.keyPressed(GLFW.GLFW_KEY_END, 0, 0);

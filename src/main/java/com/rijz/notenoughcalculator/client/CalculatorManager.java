@@ -60,7 +60,7 @@ public class CalculatorManager {
 
 
     private static String buildUnitsRegex() {
-        List<String> sortedUnits = new ArrayList<>(com.rijz.notenoughcalculator.core.ExpressionEvaluator.UNITS.keySet());
+        List<String> sortedUnits = new ArrayList<>(ExpressionEvaluator.UNITS.keySet());
         sortedUnits.sort((a, b) -> Integer.compare(b.length(), a.length()));
         StringBuilder sb = new StringBuilder("(?:");
         for (int i = 0; i < sortedUnits.size(); i++) {
@@ -72,7 +72,7 @@ public class CalculatorManager {
     }
 
     private static String buildFunctionsRegex() {
-        List<String> sortedFuncs = new ArrayList<>(com.rijz.notenoughcalculator.core.ExpressionEvaluator.FUNCTIONS);
+        List<String> sortedFuncs = new ArrayList<>(ExpressionEvaluator.FUNCTIONS);
         sortedFuncs.sort((a, b) -> Integer.compare(b.length(), a.length()));
         StringBuilder sb = new StringBuilder("(");
         for (int i = 0; i < sortedFuncs.size(); i++) {

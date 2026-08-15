@@ -364,6 +364,7 @@ deg(pi) = 180                      (radians to degrees)
   "enableCommaFormatting": true,
   "enableShorthandResults": false,
   "enableSyntaxHighlighting": true,
+  "enableFullEquationCopy": true,
   "bazaarFlipperLevel": 0,
   "customVariables": {}
 }
@@ -378,6 +379,7 @@ deg(pi) = 180                      (radians to degrees)
 - **enableCommaFormatting** (Default: true) - Format large numbers with commas
 - **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
 - **enableSyntaxHighlighting** (Default: true) - Color-code numbers, units, functions, and variables in the search bar
+- **enableFullEquationCopy** (Default: true) - Copy full equation (`expression = result`) when pressing Ctrl+C with no text selected
 - **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
 - **customVariables** (Default: empty) - Stores your saved custom variables (this variable automatically gets created when you add your first variable)
 
@@ -391,8 +393,8 @@ deg(pi) = 180                      (radians to degrees)
 ### Search Bar Shortcuts
 - **`Ctrl + Z` / `Cmd + Z`** - Recall previous calculation (undo)
 - **`Ctrl + Y` / `Cmd + Y`** - Go forward in history (redo)
-- **`Ctrl + C` / `Cmd + C`** - Copy full equation to clipboard (e.g. `1+1 = 2`); copies only selected text if a partial selection is active
-- **`Ctrl + X` / `Cmd + X`** - Cut full equation to clipboard and clear the search bar; cuts only selected text if a partial selection is active
+- **`Ctrl + C` / `Cmd + C`** - Copy full equation (`1+1 = 2`) when no text is selected; copies only selected text when text is highlighted (can be toggled in `/calcconfig`)
+- **`Ctrl + X` / `Cmd + X`** - Cut full equation to clipboard when no text is selected; cuts only selected text when text is highlighted
 - **`Ctrl + A` / `Cmd + A`** - Select all text in the search bar
 - **`Ctrl + Left` / `Right`** - Jump cursor by word
 - **`Ctrl + Backspace` / `Delete`** - Delete entire word to the left or right

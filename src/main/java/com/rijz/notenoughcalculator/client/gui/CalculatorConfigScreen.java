@@ -137,7 +137,7 @@ public class CalculatorConfigScreen extends Screen {
         int startY = tabY + 22; // panelY + 48
 
         if (activeTab == 0) {
-            // === SETTINGS TAB ===
+            // Settings Tab
             inlineBtn = addRenderableWidget(Button.builder(Component.empty(), btn -> {
                 showInlineResults = !showInlineResults;
                 updateButtonLabels();
@@ -217,7 +217,7 @@ public class CalculatorConfigScreen extends Screen {
                     .build());
 
         } else {
-            // CUSTOM VARIABLES TAB
+            // Variables Tab
             int inputY = startY + 16;
             varNameInput = new EditBox(this.font, panelX + 20, inputY, 110, 18, Component.translatable("notenoughcalculator.config.var.name_placeholder"));
             varNameInput.setHint(Component.translatable("notenoughcalculator.config.var.name_placeholder"));
@@ -287,7 +287,7 @@ public class CalculatorConfigScreen extends Screen {
             }
         }
 
-        // Common Save & Cancel Buttons at Footer
+
         int bottomY = panelY + panelHeight - 24;
         int gap = 10;
         int saveWidth = (buttonWidth - gap) / 2;
@@ -385,7 +385,7 @@ public class CalculatorConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        // Unfocus text fields when user clicks anywhere outside input boxes
+
         if (this.minecraft != null) {
             long window = this.minecraft.getWindow().handle();
             boolean isMouseDown = GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;

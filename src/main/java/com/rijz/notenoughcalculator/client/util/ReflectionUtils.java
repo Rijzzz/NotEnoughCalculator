@@ -28,14 +28,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-/**
- * Cross-version reflection utilities for Minecraft screen access and REI TextField state inspection.
- */
+
 public class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
-    // Cache reflection lookups for TextField cursor position, text selection, and setters
+
     private static Field cursorField = null;
     private static Field selectionEndField = null;
     private static Method getCursorMethod = null;
@@ -51,7 +49,7 @@ public class ReflectionUtils {
     private static Method guiScreenMethod = null;
     private static boolean screenReflectionInitialized = false;
 
-    // Set up reflection for text field cursor/selection access and modification
+
     private static void initReflection(TextField searchField) {
         if (reflectionInitialized) return;
         if (searchField == null) return;
@@ -59,7 +57,7 @@ public class ReflectionUtils {
 
         Class<?> fieldClass = searchField.getClass();
 
-        // Get cursor position method or field
+    
         try {
             getCursorMethod = fieldClass.getMethod("getCursor");
             getCursorMethod.setAccessible(true);
@@ -76,7 +74,7 @@ public class ReflectionUtils {
             }
         }
 
-        // Get selection end method or field
+    
         try {
             getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
             getSelectionEndMethod.setAccessible(true);
@@ -93,7 +91,7 @@ public class ReflectionUtils {
             }
         }
 
-        // Setters for cursor position
+    
         String[] setCursorNames = {"setCursor", "setCursorPosition", "setCaretPosition"};
         for (String name : setCursorNames) {
             try {
@@ -103,7 +101,7 @@ public class ReflectionUtils {
             } catch (NoSuchMethodException ignored) {}
         }
 
-        // Setters for selection
+    
         String[] setSelectionNames = {"setSelectionEnd", "setSelectionStart", "setHighlightPos"};
         for (String name : setSelectionNames) {
             try {
@@ -206,7 +204,7 @@ public class ReflectionUtils {
         } catch (Exception ignored) {}
     }
 
-    // Lookup field traversing superclasses
+
     public static Field findFieldInHierarchy(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);

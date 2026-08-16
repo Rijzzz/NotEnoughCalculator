@@ -18,6 +18,7 @@
 
 package com.rijz.notenoughcalculator.client.gui;
 
+import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -480,6 +481,7 @@ public class CalculatorConfigScreen extends Screen {
         config.customVariables.clear();
         config.customVariables.putAll(this.workingCustomVariables);
         config.save();
+        NotEnoughCalculatorClient.getCalculatorManager().reloadCustomVariables();
     }
 
     public static void openScreen(Minecraft minecraft, Screen screen) {

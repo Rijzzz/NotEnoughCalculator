@@ -54,9 +54,9 @@ public class ReflectionUtils {
     // Set up reflection for text field cursor/selection access and modification
     private static void initReflection(TextField searchField) {
         if (reflectionInitialized) return;
+        if (searchField == null) return;
         reflectionInitialized = true;
 
-        if (searchField == null) return;
         Class<?> fieldClass = searchField.getClass();
 
         // Get cursor position method or field

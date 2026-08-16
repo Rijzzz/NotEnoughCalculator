@@ -339,6 +339,13 @@ class ExpressionEvaluatorTest {
         void unexpectedCharacter() {
             assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("5 @ 3"));
         }
+
+        @Test
+        void unconsumedTrailingTokens() {
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("10 20"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("10 + 5 apples"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("100 foo"));
+        }
     }
 
     @Nested

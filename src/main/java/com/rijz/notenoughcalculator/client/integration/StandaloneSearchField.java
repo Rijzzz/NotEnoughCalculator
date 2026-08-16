@@ -22,7 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import org.lwjgl.glfw.GLFW;
 
-// Standalone search field component with full selection, clipboard, mouse cursor positioning, and word navigation
+// Standalone search field with selection, clipboard, and word navigation support.
 public class StandaloneSearchField implements SearchFieldAdapter {
 
     private String text = "";
@@ -164,14 +164,14 @@ public class StandaloneSearchField implements SearchFieldAdapter {
         int len = currentStr.length();
         int pos = getCursorPosition();
 
-        // Ctrl+A / Cmd+A: Select All
+
         if (key == GLFW.GLFW_KEY_A && isCtrlOrCmd) {
             cursorPosition = 0;
             selectionEnd = len;
             return true;
         }
 
-        // Ctrl+C / Cmd+C: Copy selected text
+
         if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd) {
             if (hasSelection()) {
                 String selected = getSelectedText();
@@ -180,7 +180,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
             }
         }
 
-        // Ctrl+X / Cmd+X: Cut selected text
+
         if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd) {
             if (hasSelection()) {
                 String selected = getSelectedText();
@@ -190,7 +190,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
             }
         }
 
-        // Ctrl+V / Cmd+V: Paste clipboard text
+
         if (key == GLFW.GLFW_KEY_V && isCtrlOrCmd) {
             String clipboard = getClipboardText();
             if (clipboard != null && !clipboard.isEmpty()) {
@@ -351,7 +351,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
         if (mouseX >= bounds.x && mouseX <= bounds.getMaxX() && mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
             focused = true;
 
-            // Character index calculation based on click position
+
             Font font = Minecraft.getInstance().font;
             String currentStr = getText();
             int clickX = (int) mouseX - bounds.x - 4;

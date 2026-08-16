@@ -45,7 +45,7 @@ import java.util.Set;
  */
 public class ExpressionEvaluator {
 
-    // Hardcoded: store max 15 calculations in history
+
     private static final int MAX_HISTORY = 15;
 
     private final MathContext mc;
@@ -95,7 +95,7 @@ public class ExpressionEvaluator {
         }
     }
 
-    // Token types recognized by the parser
+
     private enum TokenKind {
         NUM, OP, LPAREN, RPAREN, COMMA, PERCENT, FACTORIAL, FUNC, VAR, UNIT, EOF
     }
@@ -154,7 +154,7 @@ public class ExpressionEvaluator {
             "bz", "ah", "ahbin", "fmt", "rad", "deg"
     );
 
-    // Built-in constants & variables
+
     public static final Set<String> BUILTIN_VARIABLES = Set.of("ans", "pi", "e");
 
     // Functions that take two comma-separated arguments
@@ -237,13 +237,13 @@ public class ExpressionEvaluator {
         while (i < expr.length()) {
             char c = expr.charAt(i);
 
-            // Skip whitespace
+
             if (Character.isWhitespace(c)) {
                 i++;
                 continue;
             }
 
-            // Parse numbers (including decimals)
+
             if (Character.isDigit(c) || c == '.') {
                 int start = i;
                 StringBuilder num = new StringBuilder();
@@ -302,14 +302,14 @@ public class ExpressionEvaluator {
                 continue;
             }
 
-            // Factorial
+
             if (c == '!') {
                 tokens.add(new Token(TokenKind.FACTORIAL, "!", i));
                 i++;
                 continue;
             }
 
-            // Bitwise operators & << >> ~
+
             if (c == '&' || c == '|' || c == '~') {
                 tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
                 i++;
@@ -328,7 +328,7 @@ public class ExpressionEvaluator {
                 continue;
             }
 
-            // Standard Math Operators
+
             if ("+-*/^".indexOf(c) != -1) {
                 tokens.add(new Token(TokenKind.OP, String.valueOf(c), i));
                 i++;
@@ -438,7 +438,7 @@ public class ExpressionEvaluator {
                 // Otherwise, 'x' will be parsed as a variable/identifier below
             }
 
-            // Parentheses
+
             if (c == '(') {
                 tokens.add(new Token(TokenKind.LPAREN, "(", i));
                 i++;
@@ -486,11 +486,11 @@ public class ExpressionEvaluator {
 
                 String nameStr = name.toString().toLowerCase();
 
-                // Determine token type
+    
                 if (FUNCTIONS.contains(nameStr)) {
                     tokens.add(new Token(TokenKind.FUNC, nameStr, start));
                 } else if (nameStr.equals("pi")) {
-                    // Pi constant
+
                     Token tok = new Token(TokenKind.NUM, "pi", start);
                     tok.number = new BigDecimal("3.14159265358979323846");
                     tokens.add(tok);
@@ -512,7 +512,6 @@ public class ExpressionEvaluator {
                         tokens.add(new Token(TokenKind.VAR, nameStr, start));
                     }
                 } else if (nameStr.equals("ans")) {
-                    // Special variable for last answer
                     Token tok = new Token(TokenKind.NUM, "ans", start);
                     tok.number = lastAnswer;
                     tokens.add(tok);
@@ -563,7 +562,7 @@ public class ExpressionEvaluator {
         return result;
     }
 
-    // Helper class for parser results
+
     private static class ParseResult {
         BigDecimal value;
         int nextPos;
@@ -1034,7 +1033,7 @@ public class ExpressionEvaluator {
         throw new EvalException(tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);
     }
 
-    // Apply single-argument math functions
+
     private BigDecimal applyFunction(String func, BigDecimal arg, int pos) throws EvalException {
         switch (func) {
             case "sqrt":

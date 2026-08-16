@@ -103,17 +103,22 @@ public class CalculatorManager {
         loadPersistentVariables();
     }
 
-    private void loadPersistentVariables() {
+    public void loadPersistentVariables() {
         try {
             CalculatorConfig config = CalculatorConfig.getInstance();
             if (config.customVariables != null) {
                 for (var entry : config.customVariables.entrySet()) {
                     try {
-                        evaluator.setVariable(entry.getKey(), new BigDecimal(entry.getValue()));
+                        evaluator.setVariable(entry.getKey(), entry.getValue());
                     } catch (Exception ignored) {}
                 }
             }
         } catch (Exception ignored) {}
+    }
+
+    public void reloadCustomVariables() {
+        evaluator.clearCustomVariables();
+        loadPersistentVariables();
     }
 
     // Heuristics to determine if the query is a math equation or a standard item search
@@ -168,19 +173,14 @@ public class CalculatorManager {
 
         // Check parentheses are balanced
         int parenCount = 0;
-        for (char c : trimmed.toCharArray()) {
+        int len = trimmed.length();
+        for (int i = 0; i < len; i++) {
+            char c = trimmed.charAt(i);
             if (c == '(') parenCount++;
             if (c == ')') parenCount--;
             if (parenCount < 0) return false;  // More closing than opening
         }
-        if (parenCount != 0) return false;  // Unmatched parens
-
-        // Can't end with incomplete function call
-        if (trimmed.matches(".*(?:sqrt|abs|floor|ceil|round|log|ln|sin|cos|tan|min|max)\\s*\\([^)]*$")) {
-            return false;
-        }
-
-        return true;
+        return parenCount == 0;
     }
 
     /**

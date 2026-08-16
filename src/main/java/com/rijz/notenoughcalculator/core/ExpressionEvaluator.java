@@ -171,6 +171,12 @@ public class ExpressionEvaluator {
         List<Token> tokens = tokenize(expr);
         tokens = insertImplicitMultiplication(tokens);
         ParseResult parseRes = parseExpression(tokens, 0);
+
+        if (parseRes.nextPos < tokens.size() && tokens.get(parseRes.nextPos).kind != TokenKind.EOF) {
+            Token leftover = tokens.get(parseRes.nextPos);
+            throw new EvalException(tr("notenoughcalculator.error.unexpected_token", leftover.value), leftover.pos);
+        }
+
         BigDecimal result = parseRes.value;
 
         // Update lastAnswer but don't add to history
@@ -194,6 +200,12 @@ public class ExpressionEvaluator {
         List<Token> tokens = tokenize(expr);
         tokens = insertImplicitMultiplication(tokens);
         ParseResult parseRes = parseExpression(tokens, 0);
+
+        if (parseRes.nextPos < tokens.size() && tokens.get(parseRes.nextPos).kind != TokenKind.EOF) {
+            Token leftover = tokens.get(parseRes.nextPos);
+            throw new EvalException(tr("notenoughcalculator.error.unexpected_token", leftover.value), leftover.pos);
+        }
+
         BigDecimal result = parseRes.value;
 
         // Update lastAnswer and add to history
@@ -1096,8 +1108,12 @@ public class ExpressionEvaluator {
     }
 
     public void setVariable(String name, String expr) throws EvalException {
-        BigDecimal value = evaluate(expr);
+        BigDecimal value = evaluateQuiet(expr);
         variables.put(name.toLowerCase(), value);
+    }
+
+    public void clearCustomVariables() {
+        variables.clear();
     }
 
     public BigDecimal getLastAnswer() {

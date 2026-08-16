@@ -69,7 +69,7 @@ public class SyntaxHighlighter {
             "(?i)" +
             "(\\$\\w+)|" +                                      // Custom variable ($var)
             "(0[bxo][0-9a-fA-F_]+)|" +                          // Number literal (0b, 0x, 0o)
-            "(\\d+\\.?\\d*\\s*" + buildUnitsRegex() + ")|" +    // Number with unit (ExpressionEvaluator.UNITS)
+            "(\\d+\\.?\\d*\\s*" + buildUnitsRegex() + "(?![a-zA-Z0-9_]))|" + // Number with unit (ExpressionEvaluator.UNITS)
             "(\\d+\\.?\\d*)|" +                                 // Plain number
             "([a-zA-Z]+)|" +                                    // Word (function / builtin var)
             "(<<|>>|[+\\-*/^%xX!&|~(),])|" +                    // Operators / Delimiters

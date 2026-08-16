@@ -93,7 +93,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         });
     }
 
-    // Handles overlay rendering hooks, mouse events, and keyboard events
+
     private void registerScreenRendering() {
         ScreenEvents.BEFORE_INIT.register((client, screen, sw, sh) -> {
             ScreenEvents.afterExtract(screen).register((scr, context, mouseX, mouseY, delta) -> {
@@ -114,7 +114,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         });
     }
 
-    // Listen for key presses and handle Enter, Ctrl+Z, Ctrl+Y, standalone editing
+
     private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
         Minecraft mc = Minecraft.getInstance();
 
@@ -249,7 +249,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         return true;
     }
 
-    // Register all chat commands
+
     private void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommands.literal("calc")

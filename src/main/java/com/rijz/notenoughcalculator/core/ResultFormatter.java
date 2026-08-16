@@ -29,13 +29,12 @@ import java.math.RoundingMode;
 // Example: 1000000 -> "1,000,000 (1m)"
 public class ResultFormatter {
 
-    // Helper method for translations
+
     private static String tr(String key, Object... args) {
         return I18n.get(key, args);
     }
 
-    // Format with commas only (used for inline display in REI)
-    // Uses pure String manipulation to preserve 100% arbitrary precision without double-casting loss
+    // Format with commas (preserves arbitrary precision without double-casting loss).
     public static String formatWithCommas(BigDecimal value) {
         if (value == null) return "0";
         CalculatorConfig config = CalculatorConfig.getInstance();

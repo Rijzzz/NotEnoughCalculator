@@ -33,22 +33,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-// Manages live calculation tracking in the REI search bar.
-// Keeps track of history for both the /calchist display and Ctrl+Z/Y search box undo/redo.
+// Manages live calculation, history tracking, and Ctrl+Z/Y undo/redo.
 public class CalculatorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorManager.class);
 
-    // Hard limit: store up to 15 calculations
+
     private static final int MAX_EQUATIONS = 15;
 
     private final ExpressionEvaluator evaluator;
     private String lastSearchInput = "";
     private String lastFormattedResult = null;
 
-    // Separate history tracking:
-    // - reiSearchHistory: full expressions for Ctrl+Z/Y search bar undo/redo
-    // - completedHistory: fully evaluated results for /calchist command
+
     private final List<String> reiSearchHistory = new ArrayList<>();
     private final List<String> completedHistory = new ArrayList<>();
     private int reiHistoryIndex = -1;  // -1 means active typing
@@ -183,14 +180,7 @@ public class CalculatorManager {
         return parenCount == 0;
     }
 
-    /**
-     * Main method called on every keystroke in REI search bar.
-     *
-     * Handles:
-     * 1. Detecting manual typing vs history navigation
-     * 2. Committing equations when user clears search
-     * 3. Live calculation + display
-     */
+    // Called on every keystroke in the search bar.
     public String formatSearchBar(String input) {
         String cleanInput = ResultFormatter.cleanInput(input);
 
@@ -236,12 +226,7 @@ public class CalculatorManager {
         return cleanInput;
     }
 
-    /**
-     * Add completed equation to REI search history (for Ctrl+Z).
-     * Only saves FULL equations, not individual keystrokes.
-     *
-     * Example: "100+50" = 1 entry (not 7 entries for each character)
-     */
+    // Add completed equation to REI search history (for Ctrl+Z).
     private void addToReiHistory(String equation) {
         if (equation == null || equation.trim().isEmpty()) {
             return;
@@ -255,7 +240,7 @@ public class CalculatorManager {
         // Add the completed equation
         reiSearchHistory.add(equation);
 
-        // Keep only the last 15 equations (hardcoded limit)
+
         while (reiSearchHistory.size() > MAX_EQUATIONS) {
             reiSearchHistory.remove(0);
         }
@@ -263,10 +248,7 @@ public class CalculatorManager {
         LOGGER.debug("Equation saved to history: '{}' (total: {})", equation, reiSearchHistory.size());
     }
 
-    /**
-     * Calculate result for live display (doesn't add to /calchist).
-     * Runs quietly - errors are suppressed to avoid spam while typing.
-     */
+    // Calculate for live display (quiet, doesn't add to /calchist).
     private void calculateForDisplay(String input) {
         if (input == null || input.trim().isEmpty()) {
             lastFormattedResult = null;
@@ -290,10 +272,7 @@ public class CalculatorManager {
         }
     }
 
-    /**
-     * Save pending calculation to /calchist history.
-     * Called when user clears search bar or closes REI.
-     */
+
     private void commitPendingCalculation() {
         if (hasUncommittedCalculation && lastCompletedExpression != null && lastCompletedResult != null) {
             addToCompletedHistory(lastCompletedExpression, lastCompletedResult);
@@ -304,7 +283,7 @@ public class CalculatorManager {
         }
     }
 
-    // Public wrapper for external calls (e.g., when REI closes)
+
     public void commitPendingCalculationPublic() {
         // Also save current equation to REI history before committing
         if (!currentEquation.isEmpty() && looksLikeCalculation(currentEquation)) {
@@ -314,10 +293,7 @@ public class CalculatorManager {
         commitPendingCalculation();
     }
 
-    /**
-     * Add to completed calculation history (shown in /calchist).
-     * Stores up to 15 calculations.
-     */
+
     private void addToCompletedHistory(String expression, BigDecimal result) {
         String historyEntry = expression + " = " + ResultFormatter.formatWithCommas(result);
 
@@ -325,7 +301,7 @@ public class CalculatorManager {
         if (completedHistory.isEmpty() || !completedHistory.get(completedHistory.size() - 1).equals(historyEntry)) {
             completedHistory.add(historyEntry);
 
-            // Keep only last 15 calculations
+
             while (completedHistory.size() > MAX_EQUATIONS) {
                 completedHistory.remove(0);
             }
@@ -436,10 +412,7 @@ public class CalculatorManager {
         }
     }
 
-    /**
-     * Update search field with a history entry.
-     * Forces update without adding to history (to avoid infinite loop).
-     */
+    // Update search field with a history entry (without triggering history save).
     private void setSearchFieldText(int index) {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
@@ -463,9 +436,7 @@ public class CalculatorManager {
         }
     }
 
-    /**
-     * Restore what user was typing before they started pressing Ctrl+Z.
-     */
+
     private void restoreSavedInput() {
         try {
             SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
@@ -550,10 +521,7 @@ public class CalculatorManager {
         return evaluator.getVariablesInfo();
     }
 
-    /**
-     * Reset everything when player leaves world/server.
-     * Prevents history from persisting across sessions.
-     */
+
     public void reset() {
         lastSearchInput = "";
         lastFormattedResult = null;

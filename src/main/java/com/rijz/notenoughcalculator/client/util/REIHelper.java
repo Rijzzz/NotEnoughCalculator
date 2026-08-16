@@ -58,8 +58,7 @@ public class REIHelper {
         LOGGER.info("REIHelper reflection cache initialized");
     }
 
-    // Get the position and size of REI's search field using reflection.
-    // We cache the method/field for performance since it's called every frame.
+    // Cached per-frame for performance.
     public static Rectangle getSearchFieldBounds(TextField searchField) {
         if (searchField == null) {
             return null;
@@ -90,18 +89,18 @@ public class REIHelper {
         return null;
     }
 
-    // Search through the class hierarchy to find a bounds-related field
+
     private static Field findBoundsField(Class<?> clazz) {
         String[] fieldNames = {"bounds", "bound", "rectangle", "area", "rect"};
 
-        // Check the current class first
+
         for (String fieldName : fieldNames) {
             try {
                 return clazz.getDeclaredField(fieldName);
             } catch (NoSuchFieldException ignored) {}
         }
 
-        // Walk up the inheritance chain looking for the field
+
         Class<?> superClass = clazz.getSuperclass();
         while (superClass != null && !superClass.equals(Object.class)) {
             for (String fieldName : fieldNames) {

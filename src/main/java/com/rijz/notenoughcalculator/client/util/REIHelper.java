@@ -37,9 +37,9 @@ public class REIHelper {
 
     private static void init(TextField searchField) {
         if (reflectionAttempted) return;
+        if (searchField == null) return;
         reflectionAttempted = true;
 
-        if (searchField == null) return;
         Class<?> implClass = searchField.getClass();
 
         try {

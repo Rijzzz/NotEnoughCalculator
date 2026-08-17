@@ -38,7 +38,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 // Command handlers for /calc, /calchist, /calcset, /calcclear, /calchelp, /calcconfig.
-public class CalcCommands {
+public class CalculatorCommands {
 
 
     private static final int MAX_HISTORY_DISPLAY = 15;
@@ -149,7 +149,7 @@ public class CalcCommands {
     }
 
     public static int executeHelp(CommandContext<FabricClientCommandSource> ctx) {
-        return CalcHelpFormatter.showHelpPage(ctx, "main");
+        return CalculatorHelpFormatter.showHelpPage(ctx, "main");
     }
 
     public static int executeHelpPage(CommandContext<FabricClientCommandSource> ctx) {
@@ -159,7 +159,7 @@ public class CalcCommands {
         } catch (IllegalArgumentException e) {
             page = "main";
         }
-        return CalcHelpFormatter.showHelpPage(ctx, page);
+        return CalculatorHelpFormatter.showHelpPage(ctx, page);
     }
 
     public static int executeConfig(CommandContext<FabricClientCommandSource> ctx) {

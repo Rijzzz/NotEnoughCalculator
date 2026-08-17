@@ -24,7 +24,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
 
 // Formatter and renderer for interactive chat help pages (/calchelp).
-public class CalcHelpFormatter {
+public class CalculatorHelpFormatter {
 
     private static Component t(String key, Object... args) {
         return Component.translatable(key, args);

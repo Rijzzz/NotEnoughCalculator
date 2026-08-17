@@ -19,7 +19,7 @@
 package com.rijz.notenoughcalculator.client;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.rijz.notenoughcalculator.client.command.CalcCommands;
+import com.rijz.notenoughcalculator.client.command.CalculatorCommands;
 import com.rijz.notenoughcalculator.client.gui.overlay.CalculatorOverlayRenderer;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
@@ -254,29 +254,29 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommands.literal("calc")
                     .then(ClientCommands.argument("expression", StringArgumentType.greedyString())
-                            .executes(CalcCommands::executeCalc)));
+                            .executes(CalculatorCommands::executeCalc)));
 
             dispatcher.register(ClientCommands.literal("calchist")
-                    .executes(CalcCommands::executeHistory));
+                    .executes(CalculatorCommands::executeHistory));
             dispatcher.register(ClientCommands.literal("calcclear")
-                    .executes(CalcCommands::executeClear));
+                    .executes(CalculatorCommands::executeClear));
 
             dispatcher.register(ClientCommands.literal("calcset")
                     .then(ClientCommands.argument("variable", StringArgumentType.word())
                             .then(ClientCommands.argument("value", StringArgumentType.greedyString())
-                                    .executes(CalcCommands::executeSet))));
+                                    .executes(CalculatorCommands::executeSet))));
 
             dispatcher.register(ClientCommands.literal("calchelp")
-                    .executes(CalcCommands::executeHelp)
+                    .executes(CalculatorCommands::executeHelp)
                     .then(ClientCommands.argument("page", StringArgumentType.word())
-                            .executes(CalcCommands::executeHelpPage)));
+                            .executes(CalculatorCommands::executeHelpPage)));
 
             dispatcher.register(ClientCommands.literal("calcconfig")
-                    .executes(CalcCommands::executeConfig));
+                    .executes(CalculatorCommands::executeConfig));
 
             dispatcher.register(ClientCommands.literal("calccopy")
                     .then(ClientCommands.argument("text", StringArgumentType.greedyString())
-                            .executes(CalcCommands::executeCopy)));
+                            .executes(CalculatorCommands::executeCopy)));
         });
     }
 

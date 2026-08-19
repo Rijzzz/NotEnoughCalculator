@@ -28,11 +28,9 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-
 public class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
-
 
     private static Field cursorField = null;
     private static Field selectionEndField = null;
@@ -42,22 +40,19 @@ public class ReflectionUtils {
     private static Method setSelectionEndMethod = null;
     private static boolean reflectionInitialized = false;
 
-    // Cache reflection fields for current screen retrieval (compat helper for 26.2+)
+    // Cache reflection fields for current screen retrieval
     private static Field mcScreenField = null;
     private static Field mcGuiField = null;
     private static Field guiScreenField = null;
     private static Method guiScreenMethod = null;
     private static boolean screenReflectionInitialized = false;
 
-
     private static void initReflection(TextField searchField) {
         if (reflectionInitialized) return;
         if (searchField == null) return;
-        reflectionInitialized = true;
 
         Class<?> fieldClass = searchField.getClass();
 
-    
         try {
             getCursorMethod = fieldClass.getMethod("getCursor");
             getCursorMethod.setAccessible(true);
@@ -74,7 +69,6 @@ public class ReflectionUtils {
             }
         }
 
-    
         try {
             getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
             getSelectionEndMethod.setAccessible(true);
@@ -91,7 +85,6 @@ public class ReflectionUtils {
             }
         }
 
-    
         String[] setCursorNames = {"setCursor", "setCursorPosition", "setCaretPosition"};
         for (String name : setCursorNames) {
             try {
@@ -101,7 +94,6 @@ public class ReflectionUtils {
             } catch (NoSuchMethodException ignored) {}
         }
 
-    
         String[] setSelectionNames = {"setSelectionEnd", "setSelectionStart", "setHighlightPos"};
         for (String name : setSelectionNames) {
             try {
@@ -110,9 +102,12 @@ public class ReflectionUtils {
                 break;
             } catch (NoSuchMethodException ignored) {}
         }
+
+        if ((getCursorMethod != null || cursorField != null) && (getSelectionEndMethod != null || selectionEndField != null)) {
+            reflectionInitialized = true;
+        }
     }
 
-    // Clamp REI's search field cursor and selection pointers to prevent StringIndexOutOfBoundsException crashes
     public static void clampSearchField(TextField searchField) {
         if (searchField == null) return;
         initReflection(searchField);
@@ -130,6 +125,41 @@ public class ReflectionUtils {
                 setRawSelection(searchField, len);
             }
         } catch (Exception ignored) {}
+    }
+
+    public static int getCursorPosition(Object searchField) {
+        if (searchField == null) return 0;
+        if (searchField instanceof TextField) return getCursorPosition((TextField) searchField);
+        try {
+            Method m = searchField.getClass().getMethod("getCursorPosition");
+            Object res = m.invoke(searchField);
+            if (res instanceof Integer) return (Integer) res;
+        } catch (Throwable ignored) {}
+        try {
+            Method m = searchField.getClass().getMethod("getCursor");
+            Object res = m.invoke(searchField);
+            if (res instanceof Integer) return (Integer) res;
+        } catch (Throwable ignored) {}
+        return 0;
+    }
+
+    public static int getSelectionEnd(Object searchField) {
+        if (searchField == null) return 0;
+        if (searchField instanceof TextField) return getSelectionEnd((TextField) searchField);
+        try {
+            Method m = searchField.getClass().getMethod("getSelectionEnd");
+            Object res = m.invoke(searchField);
+            if (res instanceof Integer) return (Integer) res;
+        } catch (Throwable ignored) {}
+        return getCursorPosition(searchField);
+    }
+
+    public static void clampSearchField(Object searchField) {
+        if (searchField == null) return;
+        if (searchField instanceof TextField) {
+            clampSearchField((TextField) searchField);
+            return;
+        }
     }
 
     public static int getCursorPosition(TextField searchField) {
@@ -217,7 +247,7 @@ public class ReflectionUtils {
         return null;
     }
 
-    // Safely retrieve the current screen using reflection for cross-version 26.2+ compatibility.
+    // Retrieve the current screen using reflection
     private static void initScreenReflection(Minecraft mc) {
         if (screenReflectionInitialized) return;
         screenReflectionInitialized = true;
@@ -284,5 +314,32 @@ public class ReflectionUtils {
         }
 
         return null;
+    }
+
+    public static void openScreen(Minecraft mc, Screen screen) {
+        if (mc == null) return;
+        mc.execute(() -> {
+            try {
+                Method m = Minecraft.class.getMethod("setScreen", Screen.class);
+                m.invoke(mc, screen);
+                return;
+            } catch (Exception ignored) {}
+
+            try {
+                Field guiField = Minecraft.class.getDeclaredField("gui");
+                guiField.setAccessible(true);
+                Object gui = guiField.get(mc);
+                if (gui != null) {
+                    Method m = gui.getClass().getMethod("setScreen", Screen.class);
+                    m.invoke(gui, screen);
+                    return;
+                }
+            } catch (Exception ignored) {}
+
+            try {
+                Method m = Minecraft.class.getMethod("setScreenAndShow", Screen.class);
+                m.invoke(mc, screen);
+            } catch (Exception ignored) {}
+        });
     }
 }

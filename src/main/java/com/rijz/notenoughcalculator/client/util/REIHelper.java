@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-// Helper for accessing REI's internal search field bounds via reflection.
-// Used by the overlay renderer to position the calculator result display.
 public class REIHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(REIHelper.class);
@@ -38,7 +36,6 @@ public class REIHelper {
     private static void init(TextField searchField) {
         if (reflectionAttempted) return;
         if (searchField == null) return;
-        reflectionAttempted = true;
 
         Class<?> implClass = searchField.getClass();
 
@@ -55,7 +52,11 @@ public class REIHelper {
                 LOGGER.debug("Found bounds field in {}", implClass.getSimpleName());
             }
         }
-        LOGGER.info("REIHelper reflection cache initialized");
+
+        if (getBoundsMethod != null || boundsField != null) {
+            reflectionAttempted = true;
+            LOGGER.info("REIHelper reflection cache initialized successfully");
+        }
     }
 
     // Cached per-frame for performance.
@@ -93,13 +94,11 @@ public class REIHelper {
     private static Field findBoundsField(Class<?> clazz) {
         String[] fieldNames = {"bounds", "bound", "rectangle", "area", "rect"};
 
-
         for (String fieldName : fieldNames) {
             try {
                 return clazz.getDeclaredField(fieldName);
             } catch (NoSuchFieldException ignored) {}
         }
-
 
         Class<?> superClass = clazz.getSuperclass();
         while (superClass != null && !superClass.equals(Object.class)) {

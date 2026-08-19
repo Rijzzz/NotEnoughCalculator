@@ -22,7 +22,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import org.lwjgl.glfw.GLFW;
 
-// Standalone search field with selection, clipboard, and word navigation support.
 public class StandaloneSearchField implements SearchFieldAdapter {
 
     private String text = "";

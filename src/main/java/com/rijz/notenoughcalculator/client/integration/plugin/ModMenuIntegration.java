@@ -16,13 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rijz.notenoughcalculator.client;
+package com.rijz.notenoughcalculator.client.integration.plugin;
 
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 
-// Hooks into ModMenu so users get a "Configure" button in the mod list
 public class ModMenuIntegration implements ModMenuApi {
 
     @Override

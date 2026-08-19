@@ -25,13 +25,21 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-// Makes numbers look nice with commas and unit suggestions
-// Example: 1000000 -> "1,000,000 (1m)"
 public class ResultFormatter {
 
 
     private static String tr(String key, Object... args) {
         return I18n.get(key, args);
+    }
+
+    public static String getEqualsSign() {
+        try {
+            String val = I18n.get("notenoughcalculator.result.equals");
+            if (val != null && !val.equals("notenoughcalculator.result.equals")) {
+                return val;
+            }
+        } catch (Throwable ignored) {}
+        return " = ";
     }
 
     // Format with commas (preserves arbitrary precision without double-casting loss).
@@ -80,7 +88,7 @@ public class ResultFormatter {
     // Format result considering radix mode (hex, bin, oct) or decimal commas
     public static String formatResult(ExpressionEvaluator.EvalResult evalResult) {
         if (evalResult == null) return "0";
-        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT && evalResult.radixMode != ExpressionEvaluator.RadixMode.NONE) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
         }
         CalculatorConfig config = CalculatorConfig.getInstance();
@@ -93,7 +101,7 @@ public class ResultFormatter {
     // Convert value to base 16 (0xFF), base 2 (0b1010), or base 8 (0o77)
     public static String formatWithRadix(BigDecimal value, ExpressionEvaluator.RadixMode radixMode) {
         if (value == null) return "0";
-        if (radixMode == null || radixMode == ExpressionEvaluator.RadixMode.DEFAULT) {
+        if (radixMode == null || radixMode == ExpressionEvaluator.RadixMode.DEFAULT || radixMode == ExpressionEvaluator.RadixMode.NONE) {
             return formatWithCommas(value);
         }
         try {
@@ -119,7 +127,7 @@ public class ResultFormatter {
     // Format with units OR radix representation
     public static String formatResultWithUnits(ExpressionEvaluator.EvalResult evalResult) {
         if (evalResult == null) return "0";
-        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) {
+        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT && evalResult.radixMode != ExpressionEvaluator.RadixMode.NONE) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
         }
         return formatWithUnits(evalResult.value);

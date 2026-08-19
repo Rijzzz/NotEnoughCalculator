@@ -25,7 +25,6 @@ import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
 
-// Adapter for REI search field integration
 public class REISearchAdapter implements SearchFieldAdapter {
 
     @Override

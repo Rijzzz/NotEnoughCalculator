@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,15 @@ public class NotEnoughCalculator implements ModInitializer {
     public static final String MOD_ID = "notenoughcalculator";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static String getVersion() {
+        return FabricLoader.getInstance()
+                .getModContainer(MOD_ID)
+                .map(container -> container.getMetadata().getVersion().getFriendlyString())
+                .orElse("DEVELOPMENT");
+    }
+
     @Override
     public void onInitialize() {
-        LOGGER.info("Not Enough Calculator initialized");
-        // Client-side initialization happens in NotEnoughCalculatorClient
+        LOGGER.info("Not Enough Calculator v{} initialized", getVersion());
     }
 }

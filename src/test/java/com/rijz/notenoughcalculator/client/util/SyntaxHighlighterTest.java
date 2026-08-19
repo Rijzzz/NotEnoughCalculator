@@ -38,23 +38,28 @@ public class SyntaxHighlighterTest {
 
     @Test
     public void testFunctionHighlighting() {
-        String highlighted = SyntaxHighlighter.highlight("bz(50m)");
-        assertTrue(highlighted.contains("§ebz"), "Functions should be Bright Yellow (§e)");
+        String highlighted = SyntaxHighlighter.highlight("sqrt(50m)");
+        assertTrue(highlighted.contains("§esqrt"), "Math functions should be Bright Yellow (§e)");
         assertTrue(highlighted.contains("§f50"), "Numbers should be Pure White (§f)");
         assertTrue(highlighted.contains("§bm"), "Units should be Vibrant Cyan (§b)");
+
+        String marketHighlighted = SyntaxHighlighter.highlight("bzb(SUPERBOOM_TNT)");
+        assertTrue(marketHighlighted.contains("§9bzb"), "Market functions should be Royal Blue (§9)");
+        assertTrue(marketHighlighted.contains("§dSUPERBOOM_TNT"), "Item IDs should be Light Purple (§d)");
     }
 
     @Test
     public void testVariableHighlighting() {
-        String highlighted = SyntaxHighlighter.highlight("$buy + ans");
-        assertTrue(highlighted.contains("§a$buy"), "Custom variables should be Bright Green (§a)");
-        assertTrue(highlighted.contains("§aans"), "Builtin variables should be Bright Green (§a)");
+        String highlighted = SyntaxHighlighter.highlight("$buy + ans + $purse");
+        assertTrue(highlighted.contains("§6$§abuy"), "Dollar sign should be Gold (§6) and custom var Green (§a)");
+        assertTrue(highlighted.contains("§bans"), "Builtin variables should be Vibrant Aqua (§b)");
+        assertTrue(highlighted.contains("§6$§bpurse"), "Dollar sign Gold (§6) and API variable Vibrant Aqua (§b)");
     }
 
     @Test
     public void testOperatorsAndParens() {
         String highlighted = SyntaxHighlighter.highlight("(10 + 5) * 2");
         assertTrue(highlighted.contains("§7("), "Parens should be Light Gray (§7)");
-        assertTrue(highlighted.contains("§6+"), "Operators should be Bright Gold (§6)");
+        assertTrue(highlighted.contains("§c+"), "Operators should be Bright Light Red (§c)");
     }
 }

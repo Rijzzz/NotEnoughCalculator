@@ -287,14 +287,44 @@ class ExpressionEvaluatorTest {
 
         @Test
         void chainedVariables() throws Exception {
-            eval.setVariable("a", "10k");
-            eval.setVariable("b", "$a + 5k");
-            assertCalc("$b / $a", "1.5");
+            eval.setVariable("val1", "10k");
+            eval.setVariable("val2", "$val1 + 5k");
+            assertCalc("$val2 / $val1", "1.5");
         }
 
         @Test
         void undefinedVariable() {
             assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("$undefined + 1"));
+        }
+
+        @Test
+        void clearCustomVariables() throws Exception {
+            eval.setVariable("temp", "100");
+            assertCalc("$temp", "100");
+            eval.clearCustomVariables();
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> calc("$temp"));
+        }
+
+        @Test
+        void setVariableReturnValue() throws Exception {
+            BigDecimal res1 = eval.setVariable("val1", new BigDecimal("50"));
+            assertEquals(0, new BigDecimal("50").compareTo(res1));
+
+            BigDecimal res2 = eval.setVariable("val2", "10k + 5k");
+            assertEquals(0, new BigDecimal("15000").compareTo(res2));
+        }
+
+        @Test
+        void reservedVariables() {
+            assertTrue(ExpressionEvaluator.isReservedVariable("purse"));
+            assertTrue(ExpressionEvaluator.isReservedVariable("bz"));
+            assertTrue(ExpressionEvaluator.isReservedVariable("bzb"));
+            assertTrue(ExpressionEvaluator.isReservedVariable("sqrt"));
+            assertTrue(ExpressionEvaluator.isReservedVariable("k"));
+            assertTrue(ExpressionEvaluator.isReservedVariable("m"));
+            assertFalse(ExpressionEvaluator.isReservedVariable("buy"));
+            assertFalse(ExpressionEvaluator.isReservedVariable("sell"));
+            assertThrows(ExpressionEvaluator.EvalException.class, () -> eval.setVariable("bz", new BigDecimal("10")));
         }
     }
 
@@ -533,19 +563,14 @@ class ExpressionEvaluatorTest {
 
         @Test
         void bzFlipperPerkLevels() {
-            // Level 0: 1.25% tax
             assertEquals(0, new BigDecimal("98750000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.25)));
-            // Level 1: 1.125% tax
             assertEquals(0, new BigDecimal("98875000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.125)));
-            // Level 2: 1.0% tax
             assertEquals(0, new BigDecimal("99000000").compareTo(ExpressionEvaluator.calculateBzPayout(new BigDecimal("100000000"), 1.0)));
         }
 
         @Test
         void ahCollectionClaimTaxCapping() {
-            // Price = 1,005,000 -> 1% listing fee (10,050) -> claim tax 5,000 (capped so payout doesn't drop under 1m)
             BigDecimal net = ExpressionEvaluator.calculateAhPayout(new BigDecimal("1005000"), 6.0, true);
-            // 1,005,000 - 10,050 (listing) - 5,000 (claim tax cap) - 45 (6h fee) = 989,905
             assertEquals(0, new BigDecimal("989905").compareTo(net));
         }
 
@@ -560,6 +585,19 @@ class ExpressionEvaluatorTest {
 
             for (int i = 0; i < hours.length; i++) {
                 assertEquals(expectedFees[i], ExpressionEvaluator.calculateAhDurationFee(hours[i]), "Failed for hour " + hours[i]);
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Reserved Variables Exception Safety")
+    class ReservedVariables {
+        @Test
+        void settingReservedVariableThrowsException() {
+            String[] reserved = {"purse", "bank", "hp", "maxhealth", "def", "mana", "vitality", "speed", "mp", "farming", "mining", "zombieslayer"};
+            for (String var : reserved) {
+                assertThrows(ExpressionEvaluator.EvalException.class, () -> eval.setVariable(var, new BigDecimal("100")));
+                assertThrows(ExpressionEvaluator.EvalException.class, () -> eval.setVariable("$" + var, "100"));
             }
         }
     }

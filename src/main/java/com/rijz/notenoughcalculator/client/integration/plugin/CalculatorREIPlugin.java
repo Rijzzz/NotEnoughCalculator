@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.rijz.notenoughcalculator.client;
+package com.rijz.notenoughcalculator.client.integration.plugin;
 
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -25,8 +25,6 @@ import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// REI plugin registration
-// We don't actually add any categories/displays, just need to register as a plugin
 public class CalculatorREIPlugin implements REIClientPlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorREIPlugin.class);

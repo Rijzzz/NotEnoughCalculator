@@ -58,10 +58,11 @@ public class CalculatorConfig {
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
-    public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
+    public int bazaarFlipperLevel = 0;    // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
     public boolean enableShorthandResults = false;
     public boolean enableSyntaxHighlighting = true;
     public boolean enableFullEquationCopy = true;
+    public boolean enableItemListIntegration = true;
     public Map<String, String> customVariables = new LinkedHashMap<>();
 
     public static CalculatorConfig getInstance() {

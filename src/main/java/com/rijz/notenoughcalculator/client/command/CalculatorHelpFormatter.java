@@ -21,9 +21,11 @@ package com.rijz.notenoughcalculator.client.command;
 import com.mojang.brigadier.context.CommandContext;
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 
-// Formatter and renderer for interactive chat help pages (/calchelp).
 public class CalculatorHelpFormatter {
 
     private static Component t(String key, Object... args) {
@@ -32,6 +34,15 @@ public class CalculatorHelpFormatter {
 
     private static void send(CommandContext<FabricClientCommandSource> ctx, String key, Object... args) {
         ctx.getSource().getPlayer().sendSystemMessage(t(key, args));
+    }
+
+    private static void sendClickablePage(CommandContext<FabricClientCommandSource> ctx, String pageName, String translationKey) {
+        String fullText = t(translationKey).getString();
+        MutableComponent msg = Component.literal(fullText);
+        msg.setStyle(msg.getStyle()
+                .withClickEvent(new ClickEvent.RunCommand("/calchelp " + pageName))
+                .withHoverEvent(new HoverEvent.ShowText(t("notenoughcalculator.help.click_to_open", pageName))));
+        ctx.getSource().getPlayer().sendSystemMessage(msg);
     }
 
     private static void sendLiteral(CommandContext<FabricClientCommandSource> ctx, String text) {
@@ -55,6 +66,16 @@ public class CalculatorHelpFormatter {
                 break;
             case "variables":
                 showVariablesHelp(ctx);
+                break;
+            case "stats":
+            case "api":
+                showStatsHelp(ctx);
+                break;
+            case "market":
+                showMarketHelp(ctx);
+                break;
+            case "tax":
+                showTaxHelp(ctx);
                 break;
             case "examples":
                 showExamplesHelp(ctx);
@@ -87,12 +108,15 @@ public class CalculatorHelpFormatter {
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.help_pages");
-        send(ctx, "notenoughcalculator.help.main.page_operators");
-        send(ctx, "notenoughcalculator.help.main.page_functions");
-        send(ctx, "notenoughcalculator.help.main.page_units");
-        send(ctx, "notenoughcalculator.help.main.page_variables");
-        send(ctx, "notenoughcalculator.help.main.page_examples");
-        send(ctx, "notenoughcalculator.help.main.page_config");
+        sendClickablePage(ctx, "operators", "notenoughcalculator.help.main.page_operators");
+        sendClickablePage(ctx, "functions", "notenoughcalculator.help.main.page_functions");
+        sendClickablePage(ctx, "units", "notenoughcalculator.help.main.page_units");
+        sendClickablePage(ctx, "variables", "notenoughcalculator.help.main.page_variables");
+        sendClickablePage(ctx, "stats", "notenoughcalculator.help.main.page_stats");
+        sendClickablePage(ctx, "market", "notenoughcalculator.help.main.page_market");
+        sendClickablePage(ctx, "tax", "notenoughcalculator.help.main.page_tax");
+        sendClickablePage(ctx, "examples", "notenoughcalculator.help.main.page_examples");
+        sendClickablePage(ctx, "config", "notenoughcalculator.help.main.page_config");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts");
@@ -118,6 +142,14 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.operators.factorial");
         sendEmpty(ctx);
 
+        send(ctx, "notenoughcalculator.help.operators.bitwise");
+        send(ctx, "notenoughcalculator.help.operators.bitwise_and");
+        send(ctx, "notenoughcalculator.help.operators.bitwise_or");
+        send(ctx, "notenoughcalculator.help.operators.bitwise_not");
+        send(ctx, "notenoughcalculator.help.operators.bitwise_lshift");
+        send(ctx, "notenoughcalculator.help.operators.bitwise_rshift");
+        sendEmpty(ctx);
+
         send(ctx, "notenoughcalculator.help.operators.literals");
         send(ctx, "notenoughcalculator.help.operators.binary");
         send(ctx, "notenoughcalculator.help.operators.hex");
@@ -135,9 +167,10 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.operators.pemdas_2");
         send(ctx, "notenoughcalculator.help.operators.pemdas_3");
         send(ctx, "notenoughcalculator.help.operators.pemdas_4");
+        send(ctx, "notenoughcalculator.help.operators.pemdas_5");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showFunctionsHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -145,83 +178,116 @@ public class CalculatorHelpFormatter {
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.functions.available");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.sqrt");
-        send(ctx, "notenoughcalculator.help.functions.sqrt_example_1");
-        send(ctx, "notenoughcalculator.help.functions.sqrt_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.abs");
-        send(ctx, "notenoughcalculator.help.functions.abs_example_1");
-        send(ctx, "notenoughcalculator.help.functions.abs_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.floor");
-        send(ctx, "notenoughcalculator.help.functions.floor_example_1");
-        send(ctx, "notenoughcalculator.help.functions.floor_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.ceil");
-        send(ctx, "notenoughcalculator.help.functions.ceil_example_1");
-        send(ctx, "notenoughcalculator.help.functions.ceil_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.round");
-        send(ctx, "notenoughcalculator.help.functions.round_example_1");
-        send(ctx, "notenoughcalculator.help.functions.round_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.log");
-        send(ctx, "notenoughcalculator.help.functions.log_example_1");
-        send(ctx, "notenoughcalculator.help.functions.log_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.ln");
-        send(ctx, "notenoughcalculator.help.functions.ln_example_1");
-        send(ctx, "notenoughcalculator.help.functions.ln_example_2");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.sin");
-        send(ctx, "notenoughcalculator.help.functions.sin_example_1");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.cos");
-        send(ctx, "notenoughcalculator.help.functions.cos_example_1");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.tan");
-        send(ctx, "notenoughcalculator.help.functions.tan_example_1");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.min");
-        send(ctx, "notenoughcalculator.help.functions.min_example_1");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.functions.max");
-        send(ctx, "notenoughcalculator.help.functions.max_example_1");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.functions.tax");
-        send(ctx, "notenoughcalculator.help.functions.tax_bz");
-        send(ctx, "notenoughcalculator.help.functions.tax_ah");
+        send(ctx, "notenoughcalculator.help.functions.radix");
+        send(ctx, "notenoughcalculator.help.functions.hex");
+        send(ctx, "notenoughcalculator.help.functions.bin");
+        send(ctx, "notenoughcalculator.help.functions.oct");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.functions.shorthand_angle");
-        send(ctx, "notenoughcalculator.help.functions.fmt");
-        send(ctx, "notenoughcalculator.help.functions.rad_deg");
+        send(ctx, "notenoughcalculator.help.functions.math_helpers");
+        send(ctx, "notenoughcalculator.help.functions.pct");
+        send(ctx, "notenoughcalculator.help.functions.gcd");
+        send(ctx, "notenoughcalculator.help.functions.lcm");
+        send(ctx, "notenoughcalculator.help.functions.clamp");
+        send(ctx, "notenoughcalculator.help.functions.avg");
+        send(ctx, "notenoughcalculator.help.functions.xor");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.functions.combining");
-        send(ctx, "notenoughcalculator.help.functions.combining_example");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+    }
+
+    public static void showStatsHelp(CommandContext<FabricClientCommandSource> ctx) {
+        send(ctx, "notenoughcalculator.help.stats.title");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.functions.factorial");
-        send(ctx, "notenoughcalculator.help.functions.factorial_example_1");
-        send(ctx, "notenoughcalculator.help.functions.factorial_example_2");
+        send(ctx, "notenoughcalculator.help.stats.currency");
+        send(ctx, "notenoughcalculator.help.stats.currency_desc");
+        send(ctx, "notenoughcalculator.help.stats.currency_ex");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        send(ctx, "notenoughcalculator.help.stats.powders");
+        send(ctx, "notenoughcalculator.help.stats.powders_desc");
+        send(ctx, "notenoughcalculator.help.stats.powders_ex");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.stats.essences");
+        send(ctx, "notenoughcalculator.help.stats.essences_desc");
+        send(ctx, "notenoughcalculator.help.stats.essences_ex");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.stats.pets_bestiary");
+        send(ctx, "notenoughcalculator.help.stats.pets_bestiary_desc");
+        send(ctx, "notenoughcalculator.help.stats.pets_bestiary_ex");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.stats.player");
+        send(ctx, "notenoughcalculator.help.stats.player_desc");
+        send(ctx, "notenoughcalculator.help.stats.player_ex");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.stats.skills");
+        send(ctx, "notenoughcalculator.help.stats.skills_desc");
+        send(ctx, "notenoughcalculator.help.stats.slayer_desc");
+        send(ctx, "notenoughcalculator.help.stats.skills_ex");
+        sendEmpty(ctx);
+
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+    }
+
+    public static void showMarketHelp(CommandContext<FabricClientCommandSource> ctx) {
+        send(ctx, "notenoughcalculator.help.market.title");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.market.queries");
+        send(ctx, "notenoughcalculator.help.market.bzb");
+        send(ctx, "notenoughcalculator.help.market.bzs");
+        send(ctx, "notenoughcalculator.help.market.bzm");
+        send(ctx, "notenoughcalculator.help.market.lb");
+        send(ctx, "notenoughcalculator.help.market.lba");
+        send(ctx, "notenoughcalculator.help.market.npc");
+        send(ctx, "notenoughcalculator.help.market.motes");
+        send(ctx, "notenoughcalculator.help.market.price");
+        send(ctx, "notenoughcalculator.help.market.sack");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.market.quotes_note");
+        sendEmpty(ctx);
+
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+    }
+
+    public static void showTaxHelp(CommandContext<FabricClientCommandSource> ctx) {
+        send(ctx, "notenoughcalculator.help.tax.title");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.tax.bazaar");
+        send(ctx, "notenoughcalculator.help.tax.bz_desc");
+        send(ctx, "notenoughcalculator.help.tax.bz_ex1");
+        send(ctx, "notenoughcalculator.help.tax.bz_ex2");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.tax.ah");
+        send(ctx, "notenoughcalculator.help.tax.ah_desc");
+        send(ctx, "notenoughcalculator.help.tax.ah_ex1");
+        send(ctx, "notenoughcalculator.help.tax.ah_ex2");
+        send(ctx, "notenoughcalculator.help.tax.ah_ex3");
+        sendEmpty(ctx);
+
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showUnitsHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -260,7 +326,7 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.units.tips_3");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showVariablesHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -271,8 +337,7 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.variables.builtin_ans");
         send(ctx, "notenoughcalculator.help.variables.builtin_pi");
         send(ctx, "notenoughcalculator.help.variables.builtin_e");
-        send(ctx, "notenoughcalculator.help.variables.builtin_example_1");
-        send(ctx, "notenoughcalculator.help.variables.builtin_example_2");
+        send(ctx, "notenoughcalculator.help.variables.builtin_api");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.variables.custom");
@@ -307,7 +372,7 @@ public class CalculatorHelpFormatter {
         sendLiteral(ctx, "§7" + vars);
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showExamplesHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -356,7 +421,7 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.examples.tips_4");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showConfigHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -375,6 +440,6 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.config.current_cmd");
         sendEmpty(ctx);
 
-        send(ctx, "notenoughcalculator.help.back");
+        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 }

@@ -205,4 +205,11 @@ class ResultFormatterTest {
         assertEquals("-1.5m", ResultFormatter.toShorthand(new BigDecimal("-1500000")));
         assertEquals("-500", ResultFormatter.toShorthand(new BigDecimal("-500")));
     }
+
+    @Test
+    @DisplayName("Get equals sign formatted string")
+    void testGetEqualsSign() {
+        assertNotNull(ResultFormatter.getEqualsSign());
+        assertEquals(" = ", ResultFormatter.getEqualsSign());
+    }
 }

@@ -21,35 +21,41 @@ package com.rijz.notenoughcalculator.client.util;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Live syntax highlighter for REI search bar expressions.
- * Color codes:
- * - Numbers / Values (123, 45.6, 0xFF, 0b1010): Pure Bright White (§f)
- * - Units (k, m, b, t, s, e, h, sc, dc, eb): Vibrant Cyan (§b)
- * - Functions (sqrt, bz, ah, ahbin, fmt, rad, deg, etc.): Bright Yellow (§e)
- * - Variables (ans, pi, e, $var): Bright Green (§a)
- * - Math Operators (+, -, *, x, /, ^, %, !, &, |, ~, <<, >>): Bright Gold (§6)
- * - Delimiters & Parens ((, ), ,): Light Gray (§7)
- * - Errors: Red (§c)
- * - Chat output: Green (§a)
- */
 public class SyntaxHighlighter {
 
-    public static final String COLOR_NUMBER = "§f";    
-    public static final String COLOR_UNIT = "§b";     
-    public static final String COLOR_FUNC = "§e";      
-    public static final String COLOR_VAR = "§a";       
-    public static final String COLOR_OP = "§6";        
-    public static final String COLOR_DELIM = "§7";     
-    public static final String COLOR_ERROR = "§c";     
-    public static final String COLOR_CHAT_RESULT = "§a";
+    public static final String COLOR_NUMBER = "§f";          // Pure White (Maximum Legibility)
+    public static final String COLOR_RADIX_LITERAL = "§d";   // Light Purple / Magenta (Ultra Bright)
+    public static final String COLOR_UNIT = "§b";            // Vibrant Aqua / Cyan (Ultra Bright)
+    public static final String COLOR_MATH_FUNC = "§e";       // Bright Yellow (Ultra Bright)
+    public static final String COLOR_MARKET_FUNC = "§9";     // Royal Blue (Ultra Clear)
+    public static final String COLOR_BUILTIN_VAR = "§b";     // Vibrant Aqua (Ultra Clear & High Contrast)
+    public static final String COLOR_CUSTOM_VAR = "§a";      // Bright Lime Green (Ultra Bright)
+    public static final String COLOR_DOLLAR_SIGN = "§6";     // Vibrant Gold (Ultra Bright)
+    public static final String COLOR_STRING_ITEM = "§d";     // Light Purple / Pink (Item IDs & String Arguments)
+    public static final String COLOR_OP = "§c";              // Bright Light Red (High Contrast & Clear)
+    public static final String COLOR_DELIM = "§7";           // Neutral Light Gray
+    public static final String COLOR_ERROR = "§c";           // Bright Light Red
+    public static final String COLOR_CHAT_RESULT = "§a";     // Bright Lime Green (High Contrast & Clear)
 
-    private static final Set<String> FUNCTIONS = ExpressionEvaluator.FUNCTIONS;
+    private static final Set<String> MARKET_FUNCTIONS = Set.of(
+            "bz", "bzb", "bzbuy", "bzs", "bzsell", "bzm", "bzmargin",
+            "lb", "lowestbin", "lba", "lowestbinavg", "npc", "npcsell",
+            "motes", "motessell", "price", "sack", "sackcount"
+    );
+
+    private static final Set<String> MATH_FUNCTIONS;
+    static {
+        Set<String> funcs = new HashSet<>(ExpressionEvaluator.FUNCTIONS);
+        funcs.removeAll(MARKET_FUNCTIONS);
+        MATH_FUNCTIONS = Set.copyOf(funcs);
+    }
+
     private static final Set<String> UNITS = ExpressionEvaluator.UNITS.keySet();
     private static final Set<String> BUILTIN_VARS = ExpressionEvaluator.BUILTIN_VARIABLES;
 
@@ -67,14 +73,15 @@ public class SyntaxHighlighter {
 
     private static final Pattern TOKEN_PATTERN = Pattern.compile(
             "(?i)" +
-            "(\\$\\w+)|" +                                      // Custom variable ($var)
-            "(0[bxo][0-9a-fA-F_]+)|" +                          // Number literal (0b, 0x, 0o)
-            "(\\d+\\.?\\d*\\s*" + buildUnitsRegex() + "(?![a-zA-Z0-9_]))|" + // Number with unit (ExpressionEvaluator.UNITS)
-            "(\\d+\\.?\\d*)|" +                                 // Plain number
-            "([a-zA-Z]+)|" +                                    // Word (function / builtin var)
-            "(<<|>>|[+\\-*/^%xX!&|~(),])|" +                    // Operators / Delimiters
-            "(\\s+)|" +                                         // Whitespace
-            "(.)"                                               // Anything else
+            "(\\$\\w+)|" +                                                            // Variable with $ prefix ($var)
+            "(\"[^\"]*\"|'[^']*')|" +                                                 // Quoted string literal ("ITEM" or 'ITEM')
+            "(0[bxo][0-9a-fA-F_]+)|" +                                                // Number literal (0b, 0x, 0o)
+            "(\\d+\\.?\\d*\\s*" + buildUnitsRegex() + "(?![a-zA-Z0-9_]))|" +          // Number with unit
+            "(\\d+\\.?\\d*)|" +                                                       // Plain number
+            "([a-zA-Z0-9_]+)|" +                                                      // Word (function / builtin var / item id)
+            "(<<|>>|[+\\-*/^%xX!&|~(),=])|" +                                         // Operators / Delimiters
+            "(\\s+)|" +                                                               // Whitespace
+            "(.)"                                                                     // Anything else
     );
 
     public static String highlight(String input) {
@@ -87,44 +94,47 @@ public class SyntaxHighlighter {
 
         while (matcher.find()) {
             if (matcher.group(1) != null) {
-                // Custom variable ($var)
-                sb.append(COLOR_VAR).append(matcher.group(1));
+                String varName = matcher.group(1);
+                String cleanName = varName.substring(1).toLowerCase();
+                sb.append(COLOR_DOLLAR_SIGN).append("$");
+                if (BUILTIN_VARS.contains(cleanName)) {
+                    sb.append(COLOR_BUILTIN_VAR).append(varName.substring(1));
+                } else {
+                    sb.append(COLOR_CUSTOM_VAR).append(varName.substring(1));
+                }
             } else if (matcher.group(2) != null) {
-                // Hex / Bin / Oct literal
-                sb.append(COLOR_NUMBER).append(matcher.group(2));
+                sb.append(COLOR_STRING_ITEM).append(matcher.group(2));
             } else if (matcher.group(3) != null) {
-                // Number attached to unit (e.g. 100m, 2dc)
-                splitNumberAndUnit(matcher.group(3), sb);
+                sb.append(COLOR_RADIX_LITERAL).append(matcher.group(3));
             } else if (matcher.group(4) != null) {
-                // Plain number
-                sb.append(COLOR_NUMBER).append(matcher.group(4));
+                splitNumberAndUnit(matcher.group(4), sb);
             } else if (matcher.group(5) != null) {
-                // Word
-                String word = matcher.group(5);
+                sb.append(COLOR_NUMBER).append(matcher.group(5));
+            } else if (matcher.group(6) != null) {
+                String word = matcher.group(6);
                 String lower = word.toLowerCase();
-                if (FUNCTIONS.contains(lower)) {
-                    sb.append(COLOR_FUNC).append(word);
+                if (MARKET_FUNCTIONS.contains(lower)) {
+                    sb.append(COLOR_MARKET_FUNC).append(word);
+                } else if (MATH_FUNCTIONS.contains(lower)) {
+                    sb.append(COLOR_MATH_FUNC).append(word);
                 } else if (BUILTIN_VARS.contains(lower)) {
-                    sb.append(COLOR_VAR).append(word);
+                    sb.append(COLOR_BUILTIN_VAR).append(word);
                 } else if (UNITS.contains(lower)) {
                     sb.append(COLOR_UNIT).append(word);
                 } else {
-                    sb.append(COLOR_NUMBER).append(word);
+                    sb.append(COLOR_STRING_ITEM).append(word);
                 }
-            } else if (matcher.group(6) != null) {
-                // Operator / Delimiter
-                String opToken = matcher.group(6);
+            } else if (matcher.group(7) != null) {
+                String opToken = matcher.group(7);
                 if (opToken.equals("(") || opToken.equals(")") || opToken.equals(",")) {
                     sb.append(COLOR_DELIM).append(opToken);
                 } else {
                     sb.append(COLOR_OP).append(opToken);
                 }
-            } else if (matcher.group(7) != null) {
-                // Whitespace
-                sb.append(matcher.group(7));
             } else if (matcher.group(8) != null) {
-                // Other fallback
-                sb.append(COLOR_NUMBER).append(matcher.group(8));
+                sb.append(matcher.group(8));
+            } else if (matcher.group(9) != null) {
+                sb.append(COLOR_NUMBER).append(matcher.group(9));
             }
         }
 

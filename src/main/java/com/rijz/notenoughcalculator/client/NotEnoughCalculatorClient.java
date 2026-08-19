@@ -18,6 +18,7 @@
 
 package com.rijz.notenoughcalculator.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.rijz.notenoughcalculator.client.command.CalculatorCommands;
 import com.rijz.notenoughcalculator.client.gui.overlay.CalculatorOverlayRenderer;
@@ -36,11 +37,11 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.commands.SharedSuggestionProvider;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Client setup. Registers listeners, render hooks, and chat commands.
 public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotEnoughCalculatorClient.class);
@@ -235,6 +236,15 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         calcManager.handleKeyPress(key, modifiers);
                     }
 
+                    if (IntegrationManager.isStandaloneActive() && IntegrationManager.getStandaloneField().isFocused()) {
+                        if (mc.options.keyInventory.matches(InputConstants.Type.KEYSYM.getOrCreate(key))) {
+                            IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
+                            String text = IntegrationManager.getStandaloneField().getText();
+                            calcManager.formatSearchBar(text);
+                            return false;
+                        }
+                    }
+
                     boolean handled = IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
                     if (handled) {
                         String text = IntegrationManager.getStandaloneField().getText();
@@ -269,6 +279,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             dispatcher.register(ClientCommands.literal("calchelp")
                     .executes(CalculatorCommands::executeHelp)
                     .then(ClientCommands.argument("page", StringArgumentType.word())
+                            .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
+                                    new String[]{"main", "operators", "functions", "units", "variables", "stats", "market", "tax", "examples", "config"}, builder))
                             .executes(CalculatorCommands::executeHelpPage)));
 
             dispatcher.register(ClientCommands.literal("calcconfig")

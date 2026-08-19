@@ -5,9 +5,9 @@
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/asPJ4qgs8q)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2/LICENSE.txt)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
 
-**A NEU-style calculator, works completely standalone or hooks into Roughly Enough Items (REI). Type calculations directly in the search bar and get instant results.**
+**A NEU-style calculator that works standalone or inside Roughly Enough Items (REI) & Skyblock Item List search bars. Type calculations directly in the search bar and get instant results.**
 
 > Inspired by [NotEnoughUpdates](https://modrinth.com/mod/notenoughupdates) calculator. Recreated for newer Minecraft versions where NEU isn't available.
 
@@ -18,93 +18,321 @@
 
 ## What does this mod do?
 
-Type calculations directly in the search bar and get instant results! If REI is installed it uses REI's search bar, otherwise it shows its own standalone bar at the bottom of inventory screens. If you played with NEU on older versions, you already know how this works.
+Type calculations directly in the search bar and get instant results! Works inside **Roughly Enough Items (REI)**'s search bar, **Skyblock Item List**'s search bar, or completely **Standalone** with its own bar at the bottom of inventory screens. If you played with NEU on older versions, you already know how this works.
 
 **Example:** Type `100m - 50m` in the search bar → See `= 50,000,000` instantly
 
 ---
 
-## Key Features
+## Features
 
 <details>
-<summary><strong>Basic Math & Functions</strong></summary>
+<summary><strong>Operators, Exponents, Bitwise & Literals</strong></summary>
 
-- Addition, subtraction, multiplication, division (`+`, `-`, `*` or `x, X`, `/`)
-- Exponents and modulo (`^`, `%`)
-- Bitwise operators: `&` (AND), `|` (OR), `~` (NOT), `<<` (Left Shift), `>>` (Right Shift), `xor(a, b)`
-- Factorial: `5!` = 120, `10!` = 3,628,800
-- Number Literals: Binary (`0b1010` = 10), Hexadecimal (`0xFF` = 255), Octal (`0o77` = 63)
-- Base Conversions: `hex(255)` = `0xFF`, `bin(10)` = `0b1010`, `oct(63)` = `0o77`
-- Parentheses and implicit multiplication: `2(3+4)`, `(3)(4)`, `2sqrt(4)`
-- Smart percentage operator: `10%` = 0.1, `100 + 10%` = 110
-- Constants: `pi` (3.14159...), `e` (2.71828... standalone, enchanted unit after a number)
-- Functions: `sqrt()`, `abs()`, `floor()`, `ceil()`, `round()`, `log()`, `ln()`, `sin()`, `cos()`, `tan()`, `rad()`, `deg()`, `min()`, `max()`, `avg()`, `pct()`, `gcd()`, `lcm()`, `clamp()`, `xor()`, `fmt()`, `hex()`, `bin()`, `oct()`
-- SkyBlock Tax Calculators: `bz(price)` (Bazaar net profit accounting for Bazaar Flipper perk level), `ah(price, [hrs])` / `ahbin(price, [hrs])` (AH BIN net profit after listing fee & collection claim tax)
+| Category | Symbol / Keyword | Description | Example Input | Result Output |
+| :--- | :--- | :--- | :--- | :--- |
+| Addition | `+` | Add numbers and unit terms | `100m + 50m` | `150,000,000` |
+| Subtraction | `-` | Subtract numbers and unit terms | `1b - 250m` | `750,000,000` |
+| Multiplication | `*`, `x`, `X` | Multiply numbers (`*` or `x`/`X` multiplier) | `10x5`, `10k * 5` | `50`, `50,000` |
+| Division | `/` | Divide numbers | `100m / 4` | `25,000,000` |
+| Exponents | `^` | Power / Exponent calculation | `2^10` | `1,024` |
+| Modulo | `%` | Remainder of division | `10 % 3` | `1` |
+| Factorial | `!` | Integer Factorial ($n!$) | `5!` | `120` |
+| Percentage | `%` | Percentage scaling (`100 + 10%` = `110`) | `100 + 10%` | `110` |
+| Parentheses | `( )` | Grouping & implicit multiplication | `2(3+4)`, `(3)(4)` | `14`, `12` |
+| Bitwise AND | `&` | Bitwise AND operation | `0b1010 & 0b1100` | `8` |
+| Bitwise OR | `\|` | Bitwise OR operation | `0b1010 \| 0b0101` | `15` |
+| Bitwise NOT | `~` | Bitwise NOT operation | `~0`, `~5` | `-1`, `-6` |
+| Left Shift | `<<` | Bitwise left shift | `1 << 4` | `16` |
+| Right Shift | `>>` | Bitwise right shift | `16 >> 2` | `4` |
+| Binary Literal | `0b` | Binary number literal | `0b1010` | `10` |
+| Hex Literal | `0x` | Hexadecimal number literal | `0xFF` | `255` |
+| Octal Literal | `0o` | Octal number literal | `0o77` | `63` |
 
 </details>
 
 <details>
-<summary><strong>Hypixel Skyblock Units</strong></summary>
+<summary><strong>Hypixel SkyBlock Units & Storage Quantities</strong></summary>
 
-- Currency: `k`, `m`, `b`, `t` (thousand, million, billion, trillion)
-- Items: `s` (stack = 64), `e` (enchanted = 160)
-- Storage: `h` (shulker = 1,728), `sc` (small chest = 1,728), `dc` (double chest = 3,456), `eb` (ender chest = 2,880)
+| Unit Code | Exact Value | Description / Equivalent | Example Input | Result Output |
+| :--- | :--- | :--- | :--- | :--- |
+| `k` | 1,000 | Thousand multiplier | `10k` | `10,000` |
+| `m` | 1,000,000 | Million multiplier | `5m` | `5,000,000` |
+| `b` | 1,000,000,000 | Billion multiplier | `2b` | `2,000,000,000` |
+| `t` | 1,000,000,000,000 | Trillion multiplier | `1t` | `1,000,000,000,000` |
+| `s` | 64 | Stack multiplier | `3s` | `192` |
+| `e` | 160 | Enchanted item multiplier | `2e` | `320` |
+| `h` | 1,728 | Shulker Box capacity | `1h` | `1,728` |
+| `sc` | 1,728 | Small Chest capacity | `1sc` | `1,728` |
+| `dc` | 3,456 | Double Chest capacity | `2dc` | `6,912` |
+| `eb` | 2,880 | Ender Chest capacity | `1eb` | `2,880` |
 
 </details>
 
 <details>
-<summary><strong>Variables (Persistent)</strong></summary>
+<summary><strong>Functions, Radix Conversions & SkyBlock Tax</strong></summary>
 
-- `ans` – Automatically stores last calculation result
-- `pi` – Pi constant (3.14159265...)
-- `e` – Euler's number (2.71828182...) when standalone; enchanted unit (160) after a number
-- Custom variables with `/calcset <name> <value>` (saved automatically to config & persist across restarts)
-- Chain calculations easily with `ans`
+| Category | Function Syntax | Description | Example Input | Result Output |
+| :--- | :--- | :--- | :--- | :--- |
+| Roots & Abs | `sqrt(x)` | Square root of $x$ | `sqrt(144)` | `12` |
+| | `abs(x)` | Absolute value of $x$ | `abs(-50)` | `50` |
+| Rounding | `floor(x)` | Round down to nearest integer | `floor(3.9)` | `3` |
+| | `ceil(x)` | Round up to nearest integer | `ceil(3.1)` | `4` |
+| | `round(x)` | Round to nearest integer | `round(3.5)` | `4` |
+| Logarithms | `log(x)` | Base-10 logarithm | `log(100)` | `2` |
+| | `ln(x)` | Natural logarithm (base $e$) | `ln(e)` | `1` |
+| Trigonometry | `sin(x)` | Sine of angle in degrees | `sin(90)` | `1` |
+| | `cos(x)` | Cosine of angle in degrees | `cos(0)` | `1` |
+| | `tan(x)` | Tangent of angle in degrees | `tan(45)` | `1` |
+| Angles | `rad(x)` | Convert degrees to radians | `rad(180)` | `3.14159...` |
+| | `deg(x)` | Convert radians to degrees | `deg(pi)` | `180` |
+| Bounds | `min(a, b)` | Smaller of two values | `min(10, 5)` | `5` |
+| | `max(a, b)` | Larger of two values | `max(10, 5)` | `10` |
+| | `clamp(v, min, max)` | Clamp value to min/max range | `clamp(15, 0, 10)` | `10` |
+| Statistics | `avg(a, b, ...)` | Average of any number of inputs | `avg(10, 20, 30)` | `20` |
+| | `pct(a, b)` | Ratio percentage ($a$ as % of $b$) | `pct(50, 200)` | `25` |
+| Number Theory | `gcd(a, b)` | Greatest common divisor | `gcd(12, 18)` | `6` |
+| | `lcm(a, b)` | Least common multiple | `lcm(12, 18)` | `36` |
+| Base Conversions | `hex(x)` | Convert decimal to Hexadecimal | `hex(255)` | `0xFF` |
+| | `bin(x)` | Convert decimal to Binary | `bin(10)` | `0b1010` |
+| | `oct(x)` | Convert decimal to Octal | `oct(63)` | `0o77` |
+| Bitwise | `xor(a, b)` | Bitwise XOR function | `xor(10, 12)` | `6` |
+| Formatter | `fmt(x)` | Format number to SkyBlock shorthand | `fmt(1500000)` | `1.5m` |
+| Tax Calculators | `bz(price)` | Bazaar net payout (accounts for perk lvl) | `bz(100m)` | `98,750,000` |
+| | `ah(price, [hrs])` | AH auction net payout (5% fee + tax) | `ah(50m)` | `46,999,955` |
+| | `ahbin(price, [hrs])` | AH BIN net payout (listing fee + tax) | `ahbin(50m, 24)` | `48,499,650` |
+
+</details>
+
+<details>
+<summary><strong>Built-in Constants & Custom Variables ($)</strong></summary>
+
+| Variable | Full Identifier | Type | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Last Result | `ans` | Built-in | Holds the last calculation result | `ans * 2` |
+| Pi Constant | `pi` | Built-in | Mathematical constant $\pi \approx 3.14159265$ | `2 * pi` |
+| Euler's Number | `e` | Built-in | Constant $e \approx 2.71828182$ (when standalone) | `ln(e)` |
+| Custom Variable | `$name` | User-defined | Created via `/calcset <name> <value>` or config GUI | `$profit * 2` |
+
+</details>
+
+<details>
+<summary><strong>SkyBlock API Variables & Stats ($)</strong></summary>
+
+#### Currencies
+| Currency | Full Identifier | Short Alias(es) | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Purse Coins | `$purse` | `$p` | Purse coin balance | `$purse + $bank` |
+| Bank Coins | `$bank` | `$b` | Bank coin balance | `$bank / 2` |
+| Personal Bank | `$personalbank` | `$pbank` | Personal bank coins | `$pbank + 10m` |
+| Coop Bank | `$coopbank` | `$cbank` | Coop bank coins | `$cbank / 4` |
+| Bits | `$bits` | `$bt` | Hypixel Bits balance | `$bits * 1000` |
+| Motes | `$motes` | `$mt` | Rift Motes balance | `$motes / 50` |
+| Copper | `$copper` | `$cop` | Garden Copper balance | `$copper * 500` |
+| Sowdust | `$sowdust` | `$sdust` | Garden Sowdust count | `$sowdust / 10` |
+| Kernels | `$kernels` | `$kern` | Garden Kernels count | `$kernels * 100` |
+| North Stars | `$northstars`, `$nstars` | `$ns` | Winter Island North Stars | `$ns * 50k` |
+| Gems | `$gems` | `$gem` | SkyBlock Gems balance | `$gems * 100` |
+| Soulflow | `$soulflow`, `$sflow` | `$sf` | Soulflow count | `$soulflow * 5k` |
+
+#### Player & Dungeon Stats
+| Stat | Full Identifier | Short Alias(es) | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| SkyBlock Level | `$skyblocklevel`, `$sblevel`, `$sblvl` | `$sb` | Current SkyBlock Level | `$sblevel * 100k` |
+| Level Progress | `$sblevelprogress`, `$sblevelprog` | `$sbprog` | Progress to next SB Level | `100 - $sbprog` |
+| Faction Reputation | `$reputation` | `$rep` | Nether Faction Reputation | `$rep / 1000` |
+| Health | `$health` | `$hp` | Current Health points | `$hp / $maxhp` |
+| Max Health | `$maxhealth` | `$maxhp` | Maximum Health points | `$maxhp + 500` |
+| Defense | `$defense` | `$def` | Current Defense stat | `$def / ($def + 100)` |
+| Intelligence / Mana | `$intelligence`, `$intel` | `$mana` | Current Mana points | `$mana * 2` |
+| Max Mana | `$maxintel` | `$maxmana`, `$mmana` | Maximum Mana points | `$maxmana - 500` |
+| Overflow Mana | `$overflowmana` | `$ofmana` | Current Overflow Mana | `$ofmana * 10` |
+| Vitality | `$vitality` | `$vit` | Current Vitality stat | `$vit + 50` |
+| Max Vitality | `$maxvitality` | `$mvit` | Maximum Vitality stat | `$mvit` |
+| Speed | `$speed` | `$spd` | Current Speed stat | `$spd / 400` |
+| Vanilla XP Level | `$xplevel`, `$xplvl` | `$xp` | Vanilla Minecraft XP Level | `$xp * 100` |
+| Catacombs Level | `$catacombslevel`, `$catacombs`, `$catalvl` | `$cata` | Dungeons Catacombs Level | `$cata * 10` |
+| Catacombs XP | `$catacombsxp`, `$cataxp` | `$cxp` | Dungeons Catacombs XP | `$cxp / 1m` |
+| Dungeon Secrets | `$secretcount`, `$secrets` | `$sec` | Total Dungeon Secrets found | `$secrets / $cata` |
+| Class Level | `$dungeonclass`, `$classlvl` | `$classlevel`, `$dclass` | Active Dungeon Class Level | `$classlevel * 5` |
+| Dungeon Party Size | `$dungeonparty`, `$party` | `$partysize` | Current Dungeon Party Size | `5 - $partysize` |
+
+#### Mining & HOTM
+| Stat | Full Identifier | Short Alias(es) | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Mithril Powder | `$mithrilpowder`, `$mithril` | `$mpowder` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
+| Gemstone Powder | `$gemstonepowder`, `$gemstone` | `$gpowder` | Current Gemstone Powder | `1m - $gpowder` |
+| Glacite Powder | `$glacitepowder`, `$glacite` | `$glpowder` | Current Glacite Powder | `500k - $glpowder` |
+| Total Mithril | `$totalmithrilpowder`, `$totmithril` | `$totmpowder` | Lifetime Total Mithril | `$totmpowder / 1m` |
+| Total Gemstone | `$totalgemstonepowder`, `$totgemstone` | `$totgpowder` | Lifetime Total Gemstone | `$totgpowder / 1m` |
+| Total Glacite | `$totalglacitepowder`, `$totglacite` | `$totglpowder` | Lifetime Total Glacite | `$totglpowder / 1m` |
+| HOTM Tier | `$hotmtier` | `$hotm` | Heart of the Mountain Tier | `10 - $hotm` |
+| HOTM Tokens | `$hotmtokens` | `$tokens` | Available HOTM Tokens | `$tokens * 2` |
+
+#### Essences
+| Essence | Full Identifier(s) | Short Alias | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Wither Essence | `$witheressence`, `$wither`, `$wessence` | **`$w`** | Wither Essence count | `$w * 5k` |
+| Undead Essence | `$undeadessence`, `$undead`, `$uessence` | **`$u`** | Undead Essence count | `$u * 1k` |
+| Dragon Essence | `$dragonessence`, `$dragon`, `$dessence` | **`$d`** | Dragon Essence count | `$d * 2k` |
+| Spider Essence | `$spideressence`, `$spider`, `$spessence` | **`$sp`** | Spider Essence count | `$sp * 1.5k` |
+| Ice Essence | `$iceessence`, `$ice`, `$iessence` | **`$i`** | Ice Essence count | `$i * 3k` |
+| Diamond Essence | `$diamondessence`, `$diamond`, `$diessence` | **`$di`** | Diamond Essence count | `$di * 10k` |
+| Gold Essence | `$goldessence`, `$gold`, `$gessence` | **`$g`** | Gold Essence count | `$g * 8k` |
+| Crimson Essence | `$crimsonessence`, `$crimson`, `$cessence` | **`$c`** | Crimson Essence count | `$c * 6k` |
+
+#### Pets & Bestiary
+| Stat / Category | Full Identifier | Short Alias(es) | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Pet Level | `$petlevel`, `$petlvl` | `$pet` | Active Pet Level | `$pet * 100k` |
+| Pet XP | `$petexperience`, `$petxp` | `$pxp` | Active Pet Experience | `25m - $pxp` |
+| Bestiary Level | `$bestiarylevel`, `$bestiarylvl` | `$bestiary`, `$best` | Current Bestiary Level | `$best * 50k` |
+| Total Trophy Fish | `$trophyfishcount`, `$trophyfish` | `$tfish` | Total Trophy Fish caught | `$tfish * 10k` |
+| Diamond Trophy | `$diamondtrophyfish`, `$diamondtrophy` | `$dtrophy` | Diamond Trophy Fish count | `$dtrophy * 100k` |
+| Gold Trophy | `$goldtrophyfish`, `$goldtrophy` | `$gtrophy` | Gold Trophy Fish count | `$gtrophy * 50k` |
+| Silver Trophy | `$silvertrophyfish`, `$silvertrophy` | `$strophy` | Silver Trophy Fish count | `$strophy * 20k` |
+| Bronze Trophy | `$bronzetrophyfish`, `$bronzetrophy` | `$btrophy` | Bronze Trophy Fish count | `$btrophy * 10k` |
+| Accessory Power | `$magicalpower`, `$accessorypower` | `$mp` | Maxwell Magical Power | `$mp * 100k` |
+
+#### Skills
+| Skill | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Farming | `$farming`, `$farminglvl` / `$farm` | `$farmingxp` / `$farmxp` | Farming Skill Level & XP | `$farm * 100k` |
+| Mining | `$mining`, `$mininglvl` / `$mine` | `$miningxp` / `$minexp` | Mining Skill Level & XP | `$mine * 100k` |
+| Combat | `$combat`, `$combatlvl` / `$cmbt` | `$combatxp` / `$cmbtxp` | Combat Skill Level & XP | `$cmbt * 100k` |
+| Foraging | `$foraging`, `$foraginglvl` / `$forag` | `$foragingxp` / `$foragxp` | Foraging Skill Level & XP | `$forag * 100k` |
+| Fishing | `$fishing`, `$fishinglvl` / `$fish` | `$fishingxp` / `$fishxp` | Fishing Skill Level & XP | `$fish * 100k` |
+| Enchanting | `$enchanting`, `$enchantinglvl` / `$ench` | `$enchantingxp` / `$enchxp` | Enchanting Skill Level & XP | `$ench * 100k` |
+| Alchemy | `$alchemy`, `$alchemylvl` / `$alch` | `$alchemyxp` / `$alchxp` | Alchemy Skill Level & XP | `$alch * 100k` |
+| Taming | `$taming`, `$taminglvl` / `$tame` | `$tamingxp` / `$tamexp` | Taming Skill Level & XP | `$tame * 100k` |
+| Carpentry | `$carpentry`, `$carpentrylvl` / `$carp` | `$carpentryxp` / `$carpxp` | Carpentry Skill Level & XP | `$carp * 100k` |
+| Runecrafting | `$runecrafting`, `$runecraftinglvl` / `$rune` | `$runecraftingxp` / `$runexp` | Runecrafting Level & XP | `$rune * 100k` |
+| Social | `$social`, `$sociallvl` / `$soc` | `$socialxp` / `$socxp` | Social Skill Level & XP | `$soc * 100k` |
+
+#### Slayers
+| Slayer Boss | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
+| :--- | :--- | :--- | :--- | :--- |
+| Revenant (Zombie) | `$zombieslayer`, `$revslayer`, `$rev` | `$zombieslayerxp`, `$revxp` | Zombie Slayer Level & XP | `$rev * 50k` |
+| Tarantula (Spider) | `$spiderslayer`, `$taraslayer`, `$tara` | `$spiderslayerxp`, `$taraxp` | Spider Slayer Level & XP | `$tara * 50k` |
+| Sven (Wolf) | `$wolfslayer`, `$svenslayer`, `$sven` | `$wolfslayerxp`, `$svenxp` | Wolf Slayer Level & XP | `$sven * 50k` |
+| Voidgloom (Enderman) | `$endermanslayer`, `$emanslayer`, `$eman` | `$endermanslayerxp`, `$emanxp` | Enderman Slayer Level & XP | `$eman * 50k` |
+| Infernal (Blaze) | `$blazeslayer`, `$blaze` | `$blazeslayerxp`, `$blazexp` | Blaze Slayer Level & XP | `$blaze * 50k` |
+| Riftstalker (Vampire) | `$vampireslayer`, `$vamp` | `$vampireslayerxp`, `$vampxp` | Vampire Slayer Level & XP | `$vamp * 50k` |
+
+</details>
+
+<details>
+<summary><strong>Market Queries & Sacks</strong></summary>
+
+| Query Function | Alternative Alias | Description | Example Input |
+| :--- | :--- | :--- | :--- |
+| `bzb("ITEM")` | `bzbuy("ITEM")` | Bazaar Buy order price | `bzb(SUPERBOOM_TNT)` |
+| `bzs("ITEM")` | `bzsell("ITEM")` | Bazaar Sell offer price | `bzs("COBBLESTONE")` |
+| `bzm("ITEM")` | `bzmargin("ITEM")` | Bazaar margin (`bzb - bzs`) | `bzm(SUPERBOOM_TNT)` |
+| `lb("ITEM")` | `lowestbin("ITEM")` | Lowest BIN auction price | `lb(HYPERION)` |
+| `lba("ITEM")` | `lowestbinavg("ITEM")` | 3-Day Lowest BIN average price | `lba("HYPERION")` |
+| `npc("ITEM")` | `npcsell("ITEM")` | NPC shop sell price | `npc(COBBLESTONE)` |
+| `motes("ITEM")` | `motessell("ITEM")` | Rift Motes sell price | `motes("RIFT_ITEM")` |
+| `price("ITEM")` | N/A | Lowest price across Bazaar & BIN | `price(HYPERION)` |
+| `sack("ITEM")` | `sackcount("ITEM")` | Item count in player sacks | `sack(COBBLESTONE)` |
 
 </details>
 
 <details>
 <summary><strong>History, Shortcuts & Interactive Chat</strong></summary>
 
-- Press `Ctrl+Z` / `Cmd+Z` in the search bar to recall previous calculations (undo)
-- Press `Ctrl+Y` / `Cmd+Y` to redo/go forward in history
-- Press `Ctrl+C` / `Cmd+C` in the search bar to copy the full equation (e.g. `1+1 = 2`) to clipboard
-- Press `Ctrl+X` / `Cmd+X` in the search bar to cut the full equation to clipboard and clear the search bar
-- Partial text selection: if you highlight a specific portion of text, `Ctrl+C` / `Ctrl+X` copies/cuts only the selected snippet
-- Full Numpad Enter support (`GLFW_KEY_KP_ENTER`)
-- Interactive Chat: Click any `/calc` result in chat to copy it directly to your clipboard
-- View full history with `/calchist` (shows last 15 entries)
-- Session-based: Search history clears automatically when you leave a world/server
+| Action / Shortcut | Key Combination / Command | Description |
+| :--- | :--- | :--- |
+| Undo Calculation History | `Ctrl+Z` / `Cmd+Z` | Recall previous calculations backward in search bar |
+| Redo Calculation History | `Ctrl+Y` / `Cmd+Y` | Go forward in calculation history in search bar |
+| Copy Full Equation | `Ctrl+C` / `Cmd+C` | Copies full equation (`1+1 = 2`) to clipboard when no text is highlighted |
+| Cut Full Equation | `Ctrl+X` / `Cmd+X` | Cuts full equation to clipboard and clears search bar |
+| Partial Selection Copy/Cut | `Ctrl+C` / `Ctrl+X` | Copies or cuts only highlighted text snippet when text is selected |
+| Select All Text | `Ctrl+A` / `Cmd+A` | Selects all text in search bar |
+| Jump Cursor by Word | `Ctrl+Left` / `Right` | Moves search bar cursor by word boundaries |
+| Delete Word | `Ctrl+Backspace` / `Delete` | Deletes entire word to left or right of cursor |
+| Jump to Line End | `Home` / `End` | Moves cursor to start or end of text |
+| Commit Calculation | `Enter` / `Numpad Enter` | Commits calculation into history while keeping input focus |
+| Click-to-Copy Result | Mouse Click in Chat | Clicking any `/calc` result printed in chat copies result to clipboard |
+| View History List | `/calchist` | Shows up to 15 recent calculation history entries in chat |
+| Clear History | `/calcclear` | Clears all calculation history for current session |
 
 </details>
 
 <details>
 <summary><strong>Customization & Settings GUI</strong></summary>
 
-- Open in-game settings GUI screen via `/calcconfig` or ModMenu
-- **Custom Variables Manager**: Dedicated tab in `/calcconfig` to easily add, edit, delete, and paginate (`<` / `>`) custom variables directly in-game
-- Native Minecraft hover tooltips on all settings
-- Bazaar Flipper Perk selector pills (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%)
-- Shorthand Results toggle to convert default calculation results to SkyBlock units (`1.5m`)
-- Syntax Highlighting toggle to color-code numbers, units, functions, and variables in the search bar
-- Configurable decimal precision (default: 10 digits)
-- Toggle inline results, unit suggestions, comma formatting, and history navigation
-- All settings persist automatically in `config/notenoughcalculator.json`
+| Setting Name | Config Key | Default | Description |
+| :--- | :--- | :--- | :--- |
+| Open Settings Screen | Command `/calcconfig` | N/A | Opens interactive GUI settings screen (or via ModMenu) |
+| Custom Variables | `customVariables` | `{}` | Stores your saved custom variables (automatically created in config when you add your first variable) |
+| Custom Variables Manager | GUI Tab `Custom Variables` | N/A | In-game manager tab to add, edit, delete & paginate (`<` / `>`) variables |
+| Inline Results | `showInlineResults` | `true` | Renders calculation result `= 50m` directly inside search bar |
+| Unit Suggestions | `showUnitSuggestions` | `true` | Shows unit equivalents e.g. `(1 double chest)` |
+| Comma Formatting | `enableCommaFormatting` | `true` | Formats large numbers with commas (`1,000,000`) |
+| Shorthand Results | `enableShorthandResults` | `false` | Formats calculation results in SkyBlock shorthand (`1.5m`) |
+| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | Color-codes numbers, units, functions & variables in search bar |
+| Decimal Precision | `decimalPrecision` | `10` | Maximum decimal places for calculation output (1–50) |
+| Bazaar Flipper Perk | `bazaarFlipperLevel` | `0` | Select Bazaar perk rate (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) |
+| History Shortcuts | `enableHistoryNavigation` | `true` | Toggles `Ctrl+Z` / `Ctrl+Y` calculation history recall |
+| Full Equation Copy | `enableFullEquationCopy` | `true` | Toggles copying full equation vs plain text on `Ctrl+C` |
+| Item List Integration | `enableItemListIntegration` | `true` | Toggle Skyblock Item List search bar calculator (only shown in settings when Skyblock Item List is installed) |
+
+</details>
+
+<details>
+<summary><strong>Commands & Help Pages</strong></summary>
+
+#### Available Commands
+| Category | Command | Syntax | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| Core Calculation | `/calc` | `/calc <expression>` | Calculate directly in chat | `/calc 100m - 25m` |
+| Calculation History | `/calchist` | `/calchist` | Show up to 15 recent session calculations | `/calchist` |
+| Clear History | `/calcclear` | `/calcclear` | Clear current session calculation history | `/calcclear` |
+| Custom Variables | `/calcset` | `/calcset <name> <expression>` | Set or update a custom variable | `/calcset profit 100m-50m` |
+| Settings GUI | `/calcconfig` | `/calcconfig` | Open settings and custom variables screen | `/calcconfig` |
+| Help System | `/calchelp` | `/calchelp [topic]` | Open help menu or specific topic guide | `/calchelp functions` |
+
+#### Help Pages (`/calchelp <topic>`)
+| Topic | Command | Description |
+| :--- | :--- | :--- |
+| Main Menu | `/calchelp` | Main menu with all help topics and shortcuts |
+| Operators | `/calchelp operators` | +, -, *, /, ^, %, !, bitwise operators (&, |, ~, <<, >>), and base literals (0b, 0x, 0o) |
+| Functions | `/calchelp functions` | Math, logarithm, trig, min/max, clamp, avg, pct, gcd, lcm, and base conversions |
+| Units | `/calchelp units` | Coin multipliers (k, m, b, t) and container storage amounts (s, e, h, sc, dc, eb) |
+| Variables | `/calchelp variables` | Built-in constants (ans, pi, e), custom variables ($name), and SkyBlock API stats |
+| Player Stats | `/calchelp stats` | Currencies, powders, essences, pets, bestiary, trophy fish, player stats, skills, and slayers |
+| Market Queries | `/calchelp market` | Bazaar, Lowest BIN, NPC, Motes, and Sack query functions |
+| Tax Formulas | `/calchelp tax` | Bazaar payout and Auction House BIN listing/claim tax formulas |
+| Examples | `/calchelp examples` | Practical flipping, crafting, mining, and inventory calculation examples |
+| Config Guide | `/calchelp config` | Mod configuration settings and config file details |
 
 </details>
 
 ---
 
-**Dependencies (Required):**
-- [Fabric API](https://modrinth.com/mod/fabric-api) (0.134.1 or newer according to the Minecraft version you play on)
-- Minecraft (1.21.11, 26.1.x, 26.x)
+<details>
+<summary><strong>Dependencies</strong></summary>
 
-**Dependencies (Optional / Recommended):**
-- [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) (21.9.812 or newer according to the Minecraft version you play on) 
+#### Required
+| Name | Version |
+| :--- | :--- |
+| [Fabric Loader](https://fabricmc.net/) | `0.19.3+` |
+| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.152.1+` |
+| [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.13.13+kotlin.2.4.10+` |
 
-**Note:** Standalone mode was introduced in v2.7.0-beta. All previous versions from v1.0.0 to v2.6.1 still require REI to be installed.
+> **Note:** Dependencies and version numbers listed above apply specifically to the **latest release** of the mod. If you are using an older build or playing on a different Minecraft version, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
 
-- [ModMenu](https://modrinth.com/mod/modmenu) (16.0.0 or newer according to the Minecraft version you play on)
+> **Note:** Standalone mode was introduced in v2.7.0. All versions prior to v2.7.0 require REI to be installed.
+
+#### Optional / Recommended
+| Name | Version |
+| :--- | :--- |
+| [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.2.820+` |
+| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
+| [ModMenu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
+
+</details>
 
 ---
 
@@ -112,365 +340,14 @@ Type calculations directly in the search bar and get instant results! If REI is 
 
 1. Download the required mods and place them into your Minecraft `mods/` folder:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
+    - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
     - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) *(Optional)*
+    - [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) *(Optional)*
     - [ModMenu](https://modrinth.com/mod/modmenu) *(Optional)*
     - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Open any inventory screen (chest, crafting table, etc.)
-4. Start typing calculations into the search bar (REI's search bar if REI is installed, or the standalone calculator bar at the bottom of the screen)
-
----
-
-<details>
-<summary>Examples</summary>
-
-### Auction House & Trading
-```
-100m - 75m = 25,000,000          (profit calculation)
-100m * 0.05 = 5,000,000           (5% auction tax)
-50m * 1.1 = 55,000,000            (10% markup)
-(100m - 60m) * 0.95 = 38,000,000 (profit after tax)
-1b / 100 = 10,000,000             (price per item)
-250m + 150m + 75m = 475,000,000  (total spending)
-```
-
-### Inventory & Storage Management
-```
-640 / 64 = 10                     (stacks needed)
-5s * 2 = 640                      (10 stacks)
-3h = 5,184                        (3 shulkers total items)
-2dc + 5sc = 15,552                (storage capacity)
-10000 / 64 = 156.25               (156 stacks + 16 items)
-27s = 1,728                       (full shulker)
-```
-
-### Crafting & Resources
-```
-160 * 5 = 800                     (5 enchanted = 800 items)
-5e * 3 = 2,400                    (crafting cost)
-64 * 27 = 1,728                   (shulker capacity)
-1728 / 160 = 10.8                 (enchanted items per shulker)
-9 * 160 = 1,440                   (enchanted block crafting)
-```
-
-### Mining & Farming
-```
-500 + 300 + 200 = 1,000           (total ores mined)
-1000 / 3 = 333.33                 (average per hour)
-dc / 333 = 10.38                  (hours to fill double chest)
-64 * 100 = 6,400                  (100 stacks)
-6400 / 160 = 40                   (enchanted items)
-```
-
-### Money & Profits
-```
-1000m - 800m = 200,000,000        (200m profit)
-500m * 0.20 = 100,000,000         (20% profit margin)
-(1000m - 500m) / 500m = 1         (100% ROI)
-100m * 2.5 = 250,000,000          (2.5x flip)
-50m * 30 = 1,500,000,000          (bulk buying)
-```
-
-### Advanced Math & Functions
-```
-sqrt(144) = 12                    (square root)
-2^10 = 1,024                      (exponents)
-100 % 7 = 2                       (modulo)
-5! = 120                          (factorial)
-abs(-50) = 50                     (absolute value)
-floor(3.9) = 3                    (round down)
-ceil(3.1) = 4                     (round up)
-round(3.5) = 4                    (round nearest)
-log(100) = 2                      (base-10 logarithm)
-ln(e) = 1                         (natural logarithm)
-sin(90) = 1                       (sine, degrees)
-cos(0) = 1                        (cosine, degrees)
-tan(45) = 1                       (tangent, degrees)
-min(10, 5) = 5                    (minimum)
-max(10, 5) = 10                   (maximum)
-pi * 2 = 6.283...                 (using pi constant)
-e^2 = 7.389...                    (using Euler's number)
-```
-
-### Base Conversions
-```
-hex(255) = 0xFF                   (decimal to hexadecimal wrapper)
-bin(10) = 0b1010                  (decimal to binary wrapper)
-oct(63) = 0o77                    (decimal to octal wrapper)
-hex(0b1010 + 0o10) = 0x12         (expression base conversion)
-0b1010 = 10                       (binary literal input)
-0xFF = 255                        (hexadecimal literal input)
-0o77 = 63                         (octal literal input)
-0b10 + 0xA = 12                   (arithmetic with literals)
-```
-
-### Bitwise Operators & Functions
-```
-0b1010 & 0b1100 = 8               (bitwise AND)
-0b1010 | 0b0101 = 15              (bitwise OR)
-~0 = -1                           (bitwise NOT)
-~5 = -6                           (bitwise NOT value)
-1 << 4 = 16                       (bitwise left shift)
-16 >> 2 = 4                       (bitwise right shift)
-0x0F << 4 = 240                   (hex bitwise left shift)
-xor(0b1010, 0b1100) = 6           (bitwise XOR function)
-```
-
-### Math Helpers
-```
-avg(10, 20, 30) = 20              (variadic average)
-pct(50, 200) = 25                 (ratio percentage: 50 is 25% of 200)
-gcd(12, 18) = 6                   (greatest common divisor)
-lcm(12, 18) = 36                  (least common multiple)
-clamp(15, 0, 10) = 10             (clamp value to maximum bound)
-clamp(-5, 0, 10) = 0              (clamp value to minimum bound)
-```
-
-### Compound Calculations
-```
-100m * (1.05 ^ 10) = 162,889,462.68     (10 weeks compound)
-(50 + 25) * 1000 = 75,000               (grouped operations)
-(sqrt(2500) + abs(-100)) / 2 = 75       (complex formula)
-((100 + 50) * 2) - 50 = 250             (nested parentheses)
-```
-
-### Price Per Item
-```
-1b / 1000 = 1,000,000             (price per unit)
-500m / 64 = 7,812,500             (price per stack)
-100m / 160 = 625,000              (price per enchanted)
-50m / 27 = 1,851,851.85           (price per slot)
-```
-
-### Percentage Calculations
-```
-100m * 0.85 = 85,000,000          (15% discount)
-500m * 1.25 = 625,000,000         (25% increase)
-(200m - 150m) / 150m = 0.3333     (33% profit margin)
-1b * 0.01 = 10,000,000            (1% tax)
-```
-
-### Material Conversions
-```
-160 * 64 = 10,240                 (1 stack enchanted blocks)
-9 * 9 * 160 = 12,960              (1 enchanted block breakdown)
-64 * 64 = 4,096                   (double compressed)
-1728 / 64 = 27                    (stacks per shulker)
-```
-
-### Business & Investment
-```
-1000m * 0.02 = 20,000,000         (2% daily interest)
-20m * 365 = 7,300,000,000         (yearly earnings)
-(1000m + 200m) / 2 = 600,000,000  (average investment)
-500m * 1.5 = 750,000,000          (50% growth)
-```
-
-### Combat & Stats
-```
-(100 + 50 + 25) / 3 = 58.33       (average damage)
-sqrt(10000) = 100                 (damage calculation)
-200 * 1.5 = 300                   (crit damage)
-(500 - 100) * 1.2 = 480           (defense reduction)
-```
-
-### Bulk Operations
-```
-50 * 100m = 5,000,000,000         (buying 50 items)
-1000 * 500k = 500,000,000         (bulk crafting cost)
-64 * 15625 = 1,000,000            (precise calculations)
-27 * 64 * 100 = 172,800           (mass storage)
-```
-
-### Using Variables
-```
-/calcset buy 50m
-/calcset sell 75m
-$sell - $buy = 25,000,000         (profit using variables)
-
-/calcset stacks 10
-$stacks * 64 = 640                (items from stacks)
-
-100 + 50 = 150
-ans * 2 = 300                     (using last result)
-ans + 100 = 400                   (chain calculations)
-```
-
-### Basic Multiplication
-```
-10 x 10 = 100                     (using x operator)
-10x10 = 100                       (no spaces needed)
-5 * 5 = 25                        (traditional * also works)
-100m x 2 = 200,000,000            (x with units)
-3s x 5 = 960                      (stacks multiplication)
-10x5x2 = 100                      (chained multiplication)
-```
-
-### SkyBlock Tax & Shorthand Calculators
-```
-bz(100m) = 98,750,000              (net Bazaar payout after tax)
-ah(50m) = 46,999,955               (net Auction payout after 5% fee + 1% claim tax + 6h duration fee)
-ahbin(50m, 24) = 48,499,650        (net BIN payout after 2% fee + 1% claim tax + 24h duration fee)
-fmt(1500000) = 1.5m                (shorthand number formatter)
-rad(180) = 3.14159...              (degrees to radians)
-deg(pi) = 180                      (radians to degrees)
-```
-
-</details>
-
----
-
-<details>
-<summary>Commands</summary>
-
-### Basic Commands
-- `/calc <expression>` - Calculate in chat
-- `/calchist` - View calculation history (shows last 15)
-- `/calcclear` - Clear calculation history
-
-### Variable Commands
-- `/calcset <var> <value>` - Set custom variable
-    - Example: `/calcset profit 100m-50m`
-    - Example: `/calcset stacks 10`
-
-### Help Commands
-- `/calchelp` - Show main help menu
-- `/calchelp operators` - Learn about +, -, *, x, /, ^, %, !, &, |, ~, <<, >>, literals (0b, 0x, 0o)
-- `/calchelp functions` - Learn about sqrt, abs, floor, ceil, round, log, ln, sin, cos, tan, min, max, hex, bin, oct, pct, gcd, lcm, clamp, avg, xor, bz, ah, ahbin, fmt, rad, deg
-- `/calchelp units` - Learn about k, m, b, t, s, e, h, sc, dc, eb
-- `/calchelp variables` - Learn about ans and custom variables
-- `/calchelp examples` - See practical examples
-- `/calchelp config` - Learn about configuration
-
-### Configuration Commands
-- `/calcconfig` - Open settings screen
-
-</details>
-
----
-
-<details>
-<summary>Configuration</summary>
-
-**Config file:** `config/notenoughcalculator.json`
-
-### Available Settings
-```json
-{
-  "decimalPrecision": 10,
-  "showUnitSuggestions": true,
-  "enableHistoryNavigation": true,
-  "showInlineResults": true,
-  "enableCommaFormatting": true,
-  "enableShorthandResults": false,
-  "enableSyntaxHighlighting": true,
-  "enableFullEquationCopy": true,
-  "bazaarFlipperLevel": 0,
-  "customVariables": {}
-}
-```
-
-### Settings Explained
-
-- **decimalPrecision** (Default: 10) - Number of decimal places
-- **showUnitSuggestions** (Default: true) - Show unit hints like "(50m)" in commands
-- **enableHistoryNavigation** (Default: true) - Enable Ctrl+Z/Y shortcuts
-- **showInlineResults** (Default: true) - Show results in the search bar
-- **enableCommaFormatting** (Default: true) - Format large numbers with commas
-- **enableShorthandResults** (Default: false) - Format default calculation results in shorthand notation
-- **enableSyntaxHighlighting** (Default: true) - Color-code numbers, units, functions, and variables in the search bar
-- **enableFullEquationCopy** (Default: true) - Copy full equation (`expression = result`) when pressing Ctrl+C with no text selected
-- **bazaarFlipperLevel** (Default: 0) - Bazaar Flipper Perk level (0 = 1.25%, 1 = 1.125%, 2 = 1.0%)
-- **customVariables** (Default: empty) - Stores your saved custom variables (this variable automatically gets created when you add your first variable)
-
-</details>
-
----
-
-<details>
-<summary>Keybinds</summary>
-
-### Search Bar Shortcuts
-- **`Ctrl + Z` / `Cmd + Z`** - Recall previous calculation (undo)
-- **`Ctrl + Y` / `Cmd + Y`** - Go forward in history (redo)
-- **`Ctrl + C` / `Cmd + C`** - Copy full equation (`1+1 = 2`) when no text is selected; copies only selected text when text is highlighted (can be toggled in `/calcconfig`)
-- **`Ctrl + X` / `Cmd + X`** - Cut full equation to clipboard when no text is selected; cuts only selected text when text is highlighted
-- **`Ctrl + A` / `Cmd + A`** - Select all text in the search bar
-- **`Ctrl + Left` / `Right`** - Jump cursor by word
-- **`Ctrl + Backspace` / `Delete`** - Delete entire word to the left or right
-- **`Home` / `End`** - Jump cursor to start or end of text
-- **`Enter` / `Numpad Enter`** - Commit calculation into history and keep focus
-
-### Notes
-- History is session-based and automatically clears when you leave a world/server
-- This ensures a fresh start each time you play!
-- Use `/calchist` to view your calculation history in chat
-
-</details>
-
----
-
-<details>
-<summary>Pro Tips</summary>
-
-### Use `ans` for quick follow-up calculations
-```text
-100 + 50 = 150
-ans * 2 = 300
-ans + 1000 = 1,300
-```
-
-### SkyBlock Tax Calculators (`bz` & `ah`)
-```text
-bz(50m) = 49,375,000      (Bazaar net profit accounting for your Flipper perk level)
-ah(10m, 24) = 9,600,000    (Auction House BIN net profit after listing fee & claim tax)
-```
-
-### Hexadecimal, Binary & Octal Conversion (`hex`, `bin`, `oct`)
-```text
-0xFF + 0b1010 = 265       (Mix base prefixes directly in math expressions)
-hex(255) = 0xFF           (Convert decimal result to hex)
-bin(42) = 0b101010        (Convert decimal result to binary)
-```
-
-### Save common values as custom variables
-```text
-/calcset hourly 500k
-/calcset daily $hourly * 24
-$daily * 30 = 360,000,000 (monthly)
-```
-
-### Mix SkyBlock units & auto-formatting
-```text
-100m + 500k = 100,500,000  (k, m, b, t, s, e, h, sc, dc, eb multipliers)
-fmt(1500000) = 1.5m        (Format large numbers to SkyBlock shorthand)
-2dc + 5h = 18,432          (Double chest & shulker stack math)
-```
-
-### Clipboard & Equation Shortcuts
-```text
-Ctrl + C / Cmd + C         (Copy full equation e.g. "1+1 = 2" to clipboard; copies snippet if highlighted)
-Ctrl + X / Cmd + X         (Cut full equation to clipboard and clear search bar)
-Ctrl + Z / Ctrl + Y        (Recall previous calculations / redo history)
-Ctrl + Left / Right        (Jump cursor by word)
-Ctrl + Backspace / Delete  (Delete entire word)
-```
-
-### Chain complex calculations & parentheses
-```text
-(100m - 50m) * 1.1 / 64 = 859,375 (per stack after markup)
-(5 + 3) * 2 = 16  (not 11)
-2^(10-3) = 128    (not 1017)
-```
-
-### Flexible multiplication syntax
-```text
-10 * 5 = 50    (traditional)
-10 x 5 = 50    (also works)
-10x5 = 50      (no spaces needed)
-```
-
-</details>
+4. Start typing calculations into the search bar (REI's search bar if REI is installed, Skyblock Item List's search bar if Item List is installed, or the standalone calculator bar at the bottom of the screen)
 
 ---
 
@@ -493,21 +370,34 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 <details>
 
-<summary>Common Issues</summary>
+<summary>Common Issues & Troubleshooting</summary>
 
 - **Calculator search bar not showing up?**
-  - **Standalone Mode (REI Not Installed)**: Open any inventory screen (chest, crafting table, inventory). The standalone search bar renders automatically at the bottom of the screen.
-  - **REI Integration (REI Installed)**: Click inside REI's search bar at the bottom of your screen to activate calculation parsing.
-- **Calculator is unresponsive or not parsing inputs?**
-  - Make sure the search bar (standalone or REI) is actively in focus (clicked into). If you click elsewhere on the screen, focus is lost.
+  - **Standalone Mode (No Search Mods Installed)**: Open any inventory screen (chest, crafting table, inventory). The standalone search bar renders automatically at the bottom of the screen.
+  - **REI Integration (REI Installed)**: Click inside REI's search bar to start calculating.
+  - **Skyblock Item List Integration (Item List Installed)**: Click inside Skyblock Item List's search bar to start calculating.
+- **Calculator is unresponsive or not showing results?**
+  - Make sure the search bar (REI, Skyblock Item List, or Standalone) is actively in focus (clicked into). If you click elsewhere on the screen, focus is lost.
+- **SkyBlock API stats showing 0 or unavailable?**
+  - API stats (like `$mithrilpowder`, `$skills`, `$slayer`, `$essence` etc.) might not have loaded yet. Try running `/hotm`, `/skills` etc, this may help resolve the issue.
+- **Item price queries (`bzb`, `bzs`, `lb`, `lba`) return unknown item error?**
+  - Make sure you are using exact item IDs (e.g. `SUPERBOOM_TNT`, `HYPERION`, `COBBLESTONE`). If the item ID has special characters, wrap it in quotes: `bzb("SUPERBOOM_TNT")` or `bzs('COBBLESTONE')`.
+- **Skyblock Item List search bar is overriding or not working with the calculator?**
+  - Check if `enableItemListIntegration` is enabled in `/calcconfig`. When enabled, our mod handles calculations inside the Skyblock Item List search bar seamlessly.
 - **Bazaar / AH tax calculation rate is inaccurate?**
   - Open settings screen (`/calcconfig`) or ModMenu. You can configure your **Bazaar Flipper Perk Level** (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) so `bz()` calculations match your exact profile perk rate.
+- **Calculations showing up in chat when pressing Enter?**
+  - Running `/calc <expression>` prints the calculation result to your chat window, where you can click the result to instantly copy it. In search bar mode, results show directly inside the search bar.
 - **How to copy the result or full equation?**
   - Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard, or click any `/calc` result printed in chat to copy the full equation (`1+1 = 2`) with instant chat confirmation.
 - **History navigation (`Ctrl+Z` / `Ctrl+Y`) not recalling calculations?**
   - Make sure `enableHistoryNavigation` is set to `true` in `/calcconfig`. Note that calculation history is **session-based** and resets when joining a new world or server for a fresh start.
 - **Custom variables disappeared after restarting game?**
   - Custom variables defined via `/calcconfig` GUI or `/calcset var expr` are saved permanently to `config/notenoughcalculator.json`. Make sure you click **Save** when editing variables in `/calcconfig`.
+- **How do I reset my custom variables or config?**
+  - You can manage or delete variables individually in the `/calcconfig` GUI under the **Custom Variables** tab. To reset everything to default, delete `config/notenoughcalculator.json` in your `.minecraft` folder while the game is closed.
+- **Bitwise operations or radix outputs not behaving as expected?**
+  - Hexadecimal (`hex()`), Binary (`bin()`), and Octal (`oct()`) functions operate on integer values. Floating-point numbers are rounded to nearest integers when performing bitwise operations (`&`, `|`, `~`, `<<`, `>>`, `xor`).
 
 </details>
 
@@ -515,13 +405,20 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 
 ## Why This Mod?
 
-[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) had a great calculator built into its search bar. NEU doesn't exist for newer Minecraft versions though, so this mod fills that gap. Works with [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) if you have it, or runs standalone if you don't.
+[NEU (NotEnoughUpdates)](https://modrinth.com/mod/notenoughupdates) had a great calculator built into its search bar. NEU doesn't exist for newer Minecraft versions though, so this mod fills that gap. Works with [Roughly Enough Items (REI)](https://modrinth.com/mod/rei), [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list), or runs completely standalone.
 
 ---
 
 ## Credits
 
-Original calculator concept from **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)**. This mod recreates that for newer versions.
+- Original calculator concept inspired by **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)**.
+- Uses **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)** to fetch SkyBlock stats, skills, slayers, essences, and market data.
+
+---
+
+## Modpacks
+
+Feel free to include this mod in any modpack without restriction! Adding a link back to the mod page is also not mandatory, but is greatly appreciated.
 
 ---
 
@@ -565,7 +462,7 @@ Under the following conditions:
 * You must state any changes you make
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x-26.2/LICENSE.txt)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
 
 ---
 
@@ -575,4 +472,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 15-08-2026*
+*Last updated: 19-08-2026*

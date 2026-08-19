@@ -18,17 +18,20 @@
 
 package com.rijz.notenoughcalculator.client.integration;
 
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import me.shedaniel.rei.api.client.REIRuntime;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Manages runtime environment detection (REI, standalone) and adapter delegation
 public class IntegrationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationManager.class);
     private static Boolean reiLoaded = null;
     private static SearchFieldAdapter activeAdapter = null;
     private static StandaloneSearchField standaloneField = null;
+
+    private static Boolean itemListLoaded = null;
 
     public static boolean isREILoaded() {
         if (reiLoaded == null) {
@@ -42,6 +45,18 @@ public class IntegrationManager {
         return reiLoaded;
     }
 
+    public static boolean isItemListLoaded() {
+        if (itemListLoaded == null) {
+            try {
+                itemListLoaded = FabricLoader.getInstance().isModLoaded("skyblock-item-list");
+            } catch (Throwable e) {
+                itemListLoaded = false;
+            }
+            LOGGER.info("IntegrationManager detected Skyblock Item Viewer present: {}", itemListLoaded);
+        }
+        return itemListLoaded;
+    }
+
     public static StandaloneSearchField getStandaloneField() {
         if (standaloneField == null) {
             standaloneField = new StandaloneSearchField();
@@ -49,10 +64,33 @@ public class IntegrationManager {
         return standaloneField;
     }
 
+    public static boolean isREIOverlayVisible() {
+        if (!isREILoaded()) return false;
+        try {
+            REIRuntime runtime = REIRuntime.getInstance();
+            if (runtime != null) {
+                return runtime.isOverlayVisible();
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
+    public static boolean isStandaloneActive() {
+        if (isREILoaded() && isREIOverlayVisible()) return false;
+        if (isItemListLoaded() && CalculatorConfig.getInstance().enableItemListIntegration) return false;
+        return true;
+    }
+
     public static SearchFieldAdapter getActiveAdapter() {
-        if (isREILoaded()) {
-            if (activeAdapter == null) {
+        if (isREILoaded() && isREIOverlayVisible()) {
+            if (activeAdapter == null || !(activeAdapter instanceof REISearchAdapter)) {
                 activeAdapter = createREISearchAdapter();
+            }
+            return activeAdapter;
+        }
+        if (isItemListLoaded() && CalculatorConfig.getInstance().enableItemListIntegration) {
+            if (activeAdapter == null || !(activeAdapter instanceof SkyblockItemListAdapter)) {
+                activeAdapter = createSkyblockItemListAdapter();
             }
             return activeAdapter;
         }
@@ -65,6 +103,15 @@ public class IntegrationManager {
             return new REISearchAdapter();
         } catch (Throwable e) {
             LOGGER.warn("Failed to initialize Roughly Enough Items (REI) search adapter (falling back to Standalone search bar): {}", e.getMessage());
+            return getStandaloneField();
+        }
+    }
+
+    private static SearchFieldAdapter createSkyblockItemListAdapter() {
+        try {
+            return new SkyblockItemListAdapter();
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to initialize Skyblock Item Viewer search adapter (falling back to Standalone search bar): {}", e.getMessage());
             return getStandaloneField();
         }
     }

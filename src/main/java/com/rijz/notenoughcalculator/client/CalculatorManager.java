@@ -58,7 +58,6 @@ public class CalculatorManager {
     private BigDecimal lastCompletedResult = null;
     private boolean hasUncommittedCalculation = false;
 
-
     private static String buildUnitsRegex() {
         List<String> sortedUnits = new ArrayList<>(ExpressionEvaluator.UNITS.keySet());
         sortedUnits.sort((a, b) -> Integer.compare(b.length(), a.length()));
@@ -83,13 +82,12 @@ public class CalculatorManager {
         return sb.toString();
     }
 
-    // Precompiled patterns to avoid GC pressure on every keystroke
+    // Precompiled patterns to avoid GC pressure
     private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
     private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*" + buildUnitsRegex() + "(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*" + buildFunctionsRegex() + "\\s*\\(", Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
-    // Binary (0b), Hex (0x), or Octal (0o) number literal prefix
     private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
     private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*(?:[+\\-*/^%xX&|~]|<<|>>)\\s*$");
@@ -118,7 +116,8 @@ public class CalculatorManager {
         loadPersistentVariables();
     }
 
-    // Heuristics to determine if the query is a math equation or a standard item search
+    // Fast heuristic evaluation to determine if search input represents a calculation vs vanilla item lookup.
+    // Excludes single numbers and item keyword queries without mathematical operators.
     public static boolean looksLikeCalculation(String input) {
         if (input == null || input.trim().isEmpty()) {
             return false;
@@ -148,13 +147,8 @@ public class CalculatorManager {
     }
 
     /**
-     * Check if expression is complete enough to evaluate.
-     * We don't want to show errors while someone is mid-typing.
-     *
-     * Incomplete examples:
-     * - "5 +" (trailing operator)
-     * - "sqrt(" (unclosed function)
-     * - "(5 + 3" (unclosed paren)
+     * Verifies if an expression is syntactically complete before triggering live evaluation.
+     * Prevents rendering transient syntax errors while the user is actively typing.
      */
     private boolean isExpressionComplete(String input) {
         if (input == null || input.trim().isEmpty()) {
@@ -175,7 +169,7 @@ public class CalculatorManager {
             char c = trimmed.charAt(i);
             if (c == '(') parenCount++;
             if (c == ')') parenCount--;
-            if (parenCount < 0) return false;  // More closing than opening
+            if (parenCount < 0) return false;
         }
         return parenCount == 0;
     }
@@ -240,7 +234,6 @@ public class CalculatorManager {
         // Add the completed equation
         reiSearchHistory.add(equation);
 
-
         while (reiSearchHistory.size() > MAX_EQUATIONS) {
             reiSearchHistory.remove(0);
         }
@@ -248,7 +241,7 @@ public class CalculatorManager {
         LOGGER.debug("Equation saved to history: '{}' (total: {})", equation, reiSearchHistory.size());
     }
 
-    // Calculate for live display (quiet, doesn't add to /calchist).
+    // Evaluates expression silently for inline UI rendering without polluting command history (/calchist).
     private void calculateForDisplay(String input) {
         if (input == null || input.trim().isEmpty()) {
             lastFormattedResult = null;
@@ -295,7 +288,7 @@ public class CalculatorManager {
 
 
     private void addToCompletedHistory(String expression, BigDecimal result) {
-        String historyEntry = expression + " = " + ResultFormatter.formatWithCommas(result);
+        String historyEntry = expression + ResultFormatter.getEqualsSign() + ResultFormatter.formatWithCommas(result);
 
         // Don't duplicate last entry
         if (completedHistory.isEmpty() || !completedHistory.get(completedHistory.size() - 1).equals(historyEntry)) {
@@ -464,15 +457,16 @@ public class CalculatorManager {
         return result;
     }
 
-    public void setVariable(String name, String valueExpr) throws ExpressionEvaluator.EvalException {
-        evaluator.setVariable(name, valueExpr);
-        BigDecimal val = evaluator.evaluateQuiet(valueExpr);
+    public BigDecimal setVariable(String name, String valueExpr) throws ExpressionEvaluator.EvalException {
+        BigDecimal val = evaluator.setVariable(name, valueExpr);
         saveVariableToConfig(name, val);
+        return val;
     }
 
-    public void setVariableDirect(String name, BigDecimal value) {
-        evaluator.setVariable(name, value);
-        saveVariableToConfig(name, value);
+    public BigDecimal setVariableDirect(String name, BigDecimal value) throws ExpressionEvaluator.EvalException {
+        BigDecimal val = evaluator.setVariable(name, value);
+        saveVariableToConfig(name, val);
+        return val;
     }
 
     private void saveVariableToConfig(String name, BigDecimal value) {

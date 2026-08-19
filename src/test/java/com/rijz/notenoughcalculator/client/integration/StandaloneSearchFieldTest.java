@@ -109,22 +109,18 @@ public class StandaloneSearchFieldTest {
     @Test
     public void testCutCopyPaste() {
         field.setText("abcdef");
-        // Highlight partial selection "cd" (cursor 2, selectionEnd 4)
         field.setCursorPosition(2);
         field.setSelectionEnd(4);
         assertTrue(field.hasSelection());
         assertFalse(field.isFullSelection());
         assertEquals("cd", field.getSelectedText());
 
-        // Copy "cd"
         field.keyPressed(GLFW.GLFW_KEY_C, 0, GLFW.GLFW_MOD_CONTROL);
 
-        // Deselect and clear text
         field.setText("");
         field.setCursorPosition(0);
         field.setSelectionEnd(0);
 
-        // Paste "cd"
         field.keyPressed(GLFW.GLFW_KEY_V, 0, GLFW.GLFW_MOD_CONTROL);
         assertEquals("cd", field.getText());
     }
@@ -136,7 +132,6 @@ public class StandaloneSearchFieldTest {
         assertTrue(field.hasSelection());
         assertTrue(field.isFullSelection());
 
-        // Copying after Ctrl+A should copy selected text ("126.855m"), not pass to full equation copy
         boolean handled = field.keyPressed(GLFW.GLFW_KEY_C, 0, GLFW.GLFW_MOD_CONTROL);
         assertTrue(handled);
         assertEquals("126.855m", field.getClipboardText());
@@ -147,14 +142,12 @@ public class StandaloneSearchFieldTest {
         field.setText("100 + 200");
         field.keyPressed(GLFW.GLFW_KEY_END, 0, 0);
 
-        // Ctrl+Left word jump
         field.keyPressed(GLFW.GLFW_KEY_LEFT, 0, GLFW.GLFW_MOD_CONTROL);
         assertEquals(6, field.getCursorPosition());
 
         field.keyPressed(GLFW.GLFW_KEY_LEFT, 0, GLFW.GLFW_MOD_CONTROL);
         assertEquals(4, field.getCursorPosition());
 
-        // Ctrl+Right word jump
         field.keyPressed(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL);
         assertEquals(6, field.getCursorPosition());
     }

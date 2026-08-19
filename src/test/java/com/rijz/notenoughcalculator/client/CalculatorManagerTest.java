@@ -32,8 +32,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Tests the static looksLikeCalculation() heuristic used to distinguish
-// math expressions from item searches in the REI search bar.
 class CalculatorManagerTest {
 
     @BeforeEach
@@ -240,6 +238,16 @@ class CalculatorManagerTest {
             manager.setVariableDirect("tax", new BigDecimal("0.10"));
             BigDecimal res = manager.calculate("100 * $tax");
             assertEquals(0, new BigDecimal("10").compareTo(res));
+        }
+
+        @Test
+        void setVariableStringAndReload() throws Exception {
+            BigDecimal val = manager.setVariable("discount", "20m - 5m");
+            assertEquals(0, new BigDecimal("15000000").compareTo(val));
+            assertEquals(0, new BigDecimal("15000000").compareTo(manager.calculate("$discount")));
+
+            manager.reloadCustomVariables();
+            assertEquals(0, new BigDecimal("15000000").compareTo(manager.calculate("$discount")));
         }
 
         @Test

@@ -3,7 +3,7 @@
   "id": "notenoughcalculator",
   "version": "${version}",
   "name": "Not Enough Calculator",
-  "description": "A NEU-style calculator, works standalone or inside REI's search bar with instant results!",
+  "description": "A NEU-style calculator that works standalone or inside Roughly Enough Items & Skyblock Item List search bars!",
   "authors": [
     "Rijz",
     "Laze"
@@ -28,14 +28,13 @@
       "com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient"
     ],
     "rei_client": [
-      "com.rijz.notenoughcalculator.client.CalculatorREIPlugin"
+      "com.rijz.notenoughcalculator.client.integration.plugin.CalculatorREIPlugin"
     ],
     "modmenu": [
-      "com.rijz.notenoughcalculator.client.ModMenuIntegration"
+      "com.rijz.notenoughcalculator.client.integration.plugin.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "notenoughcalculator.mixins.json",
     {
       "config": "notenoughcalculator.client.mixins.json",
       "environment": "client"
@@ -44,11 +43,13 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${min_fabric_api_version}",
-    "minecraft": ">=${min_minecraft_version} <=${max_minecraft_version}"
+    "fabric-language-kotlin": ">=${fabric_language_kotlin_version}",
+    "minecraft": ">=${minecraft_version}"
   },
   "suggests": {
-    "roughlyenoughitems": ">=${min_rei_version}",
-    "modmenu": ">=${min_modmenu_version}"
+    "roughlyenoughitems": ">=${rei_version}",
+    "modmenu": ">=${min_modmenu_version}",
+    "skyblock-item-list": ">=${skyblockitemlist_version}"
   },
   "custom": {
     "modmenu": {

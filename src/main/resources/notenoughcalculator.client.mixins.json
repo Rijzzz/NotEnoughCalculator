@@ -4,6 +4,9 @@
   "package": "com.rijz.notenoughcalculator.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "SkyblockItemListMixin",
+    "ScreenInitMixin",
+    "REIEntryTypeDeferredMixin"
   ],
   "injectors": {
     "defaultRequire": 1

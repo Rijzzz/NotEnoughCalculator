@@ -20,7 +20,6 @@ package com.rijz.notenoughcalculator.core.skyblock;
 
 import java.math.BigDecimal;
 
-// Hypixel SkyBlock Bazaar and Auction House fee calculators.
 public class SkyblockTaxCalculator {
 
     /**

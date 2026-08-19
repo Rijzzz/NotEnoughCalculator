@@ -23,6 +23,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
+import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
@@ -37,7 +38,6 @@ import net.minecraft.network.chat.MutableComponent;
 import java.math.BigDecimal;
 import java.util.List;
 
-// Command handlers for /calc, /calchist, /calcset, /calcclear, /calchelp, /calcconfig.
 public class CalculatorCommands {
 
 
@@ -68,8 +68,9 @@ public class CalculatorCommands {
             ExpressionEvaluator.EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
             String formatted = ResultFormatter.formatResultWithUnits(evalRes);
             String fullEquation = expr + " = " + formatted;
+            String highlightedExpr = SyntaxHighlighter.highlight(expr);
 
-            MutableComponent msg = Component.literal(prefix + config.getOperatorColorCode() + expr + " " +
+            MutableComponent msg = Component.literal(prefix + highlightedExpr + " " +
                     t("notenoughcalculator.result.equals").getString() +
                     config.getChatResultColorCode() + formatted);
 
@@ -106,7 +107,7 @@ public class CalculatorCommands {
 
             int maxDisplay = Math.min(MAX_HISTORY_DISPLAY, history.size());
             for (int i = Math.max(0, history.size() - maxDisplay); i < history.size(); i++) {
-                sendLiteral(ctx, "§7" + (i + 1) + ". §f" + history.get(i));
+                send(ctx, "notenoughcalculator.history.item", (i + 1), history.get(i));
             }
 
             if (history.size() > maxDisplay) {

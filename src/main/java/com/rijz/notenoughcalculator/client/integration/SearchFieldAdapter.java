@@ -18,7 +18,6 @@
 
 package com.rijz.notenoughcalculator.client.integration;
 
-// Common adapter interface for search field inputs across rei and standalone mode
 public interface SearchFieldAdapter {
     String getText();
     void setText(String text);

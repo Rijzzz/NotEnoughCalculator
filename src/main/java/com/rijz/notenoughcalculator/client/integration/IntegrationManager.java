@@ -77,7 +77,7 @@ public class IntegrationManager {
 
     public static boolean isStandaloneActive() {
         if (isREILoaded() && isREIOverlayVisible()) return false;
-        if (isItemListLoaded() && CalculatorConfig.getInstance().enableItemListIntegration) return false;
+        if (isItemListLoaded()) return false;
         return true;
     }
 

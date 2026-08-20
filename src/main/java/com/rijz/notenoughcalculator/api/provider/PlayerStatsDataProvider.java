@@ -29,18 +29,21 @@ import tech.thatgravyboat.skyblockapi.api.profile.reputation.ReputationAPI;
 
 import java.math.BigDecimal;
 
-public class PlayerStatsProvider {
+public class PlayerStatsDataProvider {
 
     public static BigDecimal getHealth() {
         if (SkyblockApiIntegration.isAvailable()) {
             try {
                 return BigDecimal.valueOf(StatsAPI.INSTANCE.getHealth());
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
         try {
             LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) return BigDecimal.valueOf((long) player.getHealth());
-        } catch (Throwable ignored) {}
+            if (player != null)
+                return BigDecimal.valueOf((long) player.getHealth());
+        } catch (Throwable ignored) {
+        }
         return null;
     }
 
@@ -48,17 +51,21 @@ public class PlayerStatsProvider {
         if (SkyblockApiIntegration.isAvailable()) {
             try {
                 return BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxHealth());
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
         try {
             LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) return BigDecimal.valueOf((long) player.getMaxHealth());
-        } catch (Throwable ignored) {}
+            if (player != null)
+                return BigDecimal.valueOf((long) player.getMaxHealth());
+        } catch (Throwable ignored) {
+        }
         return null;
     }
 
     public static BigDecimal getDefense() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(StatsAPI.INSTANCE.getDefense());
         } catch (Throwable ignored) {
@@ -67,7 +74,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getMana() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(StatsAPI.INSTANCE.getMana());
         } catch (Throwable ignored) {
@@ -76,7 +84,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getMaxMana() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxMana());
         } catch (Throwable ignored) {
@@ -85,7 +94,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getOverflowMana() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(StatsAPI.INSTANCE.getOverflowMana());
         } catch (Throwable ignored) {
@@ -94,25 +104,28 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getVitality() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
-            return BigDecimal.valueOf(StatsAPI.INSTANCE.getVitaliy());
+            return BigDecimal.valueOf(StatsAPI.INSTANCE.getVitality());
         } catch (Throwable ignored) {
             return null;
         }
     }
 
     public static BigDecimal getMaxVitality() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
-            return BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxVitaliy());
+            return BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxVitality());
         } catch (Throwable ignored) {
             return null;
         }
     }
 
     public static BigDecimal getSkyBlockLevel() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevel());
         } catch (Throwable ignored) {
@@ -121,7 +134,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getSkyBlockLevelProgress() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevelProgress());
         } catch (Throwable ignored) {
@@ -130,7 +144,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getReputation() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(ReputationAPI.INSTANCE.getCurrentReputation());
         } catch (Throwable ignored) {
@@ -144,12 +159,14 @@ public class PlayerStatsProvider {
             if (player != null) {
                 return BigDecimal.valueOf((long) (player.getAbilities().getWalkingSpeed() * 1000.0f));
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return null;
     }
 
     public static BigDecimal getClassLevel() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(DungeonAPI.INSTANCE.getClassLevel());
         } catch (Throwable ignored) {
@@ -158,7 +175,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getDungeonPartySize() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return BigDecimal.valueOf(DungeonAPI.INSTANCE.getPartySize());
         } catch (Throwable ignored) {
@@ -167,7 +185,8 @@ public class PlayerStatsProvider {
     }
 
     public static BigDecimal getCatacombsLevel() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable())
+            return null;
         try {
             return getClassLevel();
         } catch (Throwable ignored) {
@@ -186,8 +205,10 @@ public class PlayerStatsProvider {
     public static BigDecimal getXpLevel() {
         try {
             LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) return BigDecimal.valueOf(player.experienceLevel);
-        } catch (Throwable ignored) {}
+            if (player != null)
+                return BigDecimal.valueOf(player.experienceLevel);
+        } catch (Throwable ignored) {
+        }
         return null;
     }
 }

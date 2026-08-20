@@ -22,6 +22,7 @@ import com.rijz.notenoughcalculator.NotEnoughCalculator;
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.client.gui.tab.SettingsTab;
 import com.rijz.notenoughcalculator.client.gui.tab.VariablesTab;
+import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.Minecraft;
@@ -108,8 +109,9 @@ public class CalculatorConfigScreen extends Screen {
     protected void init() {
         clearWidgets();
 
+        int extraHeight = IntegrationManager.isItemListLoaded() ? 20 : 0;
         int panelWidth = 320;
-        int panelHeight = 295;
+        int panelHeight = 295 + extraHeight;
         int panelX = (this.width - panelWidth) / 2;
         int panelY = (this.height - panelHeight) / 2;
 
@@ -205,8 +207,9 @@ public class CalculatorConfigScreen extends Screen {
             }
             wasMouseDown = isMouseDown;
         }
+        int extraHeight = IntegrationManager.isItemListLoaded() ? 20 : 0;
         int panelWidth = 320;
-        int panelHeight = 295;
+        int panelHeight = 295 + extraHeight;
         int panelX = (this.width - panelWidth) / 2;
         int panelY = (this.height - panelHeight) / 2;
 

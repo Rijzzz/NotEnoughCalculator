@@ -33,12 +33,15 @@ public class SkyblockItemListAdapter implements SearchFieldAdapter {
     private Object getSearchBox() {
         try {
             Class<?> clazz = Class.forName(TARGET_CLASS);
-            Object companion = clazz.getField("Companion").get(null);
-            Method getInstanceMethod = companion.getClass().getMethod("getInstance");
-            Object instance = getInstanceMethod.invoke(companion);
-            if (instance != null) {
-                Method getSearchBoxMethod = instance.getClass().getMethod("getSearchBox");
-                return getSearchBoxMethod.invoke(instance);
+            Object instanceField = clazz.getField("INSTANCE").get(null);
+            if (instanceField != null) {
+                Method getInstanceMethod = instanceField.getClass().getMethod("getInstance");
+                Object itemPanel = getInstanceMethod.invoke(instanceField);
+                if (itemPanel != null) {
+                    java.lang.reflect.Field searchBoxField = itemPanel.getClass().getDeclaredField("searchBox");
+                    searchBoxField.setAccessible(true);
+                    return searchBoxField.get(itemPanel);
+                }
             }
         } catch (Throwable e) {
             LOGGER.debug("Failed to obtain ItemList searchBox via reflection: {}", e.getMessage());
@@ -134,10 +137,12 @@ public class SkyblockItemListAdapter implements SearchFieldAdapter {
                 int y = (int) box.getClass().getMethod("getY").invoke(box);
                 int w = (int) box.getClass().getMethod("getWidth").invoke(box);
                 int h = (int) box.getClass().getMethod("getHeight").invoke(box);
-                return new CalculatorBounds(x, y, w, h);
+                if (w > 0 && h > 0) {
+                    return new CalculatorBounds(x, y, w, h);
+                }
             } catch (Throwable ignored) {}
         }
-        return new CalculatorBounds(0, 0, 150, 16);
+        return null;
     }
 
     @Override

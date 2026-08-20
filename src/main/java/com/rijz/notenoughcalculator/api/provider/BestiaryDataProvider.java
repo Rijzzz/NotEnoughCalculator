@@ -38,8 +38,6 @@ public class BestiaryDataProvider {
             Class<?> tabWidgetClass = Class.forName("tech.thatgravyboat.skyblockapi.api.events.info.TabWidget");
             Object bestiaryEnum = Enum.valueOf((Class<Enum>) tabWidgetClass, "BESTIARY");
             Method getCurrentLinesMethod = tabWidgetClass.getMethod("getCurrentLines");
-
-            @SuppressWarnings("unchecked")
             List<String> lines = (List<String>) getCurrentLinesMethod.invoke(bestiaryEnum);
 
             if (lines != null) {

@@ -65,7 +65,9 @@ public class CalculatorOverlayRenderer {
                 }
 
                 REIOverlayRenderer.render(context, overlay, searchField, searchText, mc.font, calcManager);
-            } else {
+            } else if (IntegrationManager.isItemListLoaded()) {
+                return;
+            } else if (IntegrationManager.isStandaloneActive()) {
                 SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
                 if (adapter == null) return;
 

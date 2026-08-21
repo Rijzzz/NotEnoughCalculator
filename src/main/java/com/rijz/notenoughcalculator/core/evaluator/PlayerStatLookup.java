@@ -21,9 +21,11 @@ package com.rijz.notenoughcalculator.core.evaluator;
 import com.rijz.notenoughcalculator.api.provider.BestiaryDataProvider;
 import com.rijz.notenoughcalculator.api.provider.CurrencyDataProvider;
 import com.rijz.notenoughcalculator.api.provider.EssenceDataProvider;
+import com.rijz.notenoughcalculator.api.provider.HotfDataProvider;
+import com.rijz.notenoughcalculator.api.provider.HotmDataProvider;
 import com.rijz.notenoughcalculator.api.provider.MaxwellDataProvider;
 import com.rijz.notenoughcalculator.api.provider.PetDataProvider;
-import com.rijz.notenoughcalculator.api.provider.PlayerStatsProvider;
+import com.rijz.notenoughcalculator.api.provider.PlayerStatsDataProvider;
 import com.rijz.notenoughcalculator.api.provider.PowderDataProvider;
 import com.rijz.notenoughcalculator.api.provider.SkillDataProvider;
 import com.rijz.notenoughcalculator.api.provider.SlayerDataProvider;
@@ -78,14 +80,14 @@ public class PlayerStatLookup {
             case "sblvl":
             case "sb":
             case "skyblocklevel":
-                return PlayerStatsProvider.getSkyBlockLevel();
+                return PlayerStatsDataProvider.getSkyBlockLevel();
             case "sblevelprogress":
             case "sbprog":
             case "sblevelprog":
-                return PlayerStatsProvider.getSkyBlockLevelProgress();
+                return PlayerStatsDataProvider.getSkyBlockLevelProgress();
             case "rep":
             case "reputation":
-                return PlayerStatsProvider.getReputation();
+                return PlayerStatsDataProvider.getReputation();
 
             case "mithrilpowder":
             case "mithril":
@@ -116,33 +118,49 @@ public class PlayerStatLookup {
                 return PowderDataProvider.getTotalGlacite();
             case "hotm":
             case "hotmtier":
-                return PowderDataProvider.getHotmTier();
+                return HotmDataProvider.getHotmTier();
             case "hotmtokens":
             case "tokens":
-                return PowderDataProvider.getHotmTokens();
+                return HotmDataProvider.getHotmTokens();
+
+            case "hotf":
+            case "hotftier":
+            case "htier":
+                return HotfDataProvider.getHotfTier();
+            case "hotftokens":
+            case "htokens":
+                return HotfDataProvider.getHotfTokens();
+            case "whispers":
+            case "whisper":
+            case "whisp":
+            case "forestwhispers":
+                return HotfDataProvider.getForestWhispers();
+            case "desertwhispers":
+            case "dwhispers":
+                return HotfDataProvider.getDesertWhispers();
 
             case "cata":
             case "catacombs":
             case "catacombslevel":
             case "catalvl":
-                return PlayerStatsProvider.getCatacombsLevel();
+                return PlayerStatsDataProvider.getCatacombsLevel();
             case "cataxp":
             case "cxp":
             case "catacombsxp":
-                return PlayerStatsProvider.getCatacombsXp();
+                return PlayerStatsDataProvider.getCatacombsXp();
             case "secrets":
             case "sec":
             case "secretcount":
-                return PlayerStatsProvider.getSecrets();
+                return PlayerStatsDataProvider.getSecrets();
             case "classlevel":
             case "classlvl":
             case "dclass":
             case "dungeonclass":
-                return PlayerStatsProvider.getClassLevel();
+                return PlayerStatsDataProvider.getClassLevel();
             case "partysize":
             case "party":
             case "dungeonparty":
-                return PlayerStatsProvider.getDungeonPartySize();
+                return PlayerStatsDataProvider.getDungeonPartySize();
 
             case "witheressence":
             case "wither":
@@ -228,37 +246,37 @@ public class PlayerStatLookup {
 
             case "hp":
             case "health":
-                return PlayerStatsProvider.getHealth();
+                return PlayerStatsDataProvider.getHealth();
             case "maxhp":
             case "maxhealth":
-                return PlayerStatsProvider.getMaxHealth();
+                return PlayerStatsDataProvider.getMaxHealth();
             case "def":
             case "defense":
-                return PlayerStatsProvider.getDefense();
+                return PlayerStatsDataProvider.getDefense();
             case "mana":
             case "intel":
             case "intelligence":
-                return PlayerStatsProvider.getMana();
+                return PlayerStatsDataProvider.getMana();
             case "maxmana":
             case "mmana":
             case "maxintel":
-                return PlayerStatsProvider.getMaxMana();
+                return PlayerStatsDataProvider.getMaxMana();
             case "overflowmana":
             case "ofmana":
-                return PlayerStatsProvider.getOverflowMana();
+                return PlayerStatsDataProvider.getOverflowMana();
             case "vit":
             case "vitality":
-                return PlayerStatsProvider.getVitality();
+                return PlayerStatsDataProvider.getVitality();
             case "maxvitality":
             case "mvit":
-                return PlayerStatsProvider.getMaxVitality();
+                return PlayerStatsDataProvider.getMaxVitality();
             case "spd":
             case "speed":
-                return PlayerStatsProvider.getSpeed();
+                return PlayerStatsDataProvider.getSpeed();
             case "xplevel":
             case "xplvl":
             case "xp":
-                return PlayerStatsProvider.getXpLevel();
+                return PlayerStatsDataProvider.getXpLevel();
 
             case "farming":
             case "farminglvl":
@@ -337,6 +355,13 @@ public class PlayerStatLookup {
             case "socialxp":
             case "socxp":
                 return SkillDataProvider.getSocialXp();
+            case "hunting":
+            case "huntinglvl":
+            case "hunt":
+                return SkillDataProvider.getHuntingLevel();
+            case "huntingxp":
+            case "huntxp":
+                return SkillDataProvider.getHuntingXp();
 
             case "zombieslayer":
             case "zombieslayerxp":

@@ -19,21 +19,10 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
-import com.rijz.notenoughcalculator.api.provider.BestiaryDataProvider;
-import com.rijz.notenoughcalculator.api.provider.CurrencyDataProvider;
-import com.rijz.notenoughcalculator.api.provider.EssenceDataProvider;
-import com.rijz.notenoughcalculator.api.provider.MarketDataProvider;
-import com.rijz.notenoughcalculator.api.provider.MaxwellDataProvider;
-import com.rijz.notenoughcalculator.api.provider.PetDataProvider;
-import com.rijz.notenoughcalculator.api.provider.PlayerStatsProvider;
-import com.rijz.notenoughcalculator.api.provider.PowderDataProvider;
-import com.rijz.notenoughcalculator.api.provider.SackDataProvider;
-import com.rijz.notenoughcalculator.api.provider.SkillDataProvider;
-import com.rijz.notenoughcalculator.api.provider.SlayerDataProvider;
-import com.rijz.notenoughcalculator.api.provider.TrophyFishDataProvider;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ApiProvidersTest {
 
@@ -66,8 +55,6 @@ class ApiProvidersTest {
         assertNull(PowderDataProvider.getTotalMithril());
         assertNull(PowderDataProvider.getTotalGemstone());
         assertNull(PowderDataProvider.getTotalGlacite());
-        assertNull(PowderDataProvider.getHotmTier());
-        assertNull(PowderDataProvider.getHotmTokens());
     }
 
     @Test
@@ -76,22 +63,22 @@ class ApiProvidersTest {
     }
 
     @Test
-    void testPlayerStatsProviderSafety() {
-        assertNull(PlayerStatsProvider.getHealth());
-        assertNull(PlayerStatsProvider.getMaxHealth());
-        assertNull(PlayerStatsProvider.getDefense());
-        assertNull(PlayerStatsProvider.getMana());
-        assertNull(PlayerStatsProvider.getMaxMana());
-        assertNull(PlayerStatsProvider.getOverflowMana());
-        assertNull(PlayerStatsProvider.getVitality());
-        assertNull(PlayerStatsProvider.getMaxVitality());
-        assertNull(PlayerStatsProvider.getSkyBlockLevel());
-        assertNull(PlayerStatsProvider.getSkyBlockLevelProgress());
-        assertNull(PlayerStatsProvider.getReputation());
-        assertNull(PlayerStatsProvider.getSpeed());
-        assertNull(PlayerStatsProvider.getClassLevel());
-        assertNull(PlayerStatsProvider.getDungeonPartySize());
-        assertNull(PlayerStatsProvider.getXpLevel());
+    void testPlayerStatsDataProviderSafety() {
+        assertNull(PlayerStatsDataProvider.getHealth());
+        assertNull(PlayerStatsDataProvider.getMaxHealth());
+        assertNull(PlayerStatsDataProvider.getDefense());
+        assertNull(PlayerStatsDataProvider.getMana());
+        assertNull(PlayerStatsDataProvider.getMaxMana());
+        assertNull(PlayerStatsDataProvider.getOverflowMana());
+        assertNull(PlayerStatsDataProvider.getVitality());
+        assertNull(PlayerStatsDataProvider.getMaxVitality());
+        assertNull(PlayerStatsDataProvider.getSkyBlockLevel());
+        assertNull(PlayerStatsDataProvider.getSkyBlockLevelProgress());
+        assertNull(PlayerStatsDataProvider.getReputation());
+        assertNull(PlayerStatsDataProvider.getSpeed());
+        assertNull(PlayerStatsDataProvider.getClassLevel());
+        assertNull(PlayerStatsDataProvider.getDungeonPartySize());
+        assertNull(PlayerStatsDataProvider.getXpLevel());
     }
 
     @Test
@@ -118,6 +105,8 @@ class ApiProvidersTest {
         assertNull(SkillDataProvider.getRunecraftingXp());
         assertNull(SkillDataProvider.getSocialLevel());
         assertNull(SkillDataProvider.getSocialXp());
+        assertNull(SkillDataProvider.getHuntingLevel());
+        assertNull(SkillDataProvider.getHuntingXp());
     }
 
     @Test
@@ -174,8 +163,26 @@ class ApiProvidersTest {
         assertNull(TrophyFishDataProvider.getSilverTrophyCount());
         assertNull(TrophyFishDataProvider.getBronzeTrophyCount());
 
-        assertNull(PlayerStatsProvider.getCatacombsLevel());
-        assertNull(PlayerStatsProvider.getCatacombsXp());
-        assertNull(PlayerStatsProvider.getSecrets());
+        assertNull(PlayerStatsDataProvider.getCatacombsLevel());
+        assertNull(PlayerStatsDataProvider.getCatacombsXp());
+        assertNull(PlayerStatsDataProvider.getSecrets());
+    }
+
+    @Test
+    void testHotmDataProviderSafety() {
+        assertNull(HotmDataProvider.getHotmTier());
+        assertNull(HotmDataProvider.getHotmTokens());
+        assertNull(HotmDataProvider.getPerkLevel("mining_speed"));
+        assertNull(HotmDataProvider.getPerkLevel(null));
+    }
+
+    @Test
+    void testHotfDataProviderSafety() {
+        assertNull(HotfDataProvider.getHotfTier());
+        assertNull(HotfDataProvider.getHotfTokens());
+        assertNull(HotfDataProvider.getForestWhispers());
+        assertNull(HotfDataProvider.getDesertWhispers());
+        assertNull(HotfDataProvider.getPerkLevel("foraging_speed"));
+        assertNull(HotfDataProvider.getPerkLevel(null));
     }
 }

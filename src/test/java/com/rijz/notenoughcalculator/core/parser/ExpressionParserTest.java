@@ -18,7 +18,7 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
-import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,7 +61,7 @@ class ExpressionParserTest {
         ParseResult result = parser.parse(tokens);
         assertNotNull(result);
         assertEquals(0, new BigDecimal("255").compareTo(result.value));
-        assertEquals(ExpressionEvaluator.RadixMode.HEX, result.radixMode);
+        assertEquals(RadixMode.HEX, result.radixMode);
     }
 
     @Test

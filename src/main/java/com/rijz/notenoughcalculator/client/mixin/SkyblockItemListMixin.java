@@ -20,7 +20,7 @@ package com.rijz.notenoughcalculator.client.mixin;
 
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import kotlin.Pair;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,16 +36,16 @@ public class SkyblockItemListMixin {
     @Inject(method = "isExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void onIsExpression(String text, CallbackInfoReturnable<Boolean> cir) {
         if (CalculatorConfig.getInstance().enableItemListIntegration) {
-            boolean isExpr = NotEnoughCalculatorClient.getCalculatorManager().looksLikeCalculation(text);
-            cir.setReturnValue(isExpr);
+            // Return false so SkyBlock Item List does not draw its basic native yellow text.
+            // StandaloneOverlayRenderer will render mostly everything
+            cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "isExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void onIsExpressionStatic(String text, CallbackInfoReturnable<Boolean> cir) {
         if (CalculatorConfig.getInstance().enableItemListIntegration) {
-            boolean isExpr = NotEnoughCalculatorClient.getCalculatorManager().looksLikeCalculation(text);
-            cir.setReturnValue(isExpr);
+            cir.setReturnValue(false);
         }
     }
 
@@ -65,8 +65,11 @@ public class SkyblockItemListMixin {
 
     private static void handleCalculateExpression(String text, CallbackInfoReturnable<Pair<String, Boolean>> cir) {
         try {
-            NotEnoughCalculatorClient.getCalculatorManager().calculateResult(text);
-            Pair<String, Boolean> pair = new Pair<>("", true);
+            String cleanInput = ResultFormatter.cleanInput(text);
+            EvalResult evalResult = NotEnoughCalculatorClient.getCalculatorManager().getEvaluator()
+                    .evaluateQuietResult(cleanInput);
+            String formatted = ResultFormatter.formatResult(evalResult);
+            Pair<String, Boolean> pair = new Pair<>(formatted != null ? formatted : "", true);
             cir.setReturnValue(pair);
         } catch (Exception e) {
             boolean isExplicit = text != null && text.trim().startsWith("=");

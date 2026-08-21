@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.core.parser;
 
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public class ExpressionTokenizer {
 
-    public static List<Token> tokenize(String expr, BigDecimal lastAnswer) throws ExpressionEvaluator.EvalException {
+    public static List<Token> tokenize(String expr, BigDecimal lastAnswer) throws EvalException {
         List<Token> tokens = new ArrayList<>();
         int i = 0;
 
@@ -92,7 +93,7 @@ public class ExpressionTokenizer {
                             BigInteger bigInt = new BigInteger(rawVal, radix);
                             parsedVal = new BigDecimal(bigInt);
                         } catch (NumberFormatException e) {
-                            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
+                            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
                         }
                     }
 
@@ -125,14 +126,14 @@ public class ExpressionTokenizer {
 
                 String numStr = num.toString();
                 if (numStr.equals(".") || numStr.isEmpty()) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
                 }
 
                 Token tok = new Token(TokenKind.NUM, numStr, start);
                 try {
                     tok.number = new BigDecimal(numStr);
                 } catch (NumberFormatException e) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
                 }
                 tokens.add(tok);
                 continue;
@@ -287,7 +288,7 @@ public class ExpressionTokenizer {
                 continue;
             }
 
-            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_character", c), i);
+            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_character", c), i);
         }
 
         tokens.add(new Token(TokenKind.EOF, "", expr.length()));

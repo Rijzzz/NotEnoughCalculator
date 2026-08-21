@@ -21,7 +21,6 @@ package com.rijz.notenoughcalculator.api.provider;
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 
 import tech.thatgravyboat.skyblockapi.api.profile.skillxp.SkillExpAPI;
-import tech.thatgravyboat.skyblockapi.api.remote.hypixel.HypixelSkillAPI;
 import tech.thatgravyboat.skyblockapi.api.remote.hypixel.HypixelSkillAPI.Skill;
 
 import java.math.BigDecimal;
@@ -88,4 +87,7 @@ public class SkillDataProvider {
 
     public static BigDecimal getSocialLevel() { return getSkillLevel(Skill.SOCIAL); }
     public static BigDecimal getSocialXp() { return getSkillXpAmount(Skill.SOCIAL); }
+
+    public static BigDecimal getHuntingLevel() { return getSkillLevel(Skill.HUNTING); }
+    public static BigDecimal getHuntingXp() { return getSkillXpAmount(Skill.HUNTING); }
 }

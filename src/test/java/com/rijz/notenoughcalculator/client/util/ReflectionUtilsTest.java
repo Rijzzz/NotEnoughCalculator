@@ -27,10 +27,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReflectionUtilsTest {
 
+    @SuppressWarnings("unused")
     static class DummyParent {
         private String parentField = "parent";
     }
 
+    @SuppressWarnings("unused")
     static class DummyChild extends DummyParent {
         private int childField = 42;
     }
@@ -48,5 +50,52 @@ public class ReflectionUtilsTest {
 
         Field fNotFound = ReflectionUtils.findFieldInHierarchy(DummyChild.class, "nonExistent");
         assertNull(fNotFound);
+    }
+
+    @Test
+    @DisplayName("Null safety for reflection methods")
+    void testNullSafety() {
+        assertEquals(0, ReflectionUtils.getCursorPosition(null));
+        assertEquals(0, ReflectionUtils.getSelectionEnd(null));
+        assertDoesNotThrow(() -> ReflectionUtils.clampSearchField(null));
+        assertTrue(ReflectionUtils.isNoSelection(null));
+    }
+
+    static class DummyBox {
+        int cursor = 5;
+        int selectionEnd = 10;
+        String text = "hello";
+
+        public String getText() {
+            return text;
+        }
+
+        public int getCursorPosition() {
+            return cursor;
+        }
+
+        public int getSelectionEnd() {
+            return selectionEnd;
+        }
+
+        public void setCursorPosition(int pos) {
+            this.cursor = pos;
+        }
+
+        public void setSelectionEnd(int pos) {
+            this.selectionEnd = pos;
+        }
+    }
+
+    @Test
+    @DisplayName("Test cursor, selection, and clamping on mock search box")
+    void testMockSearchBox() {
+        DummyBox box = new DummyBox();
+        assertEquals(5, ReflectionUtils.getCursorPosition(box));
+        assertEquals(10, ReflectionUtils.getSelectionEnd(box));
+
+        // text length is 5, selectionEnd is 10 (out of bounds) -> clamp should fix it to 5
+        ReflectionUtils.clampSearchField(box);
+        assertEquals(5, box.selectionEnd);
     }
 }

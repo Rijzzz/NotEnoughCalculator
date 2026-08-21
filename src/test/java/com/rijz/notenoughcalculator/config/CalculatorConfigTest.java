@@ -58,11 +58,21 @@ class CalculatorConfigTest {
         config.bazaarFlipperLevel = 2;
         assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
 
-        // Clamping for out of range levels
         config.bazaarFlipperLevel = 99;
         assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
 
         config.bazaarFlipperLevel = -5;
         assertEquals(1.25, config.getBazaarTaxRate(), 0.001);
+    }
+
+    @Test
+    void testResultColorCodes() {
+        config.enableSyntaxHighlighting = true;
+        assertEquals("§1", config.getResultColorCode());
+        assertEquals("§1", config.getChatResultColorCode());
+
+        config.enableSyntaxHighlighting = false;
+        assertEquals("§f", config.getResultColorCode());
+        assertEquals("§f", config.getChatResultColorCode());
     }
 }

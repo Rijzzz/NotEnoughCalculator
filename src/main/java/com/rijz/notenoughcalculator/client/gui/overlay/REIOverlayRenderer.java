@@ -20,15 +20,14 @@ package com.rijz.notenoughcalculator.client.gui.overlay;
 
 import com.rijz.notenoughcalculator.client.CalculatorManager;
 import com.rijz.notenoughcalculator.client.util.REIHelper;
-import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ResultFormatter;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.resources.language.I18n;
 import org.joml.Matrix3x2fStack;
 
 import java.lang.reflect.Method;
@@ -36,7 +35,7 @@ import java.lang.reflect.Method;
 public class REIOverlayRenderer {
 
     public static void render(GuiGraphicsExtractor context, ScreenOverlay overlay, TextField searchField,
-                              String searchText, Font font, CalculatorManager calcManager) {
+            String searchText, Font font, CalculatorManager calcManager) {
         Rectangle overlayBounds = overlay.getBounds();
         Rectangle searchBounds = REIHelper.getSearchFieldBounds(searchField);
 
@@ -45,47 +44,51 @@ public class REIOverlayRenderer {
                     overlayBounds.x + 2,
                     overlayBounds.getMaxY() - 18,
                     overlayBounds.width - 4,
-                    18
-            );
+                    18);
         }
 
-        ReflectionUtils.clampSearchField(searchField);
+        REIHelper.clampSearchField(searchField);
 
         Matrix3x2fStack pose = context.pose();
         pose.pushMatrix();
 
         boolean isFocused = isFieldFocused(searchField);
-        drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(), isFocused);
+        drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(),
+                isFocused);
 
         int innerWidth = searchBounds.width - 8;
-        int cursorPos = ReflectionUtils.getCursorPosition(searchField);
-        String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length())) : "";
+        int cursorPos = REIHelper.getCursorPosition(searchField);
+        String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length()))
+                : "";
         int cursorXOffset = font.width(textBeforeCursor);
 
         int scrollOffset = cursorXOffset > innerWidth - 10 ? cursorXOffset - innerWidth + 10 : 0;
         int textX = searchBounds.x + 4 - scrollOffset;
         int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
-        int selectionEnd = ReflectionUtils.getSelectionEnd(searchField);
+        int selectionEnd = REIHelper.getSelectionEnd(searchField);
         int selectionStart = Math.min(cursorPos, selectionEnd);
         int selectionEndPos = Math.max(cursorPos, selectionEnd);
         boolean hasSelection = selectionStart != selectionEndPos;
 
-        CalculatorOverlayRenderer.enableScissor(context, searchBounds.x + 2, searchBounds.y + 1, searchBounds.getMaxX() - 2, searchBounds.getMaxY() - 1);
+        CalculatorOverlayRenderer.enableScissor(context, searchBounds.x + 2, searchBounds.y + 1,
+                searchBounds.getMaxX() - 2, searchBounds.getMaxY() - 1);
 
         if (hasSelection) {
             drawTextWithSelection(context, font, searchText, textX, textY, selectionStart, selectionEndPos);
         } else {
-            String renderText = (CalculatorConfig.getInstance().enableSyntaxHighlighting && CalculatorManager.looksLikeCalculation(searchText))
-                    ? SyntaxHighlighter.highlight(searchText)
-                    : searchText;
+            String renderText = (CalculatorConfig.getInstance().enableSyntaxHighlighting
+                    && CalculatorManager.looksLikeCalculation(searchText))
+                            ? SyntaxHighlighter.highlight(searchText)
+                            : searchText;
             context.text(font, renderText, textX, textY, 0xFFFFFFFF, true);
         }
 
         boolean resultFitsInline = false;
-        if (calcManager.hasResult()) {
+        boolean showInline = CalculatorConfig.getInstance().showInlineResults;
+        if (calcManager.hasResult() && showInline) {
             String result = calcManager.getLastFormattedResult();
-            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+            String resultDisplay = ResultFormatter.getEqualsSign() +
                     CalculatorConfig.getInstance().getResultColorCode() + result;
             int queryWidth = font.width(searchText);
             int resultX = textX + queryWidth;
@@ -98,12 +101,13 @@ public class REIOverlayRenderer {
         }
 
         if (!hasSelection && isFocused) {
-            drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2, searchBounds.getMaxX() - 3);
+            drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2,
+                    searchBounds.getMaxX() - 3);
         }
 
         CalculatorOverlayRenderer.disableScissor(context);
 
-        if (calcManager.hasResult() && !resultFitsInline) {
+        if (calcManager.hasResult() && !resultFitsInline && showInline) {
             renderFloatingResultBox(context, overlayBounds.x, overlayBounds.getMaxX(), searchBounds.x, searchBounds.y,
                     overlayBounds.width, font, calcManager.getLastFormattedResult());
         }
@@ -112,8 +116,8 @@ public class REIOverlayRenderer {
     }
 
     private static void renderFloatingResultBox(GuiGraphicsExtractor context, int minOverlayX, int maxOverlayX,
-                                                 int searchX, int searchY, int overlayWidth, Font font, String result) {
-        String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+            int searchX, int searchY, int overlayWidth, Font font, String result) {
+        String resultDisplay = ResultFormatter.getEqualsSign() +
                 CalculatorConfig.getInstance().getResultColorCode() + result;
 
         int aboveY = searchY - 14;
@@ -140,14 +144,16 @@ public class REIOverlayRenderer {
 
         context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
 
-        CalculatorOverlayRenderer.enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2);
+        CalculatorOverlayRenderer.enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth,
+                aboveY + bgHeight - 2);
         context.text(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
         CalculatorOverlayRenderer.disableScissor(context);
     }
 
     private static void drawTextWithSelection(GuiGraphicsExtractor context, Font font,
-                                               String text, int x, int y, int selStart, int selEnd) {
-        if (text == null || text.isEmpty()) return;
+            String text, int x, int y, int selStart, int selEnd) {
+        if (text == null || text.isEmpty())
+            return;
 
         int len = text.length();
         selStart = Math.min(Math.max(0, selStart), len);
@@ -182,28 +188,32 @@ public class REIOverlayRenderer {
     }
 
     private static boolean isFieldFocused(TextField searchField) {
-        if (searchField == null) return false;
+        if (searchField == null)
+            return false;
         try {
             return searchField.isFocused();
         } catch (Throwable e) {
             try {
                 Method m = searchField.getClass().getMethod("isFocused");
                 return (boolean) m.invoke(searchField);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
         return true;
     }
 
-    private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY, boolean isFocused) {
+    private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY,
+            boolean isFocused) {
         int borderColor = isFocused ? 0xFFFFFFFF : 0xFF8B8B8B;
         context.fill(minX, minY, maxX, maxY, borderColor);
         context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, 0xFF000000);
     }
 
     private static void drawCursor(GuiGraphicsExtractor context, String text, Font font, int textX, int textY,
-                                   int cursorPos, int minX, int maxX) {
+            int cursorPos, int minX, int maxX) {
         try {
-            if (text == null) text = "";
+            if (text == null)
+                text = "";
             int len = text.length();
             cursorPos = Math.min(Math.max(0, cursorPos), len);
 
@@ -217,8 +227,7 @@ public class REIOverlayRenderer {
                     context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }
-
-

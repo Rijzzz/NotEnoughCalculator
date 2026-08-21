@@ -23,6 +23,7 @@ import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.client.gui.tab.SettingsTab;
 import com.rijz.notenoughcalculator.client.gui.tab.VariablesTab;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
+import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.Minecraft;
@@ -60,9 +61,6 @@ public class CalculatorConfigScreen extends Screen {
 
     private Button settingsTabBtn;
     private Button variablesTabBtn;
-
-    private Button saveBtn;
-    private Button cancelBtn;
 
     private final SettingsTab settingsTab = new SettingsTab();
     private final VariablesTab variablesTab = new VariablesTab();
@@ -146,14 +144,14 @@ public class CalculatorConfigScreen extends Screen {
         int gap = 10;
         int saveWidth = (buttonWidth - gap) / 2;
 
-        saveBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.save"), btn -> {
+        addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.save"), btn -> {
             saveConfig();
             closeScreen();
         }).bounds(panelX + 20, bottomY, saveWidth, 18)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.save")))
                 .build());
 
-        cancelBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.cancel"), btn -> {
+        addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.cancel"), btn -> {
             closeScreen();
         }).bounds(panelX + 20 + saveWidth + gap, bottomY, saveWidth, 18)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.cancel")))
@@ -252,6 +250,10 @@ public class CalculatorConfigScreen extends Screen {
         config.customVariables.putAll(this.workingCustomVariables);
         config.save();
         NotEnoughCalculatorClient.getCalculatorManager().reloadCustomVariables();
+        SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
+        if (adapter != null) {
+            NotEnoughCalculatorClient.getCalculatorManager().formatSearchBar(adapter.getText());
+        }
     }
 
     public static void openScreen(Minecraft minecraft, Screen screen) {

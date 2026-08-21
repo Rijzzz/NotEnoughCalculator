@@ -19,7 +19,6 @@
 package com.rijz.notenoughcalculator.client.integration;
 
 import com.rijz.notenoughcalculator.client.util.REIHelper;
-import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
@@ -49,7 +48,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
                     searchField.setText(text != null ? text : "");
-                    ReflectionUtils.clampSearchField(searchField);
+                    REIHelper.clampSearchField(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -89,7 +88,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    return ReflectionUtils.getCursorPosition(searchField);
+                    return REIHelper.getCursorPosition(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -103,7 +102,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    return ReflectionUtils.getSelectionEnd(searchField);
+                    return REIHelper.getSelectionEnd(searchField);
                 }
             }
         } catch (Exception ignored) {}
@@ -117,7 +116,7 @@ public class REISearchAdapter implements SearchFieldAdapter {
             if (runtime != null) {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField != null) {
-                    ReflectionUtils.clampSearchField(searchField);
+                    REIHelper.clampSearchField(searchField);
                 }
             }
         } catch (Exception ignored) {}

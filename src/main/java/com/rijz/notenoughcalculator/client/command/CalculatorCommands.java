@@ -25,7 +25,8 @@ import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
@@ -65,22 +66,22 @@ public class CalculatorCommands {
 
         String prefix = t("notenoughcalculator.result.prefix").getString();
         try {
-            ExpressionEvaluator.EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
+            EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
             String formatted = ResultFormatter.formatResultWithUnits(evalRes);
-            String fullEquation = expr + " = " + formatted;
-            String highlightedExpr = SyntaxHighlighter.highlight(expr);
+            String copyText = config.enableFullEquationCopy ? (expr + " = " + formatted) : formatted;
+            String highlightedExpr = config.enableSyntaxHighlighting ? SyntaxHighlighter.highlight(expr) : "§f" + expr;
 
-            MutableComponent msg = Component.literal(prefix + highlightedExpr + " " +
-                    t("notenoughcalculator.result.equals").getString() +
+            MutableComponent msg = Component.literal(prefix + highlightedExpr +
+                    ResultFormatter.getEqualsSign() +
                     config.getChatResultColorCode() + formatted);
 
             Component tooltip = t("notenoughcalculator.chat.click_to_copy_tooltip");
             msg.setStyle(msg.getStyle()
-                    .withClickEvent(new ClickEvent.RunCommand("/calccopy " + fullEquation))
+                    .withClickEvent(new ClickEvent.RunCommand("/calccopy " + copyText))
                     .withHoverEvent(new HoverEvent.ShowText(tooltip)));
 
             ctx.getSource().getPlayer().sendSystemMessage(msg);
-        } catch (ExpressionEvaluator.EvalException e) {
+        } catch (EvalException e) {
             sendLiteral(ctx, prefix + config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
         }
@@ -139,9 +140,9 @@ public class CalculatorCommands {
             String formatted = ResultFormatter.formatWithUnits(result);
 
             send(ctx, "notenoughcalculator.variable.set", varName,
-                    t("notenoughcalculator.result.equals").getString(),
+                    ResultFormatter.getEqualsSign(),
                     config.getChatResultColorCode() + formatted);
-        } catch (ExpressionEvaluator.EvalException e) {
+        } catch (EvalException e) {
             sendLiteral(ctx, config.getErrorColorCode() +
                     t("notenoughcalculator.result.error_prefix").getString() + e.getMessage());
         }

@@ -119,19 +119,19 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return SyntaxHighlighter.COLOR_NUMBER;
+        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : "§f";
     }
 
     public String getChatResultColorCode() {
-        return SyntaxHighlighter.COLOR_CHAT_RESULT;
+        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : "§f";
     }
 
     public String getErrorColorCode() {
-        return SyntaxHighlighter.COLOR_ERROR;
+        return SyntaxHighlighter.getColorError();
     }
 
     public String getOperatorColorCode() {
-        return SyntaxHighlighter.COLOR_OP;
+        return SyntaxHighlighter.getColorOp();
     }
 
     public double getBazaarTaxRate() {

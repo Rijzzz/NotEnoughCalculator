@@ -39,9 +39,13 @@ public class PlayerStatLookup {
         switch (name) {
             case "purse":
             case "p":
+            case "coins":
+            case "coin":
+            case "money":
                 return CurrencyDataProvider.getPurse();
             case "bank":
             case "b":
+            case "bankcoins":
                 return CurrencyDataProvider.getBank();
             case "personalbank":
             case "pbank":
@@ -51,9 +55,11 @@ public class PlayerStatLookup {
                 return CurrencyDataProvider.getCoopBank();
             case "bits":
             case "bt":
+            case "bit":
                 return CurrencyDataProvider.getBits();
             case "motes":
             case "mt":
+            case "mote":
                 return CurrencyDataProvider.getMotes();
             case "copper":
             case "cop":
@@ -63,10 +69,14 @@ public class PlayerStatLookup {
                 return CurrencyDataProvider.getSowdust();
             case "kernels":
             case "kern":
+            case "kernel":
                 return CurrencyDataProvider.getKernels();
             case "northstars":
             case "nstars":
             case "ns":
+            case "northstar":
+            case "star":
+            case "stars":
                 return CurrencyDataProvider.getNorthStars();
             case "gems":
             case "gem":
@@ -80,10 +90,14 @@ public class PlayerStatLookup {
             case "sblvl":
             case "sb":
             case "skyblocklevel":
+            case "sblev":
+            case "level":
                 return PlayerStatsDataProvider.getSkyBlockLevel();
             case "sblevelprogress":
             case "sbprog":
             case "sblevelprog":
+            case "levelprogress":
+            case "levelprog":
                 return PlayerStatsDataProvider.getSkyBlockLevelProgress();
             case "rep":
             case "reputation":
@@ -92,35 +106,44 @@ public class PlayerStatLookup {
             case "mithrilpowder":
             case "mithril":
             case "mpowder":
+            case "mith":
+            case "mpowd":
                 return PowderDataProvider.getMithril();
             case "gemstonepowder":
             case "gemstone":
             case "gpowder":
+            case "gpowd":
                 return PowderDataProvider.getGemstone();
             case "glacitepowder":
             case "glacite":
             case "glpowder":
+            case "glac":
+            case "glpowd":
                 return PowderDataProvider.getGlacite();
             case "totalmithrilpowder":
             case "totalmithril":
             case "totmithril":
             case "totmpowder":
+            case "totmith":
                 return PowderDataProvider.getTotalMithril();
             case "totalgemstonepowder":
             case "totalgemstone":
             case "totgemstone":
             case "totgpowder":
+            case "totgem":
                 return PowderDataProvider.getTotalGemstone();
             case "totalglacitepowder":
             case "totalglacite":
             case "totglacite":
             case "totglpowder":
+            case "totglac":
                 return PowderDataProvider.getTotalGlacite();
             case "hotm":
             case "hotmtier":
                 return HotmDataProvider.getHotmTier();
             case "hotmtokens":
             case "tokens":
+            case "token":
                 return HotmDataProvider.getHotmTokens();
 
             case "hotf":
@@ -129,14 +152,18 @@ public class PlayerStatLookup {
                 return HotfDataProvider.getHotfTier();
             case "hotftokens":
             case "htokens":
+            case "htoken":
                 return HotfDataProvider.getHotfTokens();
             case "whispers":
             case "whisper":
             case "whisp":
             case "forestwhispers":
+            case "fwhispers":
+            case "fwhisper":
                 return HotfDataProvider.getForestWhispers();
             case "desertwhispers":
             case "dwhispers":
+            case "dwhisper":
                 return HotfDataProvider.getDesertWhispers();
 
             case "cata":
@@ -151,6 +178,7 @@ public class PlayerStatLookup {
             case "secrets":
             case "sec":
             case "secretcount":
+            case "secret":
                 return PlayerStatsDataProvider.getSecrets();
             case "classlevel":
             case "classlvl":
@@ -242,6 +270,7 @@ public class PlayerStatLookup {
             case "mp":
             case "magicalpower":
             case "accessorypower":
+            case "power":
                 return MaxwellDataProvider.getAccessoryPower();
 
             case "hp":
@@ -249,9 +278,11 @@ public class PlayerStatLookup {
                 return PlayerStatsDataProvider.getHealth();
             case "maxhp":
             case "maxhealth":
+            case "mhp":
                 return PlayerStatsDataProvider.getMaxHealth();
             case "def":
             case "defense":
+            case "defence":
                 return PlayerStatsDataProvider.getDefense();
             case "mana":
             case "intel":
@@ -260,6 +291,7 @@ public class PlayerStatLookup {
             case "maxmana":
             case "mmana":
             case "maxintel":
+            case "maxintelligence":
                 return PlayerStatsDataProvider.getMaxMana();
             case "overflowmana":
             case "ofmana":
@@ -280,6 +312,7 @@ public class PlayerStatLookup {
 
             case "farming":
             case "farminglvl":
+            case "farmlvl":
             case "farm":
                 return SkillDataProvider.getFarmingLevel();
             case "farmingxp":
@@ -287,6 +320,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getFarmingXp();
             case "mining":
             case "mininglvl":
+            case "minelvl":
             case "mine":
                 return SkillDataProvider.getMiningLevel();
             case "miningxp":
@@ -294,6 +328,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getMiningXp();
             case "combat":
             case "combatlvl":
+            case "cmbtlvl":
             case "cmbt":
                 return SkillDataProvider.getCombatLevel();
             case "combatxp":
@@ -301,6 +336,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getCombatXp();
             case "foraging":
             case "foraginglvl":
+            case "foraglvl":
             case "forag":
                 return SkillDataProvider.getForagingLevel();
             case "foragingxp":
@@ -308,6 +344,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getForagingXp();
             case "fishing":
             case "fishinglvl":
+            case "fishlvl":
             case "fish":
                 return SkillDataProvider.getFishingLevel();
             case "fishingxp":
@@ -315,6 +352,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getFishingXp();
             case "enchanting":
             case "enchantinglvl":
+            case "enchlvl":
             case "ench":
                 return SkillDataProvider.getEnchantingLevel();
             case "enchantingxp":
@@ -322,6 +360,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getEnchantingXp();
             case "alchemy":
             case "alchemylvl":
+            case "alchlvl":
             case "alch":
                 return SkillDataProvider.getAlchemyLevel();
             case "alchemyxp":
@@ -329,6 +368,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getAlchemyXp();
             case "taming":
             case "taminglvl":
+            case "tamelvl":
             case "tame":
                 return SkillDataProvider.getTamingLevel();
             case "tamingxp":
@@ -336,6 +376,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getTamingXp();
             case "carpentry":
             case "carpentrylvl":
+            case "carplvl":
             case "carp":
                 return SkillDataProvider.getCarpentryLevel();
             case "carpentryxp":
@@ -343,6 +384,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getCarpentryXp();
             case "runecrafting":
             case "runecraftinglvl":
+            case "runelvl":
             case "rune":
                 return SkillDataProvider.getRunecraftingLevel();
             case "runecraftingxp":
@@ -350,6 +392,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getRunecraftingXp();
             case "social":
             case "sociallvl":
+            case "soclvl":
             case "soc":
                 return SkillDataProvider.getSocialLevel();
             case "socialxp":
@@ -357,6 +400,7 @@ public class PlayerStatLookup {
                 return SkillDataProvider.getSocialXp();
             case "hunting":
             case "huntinglvl":
+            case "huntlvl":
             case "hunt":
                 return SkillDataProvider.getHuntingLevel();
             case "huntingxp":
@@ -368,34 +412,49 @@ public class PlayerStatLookup {
             case "rev":
             case "revxp":
             case "revslayer":
+            case "zombie":
+            case "zombiexp":
                 return SlayerDataProvider.getZombieSlayerXp();
             case "spiderslayer":
             case "spiderslayerxp":
             case "tara":
             case "taraxp":
             case "taraslayer":
+            case "spiderxp":
+            case "taralvl":
+            case "spiderlvl":
                 return SlayerDataProvider.getSpiderSlayerXp();
             case "wolfslayer":
             case "wolfslayerxp":
             case "sven":
             case "svenxp":
             case "svenslayer":
+            case "wolf":
+            case "wolfxp":
                 return SlayerDataProvider.getWolfSlayerXp();
             case "endermanslayer":
             case "endermanslayerxp":
             case "eman":
             case "emanxp":
             case "emanslayer":
+            case "enderman":
+            case "endermanxp":
+            case "voidgloom":
+            case "voidgloomxp":
                 return SlayerDataProvider.getEndermanSlayerXp();
             case "blazeslayer":
             case "blazeslayerxp":
             case "blaze":
             case "blazexp":
+            case "inferno":
+            case "infernoxp":
                 return SlayerDataProvider.getBlazeSlayerXp();
             case "vampireslayer":
             case "vampireslayerxp":
             case "vamp":
             case "vampxp":
+            case "riftstalker":
+            case "riftstalkerxp":
                 return SlayerDataProvider.getVampireSlayerXp();
 
             default:

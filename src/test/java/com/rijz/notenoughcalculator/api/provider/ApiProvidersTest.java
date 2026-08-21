@@ -21,6 +21,7 @@ package com.rijz.notenoughcalculator.api.provider;
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -107,6 +108,8 @@ class ApiProvidersTest {
         assertNull(SkillDataProvider.getSocialXp());
         assertNull(SkillDataProvider.getHuntingLevel());
         assertNull(SkillDataProvider.getHuntingXp());
+        assertNull(SkillDataProvider.getSkillLevel(null));
+        assertNull(SkillDataProvider.getSkillXpAmount(null));
     }
 
     @Test
@@ -117,6 +120,7 @@ class ApiProvidersTest {
         assertNull(SlayerDataProvider.getEndermanSlayerXp());
         assertNull(SlayerDataProvider.getBlazeSlayerXp());
         assertNull(SlayerDataProvider.getVampireSlayerXp());
+        assertNull(SlayerDataProvider.getSlayerXp(null));
     }
 
     @Test
@@ -151,6 +155,8 @@ class ApiProvidersTest {
         assertNull(EssenceDataProvider.getDiamond());
         assertNull(EssenceDataProvider.getGold());
         assertNull(EssenceDataProvider.getCrimson());
+        assertNull(EssenceDataProvider.getEssence("wither"));
+        assertNull(EssenceDataProvider.getEssence(null));
 
         assertNull(PetDataProvider.getPetLevel());
         assertNull(PetDataProvider.getPetXp());
@@ -174,6 +180,8 @@ class ApiProvidersTest {
         assertNull(HotmDataProvider.getHotmTokens());
         assertNull(HotmDataProvider.getPerkLevel("mining_speed"));
         assertNull(HotmDataProvider.getPerkLevel(null));
+        assertEquals("miningspeed", HotmDataProvider.normalizePerkName("Mining Speed"));
+        assertEquals("", HotmDataProvider.normalizePerkName(null));
     }
 
     @Test
@@ -184,5 +192,7 @@ class ApiProvidersTest {
         assertNull(HotfDataProvider.getDesertWhispers());
         assertNull(HotfDataProvider.getPerkLevel("foraging_speed"));
         assertNull(HotfDataProvider.getPerkLevel(null));
+        assertEquals("foragingspeed", HotfDataProvider.normalizePerkName("Foraging Speed"));
+        assertEquals("", HotfDataProvider.normalizePerkName(null));
     }
 }

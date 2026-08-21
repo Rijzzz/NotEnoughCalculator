@@ -37,7 +37,6 @@ public class VariablesTab {
 
     private EditBox varNameInput;
     private EditBox varValueInput;
-    private Button addVarBtn;
     private Button prevPageBtn;
     private Button nextPageBtn;
     private String varStatusMessage = "";
@@ -57,7 +56,7 @@ public class VariablesTab {
         varValueInput.setMaxLength(64);
         screen.addRenderableWidgetPublic(varValueInput);
 
-        addVarBtn = screen.addRenderableWidgetPublic(Button.builder(Component.translatable("notenoughcalculator.config.var.add_button"), btn -> {
+        screen.addRenderableWidgetPublic(Button.builder(Component.translatable("notenoughcalculator.config.var.add_button"), btn -> {
             String name = varNameInput.getValue().trim();
             String value = varValueInput.getValue().trim();
             if (name.startsWith("$")) name = name.substring(1);

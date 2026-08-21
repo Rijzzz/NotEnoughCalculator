@@ -73,4 +73,22 @@ class ExpressionParserTest {
         assertNotNull(result);
         assertEquals(0, new BigDecimal("100000000").compareTo(result.value));
     }
+
+    @Test
+    @DisplayName("Parse slayerxp function with boss and levels")
+    void testParseSlayerXp() throws Exception {
+        List<Token> tokens = ExpressionTokenizer.tokenize("slayerxp(\"spider\", 2, 3)", BigDecimal.ZERO);
+        ParseResult result = parser.parse(tokens);
+        assertNotNull(result);
+        assertEquals(0, new BigDecimal("175").compareTo(result.value));
+    }
+
+    @Test
+    @DisplayName("Parse perk fallback function")
+    void testParsePerkFallback() throws Exception {
+        List<Token> tokens = ExpressionTokenizer.tokenize("perk(mining_speed)", BigDecimal.ZERO);
+        ParseResult result = parser.parse(tokens);
+        assertNotNull(result);
+        assertEquals(0, BigDecimal.ZERO.compareTo(result.value));
+    }
 }

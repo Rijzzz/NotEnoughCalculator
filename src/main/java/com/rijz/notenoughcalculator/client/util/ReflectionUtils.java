@@ -19,7 +19,6 @@
 package com.rijz.notenoughcalculator.client.util;
 
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
-import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.slf4j.Logger;
@@ -32,14 +31,6 @@ public class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
-    private static Field cursorField = null;
-    private static Field selectionEndField = null;
-    private static Method getCursorMethod = null;
-    private static Method getSelectionEndMethod = null;
-    private static Method setCursorMethod = null;
-    private static Method setSelectionEndMethod = null;
-    private static boolean reflectionInitialized = false;
-
     // Cache reflection fields for current screen retrieval
     private static Field mcScreenField = null;
     private static Field mcGuiField = null;
@@ -47,89 +38,8 @@ public class ReflectionUtils {
     private static Method guiScreenMethod = null;
     private static boolean screenReflectionInitialized = false;
 
-    private static void initReflection(TextField searchField) {
-        if (reflectionInitialized) return;
-        if (searchField == null) return;
-
-        Class<?> fieldClass = searchField.getClass();
-
-        try {
-            getCursorMethod = fieldClass.getMethod("getCursor");
-            getCursorMethod.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            String[] cursorNames = {"cursor", "cursorPosition", "cursorPos", "caretPosition"};
-            for (String name : cursorNames) {
-                try {
-                    cursorField = findFieldInHierarchy(fieldClass, name);
-                    if (cursorField != null) {
-                        cursorField.setAccessible(true);
-                        break;
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
-
-        try {
-            getSelectionEndMethod = fieldClass.getMethod("getSelectionEnd");
-            getSelectionEndMethod.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            String[] selectionNames = {"selectionEnd", "selectionEndPos", "selectionStart", "highlightPos"};
-            for (String name : selectionNames) {
-                try {
-                    selectionEndField = findFieldInHierarchy(fieldClass, name);
-                    if (selectionEndField != null) {
-                        selectionEndField.setAccessible(true);
-                        break;
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
-
-        String[] setCursorNames = {"setCursor", "setCursorPosition", "setCaretPosition"};
-        for (String name : setCursorNames) {
-            try {
-                setCursorMethod = fieldClass.getMethod(name, int.class);
-                setCursorMethod.setAccessible(true);
-                break;
-            } catch (NoSuchMethodException ignored) {}
-        }
-
-        String[] setSelectionNames = {"setSelectionEnd", "setSelectionStart", "setHighlightPos"};
-        for (String name : setSelectionNames) {
-            try {
-                setSelectionEndMethod = fieldClass.getMethod(name, int.class);
-                setSelectionEndMethod.setAccessible(true);
-                break;
-            } catch (NoSuchMethodException ignored) {}
-        }
-
-        if ((getCursorMethod != null || cursorField != null) && (getSelectionEndMethod != null || selectionEndField != null)) {
-            reflectionInitialized = true;
-        }
-    }
-
-    public static void clampSearchField(TextField searchField) {
-        if (searchField == null) return;
-        initReflection(searchField);
-        String text = searchField.getText();
-        int len = text != null ? text.length() : 0;
-
-        try {
-            int cursor = getCursorPosition(searchField);
-            if (cursor > len || cursor < 0) {
-                setRawCursor(searchField, len);
-            }
-
-            int selection = getSelectionEnd(searchField);
-            if (selection > len || selection < 0) {
-                setRawSelection(searchField, len);
-            }
-        } catch (Exception ignored) {}
-    }
-
     public static int getCursorPosition(Object searchField) {
         if (searchField == null) return 0;
-        if (searchField instanceof TextField) return getCursorPosition((TextField) searchField);
         try {
             Method m = searchField.getClass().getMethod("getCursorPosition");
             Object res = m.invoke(searchField);
@@ -140,60 +50,94 @@ public class ReflectionUtils {
             Object res = m.invoke(searchField);
             if (res instanceof Integer) return (Integer) res;
         } catch (Throwable ignored) {}
+        try {
+            Field f = findFieldInHierarchy(searchField.getClass(), "cursor");
+            if (f != null) {
+                f.setAccessible(true);
+                Object res = f.get(searchField);
+                if (res instanceof Integer) return (Integer) res;
+            }
+        } catch (Throwable ignored) {}
+        try {
+            Field f = findFieldInHierarchy(searchField.getClass(), "cursorPosition");
+            if (f != null) {
+                f.setAccessible(true);
+                Object res = f.get(searchField);
+                if (res instanceof Integer) return (Integer) res;
+            }
+        } catch (Throwable ignored) {}
         return 0;
     }
 
     public static int getSelectionEnd(Object searchField) {
         if (searchField == null) return 0;
-        if (searchField instanceof TextField) return getSelectionEnd((TextField) searchField);
         try {
             Method m = searchField.getClass().getMethod("getSelectionEnd");
             Object res = m.invoke(searchField);
             if (res instanceof Integer) return (Integer) res;
+        } catch (Throwable ignored) {}
+        try {
+            Field f = findFieldInHierarchy(searchField.getClass(), "selectionEnd");
+            if (f != null) {
+                f.setAccessible(true);
+                Object res = f.get(searchField);
+                if (res instanceof Integer) return (Integer) res;
+            }
+        } catch (Throwable ignored) {}
+        try {
+            Field f = findFieldInHierarchy(searchField.getClass(), "highlightPos");
+            if (f != null) {
+                f.setAccessible(true);
+                Object res = f.get(searchField);
+                if (res instanceof Integer) return (Integer) res;
+            }
         } catch (Throwable ignored) {}
         return getCursorPosition(searchField);
     }
 
     public static void clampSearchField(Object searchField) {
         if (searchField == null) return;
-        if (searchField instanceof TextField) {
-            clampSearchField((TextField) searchField);
-            return;
-        }
-    }
-
-    public static int getCursorPosition(TextField searchField) {
-        if (searchField == null) return 0;
-        String text = searchField.getText();
-        int len = text != null ? text.length() : 0;
         try {
-            if (getCursorMethod != null) {
-                Object result = getCursorMethod.invoke(searchField);
-                if (result instanceof Integer) return Math.min(Math.max(0, (Integer) result), len);
+            String text = "";
+            try {
+                Method getTextMethod = searchField.getClass().getMethod("getText");
+                Object t = getTextMethod.invoke(searchField);
+                if (t != null) text = t.toString();
+            } catch (Throwable e) {
+                try {
+                    Method getValueMethod = searchField.getClass().getMethod("getValue");
+                    Object t = getValueMethod.invoke(searchField);
+                    if (t != null) text = t.toString();
+                } catch (Throwable ignored) {}
             }
-            if (cursorField != null) {
-                Object result = cursorField.get(searchField);
-                if (result instanceof Integer) return Math.min(Math.max(0, (Integer) result), len);
-            }
-        } catch (Exception ignored) {}
-        return 0;
-    }
 
-    public static int getSelectionEnd(TextField searchField) {
-        if (searchField == null) return 0;
-        String text = searchField.getText();
-        int len = text != null ? text.length() : 0;
-        try {
-            if (getSelectionEndMethod != null) {
-                Object result = getSelectionEndMethod.invoke(searchField);
-                if (result instanceof Integer) return Math.min(Math.max(0, (Integer) result), len);
+            int len = text.length();
+            int cursor = getCursorPosition(searchField);
+            if (cursor > len || cursor < 0) {
+                try {
+                    Method setCursorMethod = searchField.getClass().getMethod("setCursorPosition", int.class);
+                    setCursorMethod.invoke(searchField, len);
+                } catch (Throwable e) {
+                    try {
+                        Method setCursorMethod = searchField.getClass().getMethod("setCursor", int.class);
+                        setCursorMethod.invoke(searchField, len);
+                    } catch (Throwable ignored) {}
+                }
             }
-            if (selectionEndField != null) {
-                Object result = selectionEndField.get(searchField);
-                if (result instanceof Integer) return Math.min(Math.max(0, (Integer) result), len);
+
+            int selection = getSelectionEnd(searchField);
+            if (selection > len || selection < 0) {
+                try {
+                    Method setSelectionMethod = searchField.getClass().getMethod("setSelectionEnd", int.class);
+                    setSelectionMethod.invoke(searchField, len);
+                } catch (Throwable e) {
+                    try {
+                        Method setSelectionMethod = searchField.getClass().getMethod("setHighlightPos", int.class);
+                        setSelectionMethod.invoke(searchField, len);
+                    } catch (Throwable ignored) {}
+                }
             }
-        } catch (Exception ignored) {}
-        return 0;
+        } catch (Throwable ignored) {}
     }
 
     public static boolean isNoSelection(SearchFieldAdapter adapter) {
@@ -202,38 +146,6 @@ public class ReflectionUtils {
         int selection = adapter.getSelectionEnd();
         return cursor == selection;
     }
-
-    public static boolean isNoSelection(TextField searchField) {
-        if (searchField == null) return true;
-        int cursor = getCursorPosition(searchField);
-        int selection = getSelectionEnd(searchField);
-        return cursor == selection;
-    }
-
-    private static void setRawCursor(TextField searchField, int pos) {
-        try {
-            if (setCursorMethod != null) {
-                setCursorMethod.invoke(searchField, pos);
-                return;
-            }
-            if (cursorField != null) {
-                cursorField.set(searchField, pos);
-            }
-        } catch (Exception ignored) {}
-    }
-
-    private static void setRawSelection(TextField searchField, int pos) {
-        try {
-            if (setSelectionEndMethod != null) {
-                setSelectionEndMethod.invoke(searchField, pos);
-                return;
-            }
-            if (selectionEndField != null) {
-                selectionEndField.set(searchField, pos);
-            }
-        } catch (Exception ignored) {}
-    }
-
 
     public static Field findFieldInHierarchy(Class<?> clazz, String fieldName) {
         try {

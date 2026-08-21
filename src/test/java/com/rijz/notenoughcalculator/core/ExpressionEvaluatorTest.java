@@ -1424,10 +1424,14 @@ class ExpressionEvaluatorTest {
         void testAllStatVariableLookupsSafelyResolveNullWhenDisconnected() {
             assertNull(PlayerStatLookup.lookupPlayerStat("hunting"));
             assertNull(PlayerStatLookup.lookupPlayerStat("hunt"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("huntlvl"));
             assertNull(PlayerStatLookup.lookupPlayerStat("huntingxp"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("huntxp"));
             assertNull(PlayerStatLookup.lookupPlayerStat("whispers"));
             assertNull(PlayerStatLookup.lookupPlayerStat("forestwhispers"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("fwhispers"));
             assertNull(PlayerStatLookup.lookupPlayerStat("desertwhispers"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("dwhisper"));
             assertNull(PlayerStatLookup.lookupPlayerStat("hotm"));
             assertNull(PlayerStatLookup.lookupPlayerStat("hotmtier"));
             assertNull(PlayerStatLookup.lookupPlayerStat("hotmtokens"));
@@ -1436,6 +1440,15 @@ class ExpressionEvaluatorTest {
             assertNull(PlayerStatLookup.lookupPlayerStat("hotftokens"));
             assertNull(PlayerStatLookup.lookupPlayerStat("vitality"));
             assertNull(PlayerStatLookup.lookupPlayerStat("maxvitality"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("coins"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("coin"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("money"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("defence"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("power"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("farmlvl"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("minelvl"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("cmbtlvl"));
+            assertNull(PlayerStatLookup.lookupPlayerStat("voidgloomxp"));
         }
     }
 }

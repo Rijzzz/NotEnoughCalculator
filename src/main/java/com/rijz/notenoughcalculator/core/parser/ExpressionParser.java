@@ -18,10 +18,16 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
+import com.rijz.notenoughcalculator.api.provider.HotfDataProvider;
+import com.rijz.notenoughcalculator.api.provider.HotmDataProvider;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import com.rijz.notenoughcalculator.core.evaluator.MarketPriceLookup;
 import com.rijz.notenoughcalculator.core.evaluator.PlayerStatLookup;
+import com.rijz.notenoughcalculator.core.skyblock.SkillXpTable;
+import com.rijz.notenoughcalculator.core.skyblock.SlayerXpTable;
 import com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator;
 
 import java.math.BigDecimal;
@@ -47,13 +53,13 @@ public class ExpressionParser {
         this.variableSetter = variableSetter;
     }
 
-    public ParseResult parse(List<Token> tokens) throws ExpressionEvaluator.EvalException {
+    public ParseResult parse(List<Token> tokens) throws EvalException {
         return parseExpression(tokens, 0);
     }
 
-    public ParseResult parseExpression(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    public ParseResult parseExpression(List<Token> tokens, int pos) throws EvalException {
         if (pos >= tokens.size() || tokens.get(pos).kind == TokenKind.EOF) {
-            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
+            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
         }
 
         if (pos < tokens.size() && tokens.get(pos).kind == TokenKind.VAR) {
@@ -62,7 +68,7 @@ public class ExpressionParser {
 
             if (pos + 1 < tokens.size() && tokens.get(pos + 1).kind == TokenKind.ASSIGN) {
                 if (ExpressionEvaluator.isReservedVariable(cleanName)) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.reserved_variable", cleanName), tokens.get(pos).pos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.reserved_variable", cleanName), tokens.get(pos).pos);
                 }
                 ParseResult right = parseBitwiseOr(tokens, pos + 2);
                 if (variableSetter != null) {
@@ -75,20 +81,20 @@ public class ExpressionParser {
     }
 
     // Bitwise OR (|) - Lowest precedence above assignment
-    private ParseResult parseBitwiseOr(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseBitwiseOr(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseBitwiseAnd(tokens, pos);
         int currentPos = left.nextPos;
-        ExpressionEvaluator.RadixMode mode = left.radixMode;
+        RadixMode mode = left.radixMode;
 
         while (currentPos < tokens.size() && tokens.get(currentPos).kind == TokenKind.OP && tokens.get(currentPos).value.equals("|")) {
             ParseResult right = parseBitwiseAnd(tokens, currentPos + 1);
-            if (right.radixMode != ExpressionEvaluator.RadixMode.NONE) mode = right.radixMode;
+            if (right.radixMode != RadixMode.NONE) mode = right.radixMode;
             try {
                 long a = left.value.longValueExact();
                 long b = right.value.longValueExact();
                 left = new ParseResult(BigDecimal.valueOf(a | b), right.nextPos, mode);
             } catch (ArithmeticException e) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
             }
             currentPos = right.nextPos;
         }
@@ -97,20 +103,20 @@ public class ExpressionParser {
     }
 
     // Bitwise AND (&)
-    private ParseResult parseBitwiseAnd(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseBitwiseAnd(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseShift(tokens, pos);
         int currentPos = left.nextPos;
-        ExpressionEvaluator.RadixMode mode = left.radixMode;
+        RadixMode mode = left.radixMode;
 
         while (currentPos < tokens.size() && tokens.get(currentPos).kind == TokenKind.OP && tokens.get(currentPos).value.equals("&")) {
             ParseResult right = parseShift(tokens, currentPos + 1);
-            if (right.radixMode != ExpressionEvaluator.RadixMode.NONE) mode = right.radixMode;
+            if (right.radixMode != RadixMode.NONE) mode = right.radixMode;
             try {
                 long a = left.value.longValueExact();
                 long b = right.value.longValueExact();
                 left = new ParseResult(BigDecimal.valueOf(a & b), right.nextPos, mode);
             } catch (ArithmeticException e) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
             }
             currentPos = right.nextPos;
         }
@@ -119,23 +125,23 @@ public class ExpressionParser {
     }
 
     // Bitwise shifts (<< and >>)
-    private ParseResult parseShift(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseShift(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseAddSub(tokens, pos);
         int currentPos = left.nextPos;
-        ExpressionEvaluator.RadixMode mode = left.radixMode;
+        RadixMode mode = left.radixMode;
 
         while (currentPos < tokens.size() && tokens.get(currentPos).kind == TokenKind.OP
                 && (tokens.get(currentPos).value.equals("<<") || tokens.get(currentPos).value.equals(">>"))) {
             String op = tokens.get(currentPos).value;
             ParseResult right = parseAddSub(tokens, currentPos + 1);
-            if (right.radixMode != ExpressionEvaluator.RadixMode.NONE) mode = right.radixMode;
+            if (right.radixMode != RadixMode.NONE) mode = right.radixMode;
             try {
                 long a = left.value.longValueExact();
                 int b = right.value.intValueExact();
                 long res = op.equals("<<") ? (a << b) : (a >> b);
                 left = new ParseResult(BigDecimal.valueOf(res), right.nextPos, mode);
             } catch (ArithmeticException e) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), currentPos);
             }
             currentPos = right.nextPos;
         }
@@ -144,17 +150,17 @@ public class ExpressionParser {
     }
 
     // Addition and subtraction with smart percentage calculation (e.g., 100 + 10% -> 100 + (100 * 0.10) = 110)
-    private ParseResult parseAddSub(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseAddSub(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseMulDiv(tokens, pos);
         int currentPos = left.nextPos;
-        ExpressionEvaluator.RadixMode mode = left.radixMode;
+        RadixMode mode = left.radixMode;
 
         while (currentPos < tokens.size() && tokens.get(currentPos).kind == TokenKind.OP
                 && (tokens.get(currentPos).value.equals("+") || tokens.get(currentPos).value.equals("-"))) {
             String op = tokens.get(currentPos).value;
 
             ParseResult right = parseMulDiv(tokens, currentPos + 1);
-            if (right.radixMode != ExpressionEvaluator.RadixMode.NONE && right.radixMode != ExpressionEvaluator.RadixMode.DEFAULT) mode = right.radixMode;
+            if (right.radixMode != RadixMode.NONE && right.radixMode != RadixMode.DEFAULT) mode = right.radixMode;
 
             BigDecimal res;
             if (right.isPercentage) {
@@ -171,10 +177,10 @@ public class ExpressionParser {
         return left;
     }
 
-    private ParseResult parseMulDiv(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseMulDiv(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parsePower(tokens, pos);
         int currentPos = left.nextPos;
-        ExpressionEvaluator.RadixMode mode = left.radixMode;
+        RadixMode mode = left.radixMode;
 
         while (currentPos < tokens.size() && tokens.get(currentPos).kind == TokenKind.OP
                 && (tokens.get(currentPos).value.equals("*") || tokens.get(currentPos).value.equalsIgnoreCase("x")
@@ -182,19 +188,19 @@ public class ExpressionParser {
 
             String op = tokens.get(currentPos).value.toLowerCase();
             ParseResult right = parsePower(tokens, currentPos + 1);
-            if (right.radixMode != ExpressionEvaluator.RadixMode.NONE) mode = right.radixMode;
+            if (right.radixMode != RadixMode.NONE) mode = right.radixMode;
 
             BigDecimal res;
             if (op.equals("*") || op.equals("x")) {
                 res = left.value.multiply(right.value, mc);
             } else if (op.equals("/")) {
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.division_by_zero"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.division_by_zero"), currentPos);
                 }
                 res = left.value.divide(right.value, mc);
             } else {
                 if (right.value.compareTo(BigDecimal.ZERO) == 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.modulo_by_zero"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.modulo_by_zero"), currentPos);
                 }
                 res = left.value.remainder(right.value, mc);
             }
@@ -206,7 +212,7 @@ public class ExpressionParser {
         return left;
     }
 
-    private ParseResult parsePower(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parsePower(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parseUnary(tokens, pos);
         int currentPos = left.nextPos;
 
@@ -216,27 +222,27 @@ public class ExpressionParser {
             try {
                 int exp = right.value.intValueExact();
                 if (exp < -1000 || exp > 1000) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.exponent_too_large"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.exponent_too_large"), currentPos);
                 }
                 BigDecimal res = left.value.pow(exp, mc);
-                return new ParseResult(res, right.nextPos, left.radixMode != ExpressionEvaluator.RadixMode.NONE ? left.radixMode : right.radixMode);
+                return new ParseResult(res, right.nextPos, left.radixMode != RadixMode.NONE ? left.radixMode : right.radixMode);
             } catch (ArithmeticException e) {
                 if (left.value.compareTo(BigDecimal.ZERO) < 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.negative_power"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.negative_power"), currentPos);
                 }
                 double baseD = left.value.doubleValue();
                 double expD = right.value.doubleValue();
                 double resD = Math.pow(baseD, expD);
-                return new ParseResult(BigDecimal.valueOf(resD), right.nextPos, left.radixMode != ExpressionEvaluator.RadixMode.NONE ? left.radixMode : right.radixMode);
+                return new ParseResult(BigDecimal.valueOf(resD), right.nextPos, left.radixMode != RadixMode.NONE ? left.radixMode : right.radixMode);
             }
         }
 
         return left;
     }
 
-    private ParseResult parseUnary(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseUnary(List<Token> tokens, int pos) throws EvalException {
         if (pos >= tokens.size()) {
-            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
+            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
         }
 
         Token tok = tokens.get(pos);
@@ -253,14 +259,14 @@ public class ExpressionParser {
                 long val = res.value.longValueExact();
                 return new ParseResult(BigDecimal.valueOf(~val), res.nextPos, res.radixMode);
             } catch (ArithmeticException e) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), pos);
             }
         }
 
         return parseFactorial(tokens, pos);
     }
 
-    private ParseResult parseFactorial(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parseFactorial(List<Token> tokens, int pos) throws EvalException {
         ParseResult left = parsePrimary(tokens, pos);
         int currentPos = left.nextPos;
 
@@ -269,10 +275,10 @@ public class ExpressionParser {
             try {
                 long n = val.longValueExact();
                 if (n < 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_non_integer"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_non_integer"), currentPos);
                 }
                 if (n > 1000) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_too_large"), currentPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_too_large"), currentPos);
                 }
                 BigDecimal fact = BigDecimal.ONE;
                 for (long i = 2; i <= n; i++) {
@@ -280,7 +286,7 @@ public class ExpressionParser {
                 }
                 left = new ParseResult(fact, currentPos + 1, left.radixMode);
             } catch (ArithmeticException e) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_non_integer"), currentPos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.factorial_non_integer"), currentPos);
             }
             currentPos++;
         }
@@ -288,19 +294,19 @@ public class ExpressionParser {
         return left;
     }
 
-    private ParseResult parsePrimary(List<Token> tokens, int pos) throws ExpressionEvaluator.EvalException {
+    private ParseResult parsePrimary(List<Token> tokens, int pos) throws EvalException {
         if (pos >= tokens.size()) {
-            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
+            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_end"), pos);
         }
 
         Token tok = tokens.get(pos);
 
         if (tok.kind == TokenKind.NUM) {
             BigDecimal val = tok.number;
-            ExpressionEvaluator.RadixMode mode = ExpressionEvaluator.RadixMode.NONE;
-            if (tok.value.startsWith("0b") || tok.value.startsWith("0B")) mode = ExpressionEvaluator.RadixMode.BIN;
-            else if (tok.value.startsWith("0x") || tok.value.startsWith("0X")) mode = ExpressionEvaluator.RadixMode.HEX;
-            else if (tok.value.startsWith("0o") || tok.value.startsWith("0O")) mode = ExpressionEvaluator.RadixMode.OCT;
+            RadixMode mode = RadixMode.NONE;
+            if (tok.value.startsWith("0b") || tok.value.startsWith("0B")) mode = RadixMode.BIN;
+            else if (tok.value.startsWith("0x") || tok.value.startsWith("0X")) mode = RadixMode.HEX;
+            else if (tok.value.startsWith("0o") || tok.value.startsWith("0O")) mode = RadixMode.OCT;
 
             int nextPos = pos + 1;
             boolean isPct = false;
@@ -340,15 +346,15 @@ public class ExpressionParser {
             }
 
             if (ExpressionEvaluator.BUILTIN_VARIABLES.contains(cleanName) || ExpressionEvaluator.BUILTIN_VARIABLES.contains(rawName)) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.api_data_unavailable", cleanName), tok.pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.api_data_unavailable", cleanName), tok.pos);
             }
 
-            throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.undefined_variable", tok.value), tok.pos);
+            throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.undefined_variable", tok.value), tok.pos);
         }
 
         if (tok.kind == TokenKind.FUNC) {
             if (pos + 1 >= tokens.size() || tokens.get(pos + 1).kind != TokenKind.LPAREN) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
             }
 
             String fnName = tok.value.toLowerCase();
@@ -363,28 +369,169 @@ public class ExpressionParser {
                         if (marketPrice != null) {
                             return new ParseResult(marketPrice, endPos + 1);
                         }
-                        throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.item_not_found", itemId), tok.pos);
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.item_not_found", itemId), tok.pos);
                     }
                 }
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_market_syntax", fnName), tok.pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_market_syntax", fnName), tok.pos);
+            }
+
+            if (fnName.equals("perk") || fnName.equals("hotmperk") || fnName.equals("hperk")) {
+                int nextPos = pos + 2;
+                if (nextPos < tokens.size() && (tokens.get(nextPos).kind == TokenKind.VAR || tokens.get(nextPos).kind == TokenKind.NUM)) {
+                    String perkName = tokens.get(nextPos).value;
+                    int endPos = nextPos + 1;
+                    if (endPos < tokens.size() && tokens.get(endPos).kind == TokenKind.RPAREN) {
+                        BigDecimal level = HotmDataProvider.getPerkLevel(perkName);
+                        if (level == null) {
+                            level = HotfDataProvider.getPerkLevel(perkName);
+                        }
+                        if (level != null) {
+                            return new ParseResult(level, endPos + 1);
+                        }
+                        return new ParseResult(BigDecimal.ZERO, endPos + 1);
+                    }
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
+            }
+
+            if (fnName.equals("skillxp") || fnName.equals("skill_xp") || fnName.equals("skilltable")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SkillXpTable.getSkillXpBetween(arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SkillXpTable.getSkillXp(arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+            }
+
+            if (fnName.equals("huntingxp") || fnName.equals("hunting_xp") || fnName.equals("huntingtable")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SkillXpTable.getHuntingXpBetween(arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SkillXpTable.getHuntingXp(arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+            }
+
+            if (fnName.equals("runecraftingxp") || fnName.equals("runecrafting_xp") || fnName.equals("runetable")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SkillXpTable.getRunecraftingXpBetween(arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SkillXpTable.getRunecraftingXp(arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+            }
+
+            if (fnName.equals("socialxp") || fnName.equals("social_xp") || fnName.equals("socialtable")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SkillXpTable.getSocialXpBetween(arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SkillXpTable.getSocialXp(arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+            }
+
+            if (fnName.equals("cataxp") || fnName.equals("cata_xp") || fnName.equals("catatable") || fnName.equals("cxp_table")) {
+                ParseResult arg1 = parseExpression(tokens, pos + 2);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SkillXpTable.getCataXpBetween(arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SkillXpTable.getCataXp(arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+            }
+
+            if (isSlayerFunction(fnName)) {
+                String defaultBoss = getBossFromFunction(fnName);
+                int curPos = pos + 2;
+                if (curPos >= tokens.size()) {
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), curPos);
+                }
+
+                String boss = defaultBoss;
+                Token firstTok = tokens.get(curPos);
+
+                if ((firstTok.kind == TokenKind.VAR || firstTok.kind == TokenKind.FUNC) && curPos + 1 < tokens.size() && tokens.get(curPos + 1).kind == TokenKind.COMMA) {
+                    boss = firstTok.value;
+                    curPos += 2;
+                }
+
+                ParseResult arg1 = parseExpression(tokens, curPos);
+                int nextPos = arg1.nextPos;
+                if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.COMMA) {
+                    ParseResult arg2 = parseExpression(tokens, nextPos + 1);
+                    nextPos = arg2.nextPos;
+                    if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
+                        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    }
+                    BigDecimal xp = SlayerXpTable.getSlayerXpBetween(boss, arg1.value.intValue(), arg2.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                } else if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.RPAREN) {
+                    BigDecimal xp = SlayerXpTable.getSlayerXp(boss, arg1.value.intValue());
+                    return new ParseResult(xp, nextPos + 1, arg1.radixMode);
+                }
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
             }
 
             if (fnName.equals("avg")) {
                 int curPos = pos + 2;
                 List<BigDecimal> args = new ArrayList<>();
-                ExpressionEvaluator.RadixMode mode = ExpressionEvaluator.RadixMode.NONE;
+                RadixMode mode = RadixMode.NONE;
 
                 while (curPos < tokens.size() && tokens.get(curPos).kind != TokenKind.RPAREN) {
                     ParseResult argRes = parseExpression(tokens, curPos);
                     args.add(argRes.value);
-                    if (argRes.radixMode != ExpressionEvaluator.RadixMode.NONE) mode = argRes.radixMode;
+                    if (argRes.radixMode != RadixMode.NONE) mode = argRes.radixMode;
                     curPos = argRes.nextPos;
                     if (curPos < tokens.size() && tokens.get(curPos).kind == TokenKind.COMMA) {
                         curPos++;
                     }
                 }
                 if (curPos >= tokens.size() || tokens.get(curPos).kind != TokenKind.RPAREN) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), curPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), curPos);
                 }
                 if (args.isEmpty()) {
                     return new ParseResult(BigDecimal.ZERO, curPos + 1, mode);
@@ -406,32 +553,32 @@ public class ExpressionParser {
                             return new ParseResult(payout, nextPos + 1, arg1.radixMode);
                         }
                     }
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), nextPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), nextPos);
                 }
 
                 ParseResult arg2 = parseExpression(tokens, nextPos + 1);
                 nextPos = arg2.nextPos;
 
                 if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
                 }
 
                 BigDecimal resultVal = applyBinaryFunction(fnName, arg1.value, arg2.value, pos);
-                return new ParseResult(resultVal, nextPos + 1, arg1.radixMode != ExpressionEvaluator.RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
+                return new ParseResult(resultVal, nextPos + 1, arg1.radixMode != RadixMode.NONE ? arg1.radixMode : arg2.radixMode);
             }
 
             if (fnName.equals("clamp")) {
                 ParseResult vRes = parseExpression(tokens, pos + 2);
                 int np = vRes.nextPos;
-                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.COMMA) throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), np);
+                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.COMMA) throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), np);
 
                 ParseResult minRes = parseExpression(tokens, np + 1);
                 np = minRes.nextPos;
-                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.COMMA) throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), np);
+                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.COMMA) throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_comma", tok.value), np);
 
                 ParseResult maxRes = parseExpression(tokens, np + 1);
                 np = maxRes.nextPos;
-                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.RPAREN) throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), np);
+                if (np >= tokens.size() || tokens.get(np).kind != TokenKind.RPAREN) throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), np);
 
                 BigDecimal clamped = vRes.value.min(maxRes.value).max(minRes.value);
                 return new ParseResult(clamped, np + 1, vRes.radixMode);
@@ -441,14 +588,14 @@ public class ExpressionParser {
             int nextPos = argResult.nextPos;
 
             if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.expected_closing_paren"), nextPos);
             }
 
-            ExpressionEvaluator.RadixMode mode = argResult.radixMode;
-            if (fnName.equals("hex")) mode = ExpressionEvaluator.RadixMode.HEX;
-            else if (fnName.equals("bin")) mode = ExpressionEvaluator.RadixMode.BIN;
-            else if (fnName.equals("oct")) mode = ExpressionEvaluator.RadixMode.OCT;
-            else if (fnName.equals("fmt")) mode = ExpressionEvaluator.RadixMode.SHORTHAND;
+            RadixMode mode = argResult.radixMode;
+            if (fnName.equals("hex")) mode = RadixMode.HEX;
+            else if (fnName.equals("bin")) mode = RadixMode.BIN;
+            else if (fnName.equals("oct")) mode = RadixMode.OCT;
+            else if (fnName.equals("fmt")) mode = RadixMode.SHORTHAND;
 
             BigDecimal resultValue = applyFunction(fnName, argResult.value, pos);
             return new ParseResult(resultValue, nextPos + 1, mode);
@@ -458,7 +605,7 @@ public class ExpressionParser {
             ParseResult inner = parseExpression(tokens, pos + 1);
             int nextPos = inner.nextPos;
             if (nextPos >= tokens.size() || tokens.get(nextPos).kind != TokenKind.RPAREN) {
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unmatched_parenthesis"), pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unmatched_parenthesis"), pos);
             }
             nextPos++;
             boolean isPct = false;
@@ -473,18 +620,14 @@ public class ExpressionParser {
             return res;
         }
 
-        throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);
+        throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);
     }
 
     private static boolean isMarketFunction(String name) {
-        return name.equals("bzb") || name.equals("bzbuy") || name.equals("bzs") || name.equals("bzsell")
-                || name.equals("bzm") || name.equals("bzmargin") || name.equals("lb") || name.equals("lowestbin")
-                || name.equals("lba") || name.equals("lowestbinavg") || name.equals("npc") || name.equals("npcsell")
-                || name.equals("motes") || name.equals("motessell") || name.equals("price")
-                || name.equals("sack") || name.equals("sackcount");
+        return ExpressionEvaluator.MARKET_QUERY_FUNCTIONS.contains(name);
     }
 
-    private BigDecimal applyBinaryFunction(String func, BigDecimal a, BigDecimal b, int pos) throws ExpressionEvaluator.EvalException {
+    private BigDecimal applyBinaryFunction(String func, BigDecimal a, BigDecimal b, int pos) throws EvalException {
         switch (func) {
             case "min": return a.min(b);
             case "max": return a.max(b);
@@ -503,15 +646,15 @@ public class ExpressionParser {
             case "ahbin":
                 return SkyblockTaxCalculator.calculateAhPayout(a, b.doubleValue(), true);
             default:
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unknown_function", func), pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unknown_function", func), pos);
         }
     }
 
-    private BigDecimal applyFunction(String func, BigDecimal arg, int pos) throws ExpressionEvaluator.EvalException {
+    private BigDecimal applyFunction(String func, BigDecimal arg, int pos) throws EvalException {
         switch (func) {
             case "sqrt":
                 if (arg.compareTo(BigDecimal.ZERO) < 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.negative_sqrt"), pos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.negative_sqrt"), pos);
                 }
                 return arg.sqrt(mc);
             case "abs":
@@ -524,12 +667,12 @@ public class ExpressionParser {
                 return arg.setScale(0, RoundingMode.HALF_UP);
             case "log":
                 if (arg.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.log_non_positive"), pos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.log_non_positive"), pos);
                 }
                 return BigDecimal.valueOf(Math.log10(arg.doubleValue()));
             case "ln":
                 if (arg.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.log_non_positive"), pos);
+                    throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.log_non_positive"), pos);
                 }
                 return BigDecimal.valueOf(Math.log(arg.doubleValue()));
             case "sin":
@@ -554,7 +697,28 @@ public class ExpressionParser {
             case "fmt":
                 return arg;
             default:
-                throw new ExpressionEvaluator.EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unknown_function", func), pos);
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unknown_function", func), pos);
         }
+    }
+
+    private static boolean isSlayerFunction(String fn) {
+        return fn.equals("slayerxp") || fn.equals("slayer_xp") || fn.equals("slayertable")
+                || fn.equals("zombiexp") || fn.equals("wolfxp") || fn.equals("svenxp")
+                || fn.equals("revxp") || fn.equals("revenantxp")
+                || fn.equals("spiderxp") || fn.equals("spider_xp") || fn.equals("tarantulaxp")
+                || fn.equals("tarantula_xp") || fn.equals("spidertable")
+                || fn.equals("emanxp") || fn.equals("voidgloomxp") || fn.equals("blazexp") || fn.equals("infernoxp")
+                || fn.equals("endermanxp")
+                || fn.equals("vampirexp") || fn.equals("vampire_xp") || fn.equals("vampiretable")
+                || fn.equals("vampslayerxp") || fn.equals("riftstalkerxp");
+    }
+
+    private static String getBossFromFunction(String fn) {
+        return switch (fn) {
+            case "spiderxp", "spider_xp", "tarantulaxp", "tarantula_xp", "spidertable" -> "spider";
+            case "emanxp", "voidgloomxp", "endermanxp", "blazexp", "infernoxp" -> "eman";
+            case "vampirexp", "vampire_xp", "vampiretable", "vampslayerxp", "riftstalkerxp" -> "vampire";
+            default -> "zombie";
+        };
     }
 }

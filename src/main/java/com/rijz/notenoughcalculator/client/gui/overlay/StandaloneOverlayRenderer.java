@@ -23,6 +23,7 @@ import com.rijz.notenoughcalculator.client.integration.CalculatorBounds;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ResultFormatter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
@@ -71,9 +72,10 @@ public class StandaloneOverlayRenderer {
         }
 
         boolean resultFitsInline = false;
-        if (calcManager.hasResult()) {
+        boolean showInline = CalculatorConfig.getInstance().showInlineResults;
+        if (calcManager.hasResult() && showInline) {
             String result = calcManager.getLastFormattedResult();
-            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+            String resultDisplay = ResultFormatter.getEqualsSign() +
                     CalculatorConfig.getInstance().getResultColorCode() + result;
             int queryWidth = font.width(searchText);
             int resultX = textX + queryWidth;
@@ -91,9 +93,9 @@ public class StandaloneOverlayRenderer {
 
         CalculatorOverlayRenderer.disableScissor(context);
 
-        if (calcManager.hasResult() && !resultFitsInline) {
+        if (calcManager.hasResult() && !resultFitsInline && showInline) {
             String result = calcManager.getLastFormattedResult();
-            String resultDisplay = I18n.get("notenoughcalculator.result.equals") +
+            String resultDisplay = ResultFormatter.getEqualsSign() +
                     CalculatorConfig.getInstance().getResultColorCode() + result;
 
             int resultWidth = font.width(resultDisplay);

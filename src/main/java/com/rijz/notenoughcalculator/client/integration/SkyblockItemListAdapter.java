@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class SkyblockItemListAdapter implements SearchFieldAdapter {
@@ -38,7 +39,7 @@ public class SkyblockItemListAdapter implements SearchFieldAdapter {
                 Method getInstanceMethod = instanceField.getClass().getMethod("getInstance");
                 Object itemPanel = getInstanceMethod.invoke(instanceField);
                 if (itemPanel != null) {
-                    java.lang.reflect.Field searchBoxField = itemPanel.getClass().getDeclaredField("searchBox");
+                    Field searchBoxField = itemPanel.getClass().getDeclaredField("searchBox");
                     searchBoxField.setAccessible(true);
                     return searchBoxField.get(itemPanel);
                 }

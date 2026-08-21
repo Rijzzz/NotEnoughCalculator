@@ -22,6 +22,8 @@ import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -38,17 +40,15 @@ public class CalculatorManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorManager.class);
 
-
     private static final int MAX_EQUATIONS = 15;
 
     private final ExpressionEvaluator evaluator;
     private String lastSearchInput = "";
     private String lastFormattedResult = null;
 
-
     private final List<String> reiSearchHistory = new ArrayList<>();
     private final List<String> completedHistory = new ArrayList<>();
-    private int reiHistoryIndex = -1;  // -1 means active typing
+    private int reiHistoryIndex = -1; // -1 means active typing
     private String savedCurrentInput = ""; // Stores text field content before history traversal
 
     private String currentEquation = "";
@@ -58,40 +58,19 @@ public class CalculatorManager {
     private BigDecimal lastCompletedResult = null;
     private boolean hasUncommittedCalculation = false;
 
-    private static String buildUnitsRegex() {
-        List<String> sortedUnits = new ArrayList<>(ExpressionEvaluator.UNITS.keySet());
-        sortedUnits.sort((a, b) -> Integer.compare(b.length(), a.length()));
-        StringBuilder sb = new StringBuilder("(?:");
-        for (int i = 0; i < sortedUnits.size(); i++) {
-            if (i > 0) sb.append("|");
-            sb.append(Pattern.quote(sortedUnits.get(i)));
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
-    private static String buildFunctionsRegex() {
-        List<String> sortedFuncs = new ArrayList<>(ExpressionEvaluator.FUNCTIONS);
-        sortedFuncs.sort((a, b) -> Integer.compare(b.length(), a.length()));
-        StringBuilder sb = new StringBuilder("(");
-        for (int i = 0; i < sortedFuncs.size(); i++) {
-            if (i > 0) sb.append("|");
-            sb.append(Pattern.quote(sortedFuncs.get(i)));
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
     // Precompiled patterns to avoid GC pressure
     private static final Pattern OPERATOR_PATTERN = Pattern.compile(".*(?:[+\\-*/^%xX!&|~]|<<|>>).*");
-    private static final Pattern UNIT_PATTERN = Pattern.compile(".*\\d+\\s*" + buildUnitsRegex() + "(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*" + buildFunctionsRegex() + "\\s*\\(", Pattern.CASE_INSENSITIVE);
+    private static final Pattern UNIT_PATTERN = Pattern
+            .compile(".*\\d+\\s*" + ExpressionEvaluator.UNITS_REGEX + "(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*" + ExpressionEvaluator.FUNCTIONS_REGEX + "\\s*\\(",
+            Pattern.CASE_INSENSITIVE);
     private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
     private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*(?:[+\\-*/^%xX&|~]|<<|>>)\\s*$");
-    private static final Pattern MINECRAFT_ITEM = Pattern.compile("(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
+    private static final Pattern MINECRAFT_ITEM = Pattern.compile(
+            "(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
 
     public CalculatorManager() {
         this.evaluator = new ExpressionEvaluator();
@@ -105,10 +84,12 @@ public class CalculatorManager {
                 for (var entry : config.customVariables.entrySet()) {
                     try {
                         evaluator.setVariable(entry.getKey(), entry.getValue());
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public void reloadCustomVariables() {
@@ -116,8 +97,10 @@ public class CalculatorManager {
         loadPersistentVariables();
     }
 
-    // Fast heuristic evaluation to determine if search input represents a calculation vs vanilla item lookup.
-    // Excludes single numbers and item keyword queries without mathematical operators.
+    // Fast heuristic evaluation to determine if search input represents a
+    // calculation vs vanilla item lookup.
+    // Excludes single numbers and item keyword queries without mathematical
+    // operators.
     public static boolean looksLikeCalculation(String input) {
         if (input == null || input.trim().isEmpty()) {
             return false;
@@ -136,18 +119,25 @@ public class CalculatorManager {
         }
 
         // Check features indicating a calculation
-        if (OPERATOR_PATTERN.matcher(trimmed).matches()) return true;
-        if (PAREN_PATTERN.matcher(trimmed).matches()) return true;
-        if (FUNCTION_PATTERN.matcher(trimmed).matches()) return true;
-        if (VARIABLE_PATTERN.matcher(trimmed).matches()) return true;
-        if (UNIT_PATTERN.matcher(trimmed).matches()) return true;
-        if (LOOSE_LITERAL_PATTERN.matcher(trimmed).matches()) return true;
+        if (OPERATOR_PATTERN.matcher(trimmed).matches())
+            return true;
+        if (PAREN_PATTERN.matcher(trimmed).matches())
+            return true;
+        if (FUNCTION_PATTERN.matcher(trimmed).matches())
+            return true;
+        if (VARIABLE_PATTERN.matcher(trimmed).matches())
+            return true;
+        if (UNIT_PATTERN.matcher(trimmed).matches())
+            return true;
+        if (LOOSE_LITERAL_PATTERN.matcher(trimmed).matches())
+            return true;
 
         return false;
     }
 
     /**
-     * Verifies if an expression is syntactically complete before triggering live evaluation.
+     * Verifies if an expression is syntactically complete before triggering live
+     * evaluation.
      * Prevents rendering transient syntax errors while the user is actively typing.
      */
     private boolean isExpressionComplete(String input) {
@@ -167,9 +157,12 @@ public class CalculatorManager {
         int len = trimmed.length();
         for (int i = 0; i < len; i++) {
             char c = trimmed.charAt(i);
-            if (c == '(') parenCount++;
-            if (c == ')') parenCount--;
-            if (parenCount < 0) return false;
+            if (c == '(')
+                parenCount++;
+            if (c == ')')
+                parenCount--;
+            if (parenCount < 0)
+                return false;
         }
         return parenCount == 0;
     }
@@ -241,7 +234,8 @@ public class CalculatorManager {
         LOGGER.debug("Equation saved to history: '{}' (total: {})", equation, reiSearchHistory.size());
     }
 
-    // Evaluates expression silently for inline UI rendering without polluting command history (/calchist).
+    // Evaluates expression silently for inline UI rendering without polluting
+    // command history (/calchist).
     private void calculateForDisplay(String input) {
         if (input == null || input.trim().isEmpty()) {
             lastFormattedResult = null;
@@ -249,7 +243,7 @@ public class CalculatorManager {
         }
 
         try {
-            ExpressionEvaluator.EvalResult evalRes = evaluator.evaluateQuietResult(input);
+            EvalResult evalRes = evaluator.evaluateQuietResult(input);
             lastFormattedResult = ResultFormatter.formatResult(evalRes);
 
             // Mark as uncommitted (will be committed when user clears search)
@@ -257,7 +251,7 @@ public class CalculatorManager {
             lastCompletedResult = evalRes.value;
             hasUncommittedCalculation = true;
 
-        } catch (ExpressionEvaluator.EvalException e) {
+        } catch (EvalException e) {
             // Silently ignore errors during live typing
             lastFormattedResult = null;
         } catch (Exception e) {
@@ -265,17 +259,34 @@ public class CalculatorManager {
         }
     }
 
-
     private void commitPendingCalculation() {
         if (hasUncommittedCalculation && lastCompletedExpression != null && lastCompletedResult != null) {
             addToCompletedHistory(lastCompletedExpression, lastCompletedResult);
             lastCompletedExpression = null;
             lastCompletedResult = null;
             hasUncommittedCalculation = false;
-            LOGGER.debug("Committed calculation to history");
         }
     }
 
+    public boolean hasResult() {
+        return lastFormattedResult != null;
+    }
+
+    public String getFormattedResult() {
+        return lastFormattedResult;
+    }
+
+    public boolean hasError() {
+        return false;
+    }
+
+    public BigDecimal calculate(String input) throws EvalException {
+        String cleanInput = ResultFormatter.cleanInput(input);
+        BigDecimal result = evaluator.evaluate(cleanInput);
+        addToCompletedHistory(cleanInput, result);
+
+        return result;
+    }
 
     public void commitPendingCalculationPublic() {
         // Also save current equation to REI history before committing
@@ -286,14 +297,12 @@ public class CalculatorManager {
         commitPendingCalculation();
     }
 
-
     private void addToCompletedHistory(String expression, BigDecimal result) {
-        String historyEntry = expression + ResultFormatter.getEqualsSign() + ResultFormatter.formatWithCommas(result);
+        String historyEntry = expression + " = " + ResultFormatter.formatWithCommas(result);
 
         // Don't duplicate last entry
         if (completedHistory.isEmpty() || !completedHistory.get(completedHistory.size() - 1).equals(historyEntry)) {
             completedHistory.add(historyEntry);
-
 
             while (completedHistory.size() > MAX_EQUATIONS) {
                 completedHistory.remove(0);
@@ -308,28 +317,7 @@ public class CalculatorManager {
     }
 
     public String getLastErrorMessage() {
-        return null;  // We don't show errors in live view
-    }
-
-    public boolean hasResult() {
-        return lastFormattedResult != null;
-    }
-
-    public boolean hasError() {
-        return false;
-    }
-
-    /**
-     * Calculate via /calc command (this version DOES add to history).
-     */
-    public BigDecimal calculate(String input) throws ExpressionEvaluator.EvalException {
-        String cleanInput = ResultFormatter.cleanInput(input);
-        BigDecimal result = evaluator.evaluate(cleanInput);
-
-        // Command-based calculations go straight to history
-        addToCompletedHistory(cleanInput, result);
-
-        return result;
+        return null;
     }
 
     /**
@@ -370,7 +358,8 @@ public class CalculatorManager {
             if (reiHistoryIndex == -1) {
                 // Start from most recent (skip the one we just added)
                 reiHistoryIndex = reiSearchHistory.size() - 2;
-                if (reiHistoryIndex < 0) reiHistoryIndex = 0;
+                if (reiHistoryIndex < 0)
+                    reiHistoryIndex = 0;
             } else if (reiHistoryIndex > 0) {
                 // Go back one more
                 reiHistoryIndex--;
@@ -416,7 +405,7 @@ public class CalculatorManager {
 
                 // Update internal state without triggering history save
                 lastSearchInput = historyText;
-                currentEquation = "";  // Don't save while navigating
+                currentEquation = ""; // Don't save while navigating
 
                 if (looksLikeCalculation(historyText) && isExpressionComplete(historyText)) {
                     calculateForDisplay(historyText);
@@ -429,14 +418,13 @@ public class CalculatorManager {
         }
     }
 
-
     private void restoreSavedInput() {
         try {
             SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
             adapter.setText(savedCurrentInput);
             adapter.clamp();
             lastSearchInput = savedCurrentInput;
-            currentEquation = savedCurrentInput;  // Resume tracking this equation
+            currentEquation = savedCurrentInput; // Resume tracking this equation
 
             if (looksLikeCalculation(savedCurrentInput) && isExpressionComplete(savedCurrentInput)) {
                 calculateForDisplay(savedCurrentInput);
@@ -450,20 +438,20 @@ public class CalculatorManager {
         }
     }
 
-    public ExpressionEvaluator.EvalResult calculateResult(String input) throws ExpressionEvaluator.EvalException {
+    public EvalResult calculateResult(String input) throws EvalException {
         String cleanInput = ResultFormatter.cleanInput(input);
-        ExpressionEvaluator.EvalResult result = evaluator.evaluateResult(cleanInput);
+        EvalResult result = evaluator.evaluateResult(cleanInput);
         addToCompletedHistory(cleanInput, result.value);
         return result;
     }
 
-    public BigDecimal setVariable(String name, String valueExpr) throws ExpressionEvaluator.EvalException {
+    public BigDecimal setVariable(String name, String valueExpr) throws EvalException {
         BigDecimal val = evaluator.setVariable(name, valueExpr);
         saveVariableToConfig(name, val);
         return val;
     }
 
-    public BigDecimal setVariableDirect(String name, BigDecimal value) throws ExpressionEvaluator.EvalException {
+    public BigDecimal setVariableDirect(String name, BigDecimal value) throws EvalException {
         BigDecimal val = evaluator.setVariable(name, value);
         saveVariableToConfig(name, val);
         return val;
@@ -477,7 +465,8 @@ public class CalculatorManager {
             }
             config.customVariables.put(name.toLowerCase(), value.toPlainString());
             config.save();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public List<String> getHistory() {
@@ -511,10 +500,13 @@ public class CalculatorManager {
         return evaluator.getLastAnswer();
     }
 
+    public ExpressionEvaluator getEvaluator() {
+        return evaluator;
+    }
+
     public String getVariablesInfo() {
         return evaluator.getVariablesInfo();
     }
-
 
     public void reset() {
         lastSearchInput = "";

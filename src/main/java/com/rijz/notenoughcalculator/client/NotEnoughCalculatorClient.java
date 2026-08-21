@@ -24,6 +24,7 @@ import com.rijz.notenoughcalculator.client.command.CalculatorCommands;
 import com.rijz.notenoughcalculator.client.gui.overlay.CalculatorOverlayRenderer;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
+import com.rijz.notenoughcalculator.client.util.REIHelper;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
@@ -145,7 +146,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                             if (result != null && !result.isEmpty()) {
                                 String cleanResult = result.replace(",", "");
                                 searchField.setText(cleanResult);
-                                ReflectionUtils.clampSearchField(searchField);
+                                REIHelper.clampSearchField(searchField);
                                 LOGGER.debug("Enter pressed - result '{}' inserted into search bar", cleanResult);
                             }
 
@@ -155,25 +156,25 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
                         boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
 
-                        if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(searchField)) {
+                        if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && REIHelper.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
-                                String fullEquation = searchText + " = " + result;
-                                Minecraft.getInstance().keyboardHandler.setClipboard(fullEquation);
-                                LOGGER.debug("Copied full equation '{}' to clipboard", fullEquation);
+                                String copyText = enableFullCopy ? (searchText + " = " + result) : result;
+                                Minecraft.getInstance().keyboardHandler.setClipboard(copyText);
+                                LOGGER.debug("Copied '{}' to clipboard", copyText);
                                 return false;
                             }
                         }
 
-                        if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(searchField)) {
+                        if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && REIHelper.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
-                                String fullEquation = searchText + " = " + result;
-                                Minecraft.getInstance().keyboardHandler.setClipboard(fullEquation);
+                                String cutText = enableFullCopy ? (searchText + " = " + result) : result;
+                                Minecraft.getInstance().keyboardHandler.setClipboard(cutText);
                                 searchField.setText("");
-                                ReflectionUtils.clampSearchField(searchField);
+                                REIHelper.clampSearchField(searchField);
                                 calcManager.formatSearchBar("");
-                                LOGGER.debug("Cut full equation '{}' to clipboard", fullEquation);
+                                LOGGER.debug("Cut '{}' to clipboard", cutText);
                                 return false;
                             }
                         }
@@ -209,25 +210,25 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
                     boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
 
-                    if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(adapter)) {
+                    if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
-                            String fullEquation = searchText + " = " + result;
-                            Minecraft.getInstance().keyboardHandler.setClipboard(fullEquation);
-                            LOGGER.debug("Copied full equation '{}' to clipboard", fullEquation);
+                            String copyText = enableFullCopy ? (searchText + " = " + result) : result;
+                            Minecraft.getInstance().keyboardHandler.setClipboard(copyText);
+                            LOGGER.debug("Copied '{}' to clipboard", copyText);
                             return false;
                         }
                     }
 
-                    if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && enableFullCopy && ReflectionUtils.isNoSelection(adapter)) {
+                    if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
-                            String fullEquation = searchText + " = " + result;
-                            Minecraft.getInstance().keyboardHandler.setClipboard(fullEquation);
+                            String cutText = enableFullCopy ? (searchText + " = " + result) : result;
+                            Minecraft.getInstance().keyboardHandler.setClipboard(cutText);
                             adapter.setText("");
                             adapter.clamp();
                             calcManager.formatSearchBar("");
-                            LOGGER.debug("Cut full equation '{}' to clipboard", fullEquation);
+                            LOGGER.debug("Cut '{}' to clipboard", cutText);
                             return false;
                         }
                     }

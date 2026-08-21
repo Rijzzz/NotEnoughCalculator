@@ -19,8 +19,6 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
-
-import tech.thatgravyboat.skyblockapi.api.profile.hotm.HotmAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.hotm.PowderAPI;
 
 import java.math.BigDecimal;
@@ -28,7 +26,9 @@ import java.math.BigDecimal;
 public class PowderDataProvider {
 
     public static BigDecimal getMithril() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getMithril());
         } catch (Throwable ignored) {
@@ -37,7 +37,9 @@ public class PowderDataProvider {
     }
 
     public static BigDecimal getGemstone() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstone());
         } catch (Throwable ignored) {
@@ -46,7 +48,9 @@ public class PowderDataProvider {
     }
 
     public static BigDecimal getGlacite() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getGlacite());
         } catch (Throwable ignored) {
@@ -55,7 +59,9 @@ public class PowderDataProvider {
     }
 
     public static BigDecimal getTotalMithril() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getMithrilTotal());
         } catch (Throwable ignored) {
@@ -64,7 +70,9 @@ public class PowderDataProvider {
     }
 
     public static BigDecimal getTotalGemstone() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstoneTotal());
         } catch (Throwable ignored) {
@@ -73,27 +81,11 @@ public class PowderDataProvider {
     }
 
     public static BigDecimal getTotalGlacite() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
+        if (!SkyblockApiIntegration.isAvailable()) {
+            return null;
+        }
         try {
             return BigDecimal.valueOf(PowderAPI.INSTANCE.getGlaciteTotal());
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
-
-    public static BigDecimal getHotmTier() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            return BigDecimal.valueOf(HotmAPI.INSTANCE.getTier());
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
-
-    public static BigDecimal getHotmTokens() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            return BigDecimal.valueOf(HotmAPI.INSTANCE.getTokens());
         } catch (Throwable ignored) {
             return null;
         }

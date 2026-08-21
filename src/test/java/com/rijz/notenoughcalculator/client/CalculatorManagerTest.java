@@ -19,7 +19,8 @@
 package com.rijz.notenoughcalculator.client;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -157,12 +158,12 @@ class CalculatorManagerTest {
 
             config.enableShorthandResults = false;
             config.save();
-            ExpressionEvaluator.EvalResult eval1 = manager.calculateResult("1000000 + 500000");
+            EvalResult eval1 = manager.calculateResult("1000000 + 500000");
             assertEquals("1,500,000", ResultFormatter.formatResult(eval1));
 
             config.enableShorthandResults = true;
             config.save();
-            ExpressionEvaluator.EvalResult eval2 = manager.calculateResult("1000000 + 500000");
+            EvalResult eval2 = manager.calculateResult("1000000 + 500000");
             assertEquals("1.5m", ResultFormatter.formatResult(eval2));
         }
 
@@ -200,12 +201,12 @@ class CalculatorManagerTest {
 
             config.showUnitSuggestions = true;
             config.save();
-            String withUnits = ResultFormatter.formatResultWithUnits(new ExpressionEvaluator.EvalResult(new BigDecimal("1728")));
+            String withUnits = ResultFormatter.formatResultWithUnits(new EvalResult(new BigDecimal("1728")));
             assertTrue(withUnits.contains("("));
 
             config.showUnitSuggestions = false;
             config.save();
-            String withoutUnits = ResultFormatter.formatResultWithUnits(new ExpressionEvaluator.EvalResult(new BigDecimal("1728")));
+            String withoutUnits = ResultFormatter.formatResultWithUnits(new EvalResult(new BigDecimal("1728")));
             assertFalse(withoutUnits.contains("("));
         }
     }
@@ -228,9 +229,9 @@ class CalculatorManagerTest {
 
         @Test
         void calculateResultWithRadix() throws Exception {
-            ExpressionEvaluator.EvalResult res = manager.calculateResult("hex(255)");
+            EvalResult res = manager.calculateResult("hex(255)");
             assertEquals(0, new BigDecimal("255").compareTo(res.value));
-            assertEquals(ExpressionEvaluator.RadixMode.HEX, res.radixMode);
+            assertEquals(RadixMode.HEX, res.radixMode);
         }
 
         @Test

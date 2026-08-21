@@ -18,24 +18,24 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
-import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 
 import java.math.BigDecimal;
 
 public class ParseResult {
     public final BigDecimal value;
     public final int nextPos;
-    public final ExpressionEvaluator.RadixMode radixMode;
+    public final RadixMode radixMode;
     public boolean isPercentage;
 
     public ParseResult(BigDecimal value, int nextPos) {
-        this(value, nextPos, ExpressionEvaluator.RadixMode.DEFAULT);
+        this(value, nextPos, RadixMode.DEFAULT);
     }
 
-    public ParseResult(BigDecimal value, int nextPos, ExpressionEvaluator.RadixMode radixMode) {
+    public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode) {
         this.value = value;
         this.nextPos = nextPos;
-        this.radixMode = radixMode != null ? radixMode : ExpressionEvaluator.RadixMode.DEFAULT;
+        this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
         this.isPercentage = false;
     }
 }

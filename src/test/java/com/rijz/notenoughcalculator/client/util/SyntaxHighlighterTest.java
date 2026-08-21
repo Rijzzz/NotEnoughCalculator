@@ -46,6 +46,15 @@ public class SyntaxHighlighterTest {
         String marketHighlighted = SyntaxHighlighter.highlight("bzb(SUPERBOOM_TNT)");
         assertTrue(marketHighlighted.contains("§9bzb"), "Market functions should be Royal Blue (§9)");
         assertTrue(marketHighlighted.contains("§dSUPERBOOM_TNT"), "Item IDs should be Light Purple (§d)");
+
+        String progHighlighted = SyntaxHighlighter.highlight("vampirexp(5) + skillxp(50) + perk(mining_speed)");
+        assertTrue(progHighlighted.contains("§6vampirexp"), "Progression functions should be Vibrant Gold (§6)");
+        assertTrue(progHighlighted.contains("§6skillxp"), "Progression functions should be Vibrant Gold (§6)");
+        assertTrue(progHighlighted.contains("§6perk"), "Perk functions should be Vibrant Gold (§6)");
+
+        String radixHighlighted = SyntaxHighlighter.highlight("hex(255) + 0xFF");
+        assertTrue(radixHighlighted.contains("§dhex"), "Radix functions should be Light Purple (§d)");
+        assertTrue(radixHighlighted.contains("§d0xFF"), "Radix literals should be Light Purple (§d)");
     }
 
     @Test
@@ -58,8 +67,20 @@ public class SyntaxHighlighterTest {
 
     @Test
     public void testOperatorsAndParens() {
-        String highlighted = SyntaxHighlighter.highlight("(10 + 5) * 2");
+        String highlighted = SyntaxHighlighter.highlight("(10 + 5) * 2 << 1");
         assertTrue(highlighted.contains("§7("), "Parens should be Light Gray (§7)");
         assertTrue(highlighted.contains("§c+"), "Operators should be Bright Light Red (§c)");
+        assertTrue(highlighted.contains("§c<<"), "Bitwise shift operators should be Bright Light Red (§c)");
+    }
+
+    @Test
+    public void testStorageUnitsAndQuotedStrings() {
+        String unitHighlighted = SyntaxHighlighter.highlight("2dc + 1eb + 3sc");
+        assertTrue(unitHighlighted.contains("§bdc"), "Double chest unit should be Vibrant Aqua (§b)");
+        assertTrue(unitHighlighted.contains("§beb"), "Ender chest unit should be Vibrant Aqua (§b)");
+        assertTrue(unitHighlighted.contains("§bsc"), "Small chest unit should be Vibrant Aqua (§b)");
+
+        String quoteHighlighted = SyntaxHighlighter.highlight("bzb(\"HYPERION\")");
+        assertTrue(quoteHighlighted.contains("§d\"HYPERION\""), "Quoted string should be Light Purple (§d)");
     }
 }

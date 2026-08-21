@@ -36,7 +36,8 @@ public class CalculatorHelpFormatter {
         ctx.getSource().getPlayer().sendSystemMessage(t(key, args));
     }
 
-    private static void sendClickablePage(CommandContext<FabricClientCommandSource> ctx, String pageName, String translationKey) {
+    private static void sendClickablePage(CommandContext<FabricClientCommandSource> ctx, String pageName,
+            String translationKey) {
         String fullText = t(translationKey).getString();
         MutableComponent msg = Component.literal(fullText);
         msg.setStyle(msg.getStyle()
@@ -205,6 +206,18 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.functions.clamp");
         send(ctx, "notenoughcalculator.help.functions.avg");
         send(ctx, "notenoughcalculator.help.functions.xor");
+        sendEmpty(ctx);
+
+        send(ctx, "notenoughcalculator.help.functions.xp_tables");
+        send(ctx, "notenoughcalculator.help.functions.skillxp");
+        send(ctx, "notenoughcalculator.help.functions.huntingxp");
+        send(ctx, "notenoughcalculator.help.functions.runecraftingxp");
+        send(ctx, "notenoughcalculator.help.functions.socialxp");
+        send(ctx, "notenoughcalculator.help.functions.cataxp");
+        send(ctx, "notenoughcalculator.help.functions.slayerxp");
+        send(ctx, "notenoughcalculator.help.functions.emanxp");
+        send(ctx, "notenoughcalculator.help.functions.vampirexp");
+        send(ctx, "notenoughcalculator.help.functions.perk");
         sendEmpty(ctx);
 
         sendClickablePage(ctx, "main", "notenoughcalculator.help.back");

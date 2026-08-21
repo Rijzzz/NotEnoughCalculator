@@ -18,6 +18,9 @@
 
 package com.rijz.notenoughcalculator.core;
 
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -71,28 +74,28 @@ class ResultFormatterTest {
     @Test
     @DisplayName("Format with Hex radix")
     void formatHexRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("255"), ExpressionEvaluator.RadixMode.HEX);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("255"), RadixMode.HEX);
         assertEquals("0xFF", formatted);
     }
 
     @Test
     @DisplayName("Format with Binary radix")
     void formatBinRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("10"), ExpressionEvaluator.RadixMode.BIN);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("10"), RadixMode.BIN);
         assertEquals("0b1010", formatted);
     }
 
     @Test
     @DisplayName("Format with Octal radix")
     void formatOctRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("63"), ExpressionEvaluator.RadixMode.OCT);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("63"), RadixMode.OCT);
         assertEquals("0o77", formatted);
     }
 
     @Test
     @DisplayName("Format negative number with Hex radix")
     void formatNegativeHexRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-255"), ExpressionEvaluator.RadixMode.HEX);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-255"), RadixMode.HEX);
         assertEquals("-0xFF", formatted);
     }
 
@@ -113,42 +116,42 @@ class ResultFormatterTest {
     @Test
     @DisplayName("Format zero with Hex radix")
     void formatZeroHexRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.HEX);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), RadixMode.HEX);
         assertEquals("0x0", formatted);
     }
 
     @Test
     @DisplayName("Format zero with Binary radix")
     void formatZeroBinRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.BIN);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), RadixMode.BIN);
         assertEquals("0b0", formatted);
     }
 
     @Test
     @DisplayName("Format zero with Octal radix")
     void formatZeroOctRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), ExpressionEvaluator.RadixMode.OCT);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("0"), RadixMode.OCT);
         assertEquals("0o0", formatted);
     }
 
     @Test
     @DisplayName("Format large hex value")
     void formatLargeHex() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("4294967295"), ExpressionEvaluator.RadixMode.HEX);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("4294967295"), RadixMode.HEX);
         assertEquals("0xFFFFFFFF", formatted);
     }
 
     @Test
     @DisplayName("Format negative binary radix")
     void formatNegativeBinRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-10"), ExpressionEvaluator.RadixMode.BIN);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-10"), RadixMode.BIN);
         assertEquals("-0b1010", formatted);
     }
 
     @Test
     @DisplayName("Format negative octal radix")
     void formatNegativeOctRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-63"), ExpressionEvaluator.RadixMode.OCT);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("-63"), RadixMode.OCT);
         assertEquals("-0o77", formatted);
     }
 
@@ -170,7 +173,7 @@ class ResultFormatterTest {
     @Test
     @DisplayName("Format null value with radix returns 0")
     void formatNullRadix() {
-        assertEquals("0", ResultFormatter.formatWithRadix(null, ExpressionEvaluator.RadixMode.HEX));
+        assertEquals("0", ResultFormatter.formatWithRadix(null, RadixMode.HEX));
     }
 
     @Test
@@ -183,14 +186,14 @@ class ResultFormatterTest {
     @Test
     @DisplayName("Format with Shorthand radix mode")
     void formatShorthandRadix() {
-        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("1500000"), ExpressionEvaluator.RadixMode.SHORTHAND);
+        String formatted = ResultFormatter.formatWithRadix(new BigDecimal("1500000"), RadixMode.SHORTHAND);
         assertEquals("1.5m", formatted);
     }
 
     @Test
     @DisplayName("Format result with units under Shorthand radix mode")
     void formatResultWithUnitsShorthand() {
-        ExpressionEvaluator.EvalResult res = new ExpressionEvaluator.EvalResult(new BigDecimal("2500000000"), ExpressionEvaluator.RadixMode.SHORTHAND);
+        EvalResult res = new EvalResult(new BigDecimal("2500000000"), RadixMode.SHORTHAND);
         String formatted = ResultFormatter.formatResultWithUnits(res);
         assertEquals("2.5b", formatted);
     }
@@ -207,9 +210,15 @@ class ResultFormatterTest {
     }
 
     @Test
-    @DisplayName("Get equals sign formatted string")
+    @DisplayName("Get equals sign formatted string respects syntax highlighting toggle")
     void testGetEqualsSign() {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        config.enableSyntaxHighlighting = true;
         assertNotNull(ResultFormatter.getEqualsSign());
-        assertEquals(" = ", ResultFormatter.getEqualsSign());
+        assertTrue(ResultFormatter.getEqualsSign().contains("="));
+
+        config.enableSyntaxHighlighting = false;
+        assertEquals(" §f= ", ResultFormatter.getEqualsSign());
+        config.enableSyntaxHighlighting = true;
     }
 }

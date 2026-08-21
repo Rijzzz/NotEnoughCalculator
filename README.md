@@ -60,7 +60,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | `m` | 1,000,000 | Million multiplier | `5m` | `5,000,000` |
 | `b` | 1,000,000,000 | Billion multiplier | `2b` | `2,000,000,000` |
 | `t` | 1,000,000,000,000 | Trillion multiplier | `1t` | `1,000,000,000,000` |
-| `s` | 64 | Stack multiplier | `3s` | `192` |
+| `s`, `st`, `stack`, `stacks` | 64 | Stack multiplier | `3s`, `2st`, `5stacks` | `192` |
 | `e` | 160 | Enchanted item multiplier | `2e` | `320` |
 | `h` | 1,728 | Shulker Box capacity | `1h` | `1,728` |
 | `sc` | 1,728 | Small Chest capacity | `1sc` | `1,728` |
@@ -101,6 +101,16 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Tax Calculators | `bz(price)` | Bazaar net payout (accounts for perk lvl) | `bz(100m)` | `98,750,000` |
 | | `ah(price, [hrs])` | AH auction net payout (5% fee + tax) | `ah(50m)` | `46,999,955` |
 | | `ahbin(price, [hrs])` | AH BIN net payout (listing fee + tax) | `ahbin(50m, 24)` | `48,499,650` |
+| XP Tables & Perks | `skillxp(lvl, [toLvl])` | `skill_xp`, `skilltable` | Skill XP milestones & level deltas (1–60) | `skillxp(40, 50)` | `29,650,000` |
+| | `huntingxp(lvl, [toLvl])` | `hunting_xp`, `huntingtable` | Hunting XP milestones & level deltas (1–50) | `huntingxp(50)` | `55,172,425` |
+| | `runecraftingxp(lvl, [toLvl])` | `runecrafting_xp`, `runetable` | Runecrafting XP milestones & deltas (1–25) | `runecraftingxp(25)` | `94,450` |
+| | `socialxp(lvl, [toLvl])` | `social_xp`, `socialtable` | Social XP milestones & deltas (1–25) | `socialxp(25)` | `272,800` |
+| | `cataxp(lvl, [toLvl])` | `cata_xp`, `catatable`, `catacombsxp` | Catacombs XP milestones & level deltas (1–50+) | `cataxp(50)` | `569,809,640` |
+| | `slayerxp([boss], lvl, [toLvl])` | `slayer_xp`, `slayertable`, `zombiexp`, `wolfxp`, `svenxp`, `revxp` | Slayer XP milestones & level deltas (Zombie, Spider, Wolf, Enderman, Blaze, Vampire) | `slayerxp(spider, 2)` | `25` |
+| | `spiderxp(lvl, [toLvl])` | `spider_xp`, `tarantulaxp`, `spidertable` | Spider / Tarantula Slayer XP | `spiderxp(2)` | `25` |
+| | `emanxp(lvl, [toLvl])` | `voidgloomxp`, `endermanxp`, `blazexp`, `infernoxp` | Enderman (Voidgloom) & Blaze (Inferno) Slayer XP | `emanxp(4)` | `1,500` |
+| | `vampirexp(lvl, [toLvl])` | `vampire_xp`, `vampiretable`, `vampslayerxp`, `riftstalkerxp` | Vampire Slayer XP milestones & deltas (1–5) | `vampirexp(5)` | `2,400` |
+| | `perk("name")` | `hotmperk`, `hperk` | Live active HotM / HotF perk level | `perk(mining_speed)` | `50` |
 
 </details>
 
@@ -122,30 +132,30 @@ Type calculations directly in the search bar and get instant results! Works insi
 #### Currencies
 | Currency | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Purse Coins | `$purse` | `$p` | Purse coin balance | `$purse + $bank` |
-| Bank Coins | `$bank` | `$b` | Bank coin balance | `$bank / 2` |
+| Purse Coins | `$purse`, `$coins`, `$coin`, `$money` | `$p` | Purse coin balance | `$purse + $bank`, `$coins / 2` |
+| Bank Coins | `$bank`, `$bankcoins` | `$b` | Bank coin balance | `$bank / 2` |
 | Personal Bank | `$personalbank` | `$pbank` | Personal bank coins | `$pbank + 10m` |
 | Coop Bank | `$coopbank` | `$cbank` | Coop bank coins | `$cbank / 4` |
-| Bits | `$bits` | `$bt` | Hypixel Bits balance | `$bits * 1000` |
-| Motes | `$motes` | `$mt` | Rift Motes balance | `$motes / 50` |
+| Bits | `$bits`, `$bit` | `$bt` | Hypixel Bits balance | `$bits * 1000` |
+| Motes | `$motes`, `$mote` | `$mt` | Rift Motes balance | `$motes / 50` |
 | Copper | `$copper` | `$cop` | Garden Copper balance | `$copper * 500` |
 | Sowdust | `$sowdust` | `$sdust` | Garden Sowdust count | `$sowdust / 10` |
-| Kernels | `$kernels` | `$kern` | Garden Kernels count | `$kernels * 100` |
-| North Stars | `$northstars`, `$nstars` | `$ns` | Winter Island North Stars | `$ns * 50k` |
+| Kernels | `$kernels`, `$kernel` | `$kern` | Garden Kernels count | `$kernels * 100` |
+| North Stars | `$northstars`, `$nstars`, `$northstar`, `$star`, `$stars` | `$ns` | Winter Island North Stars | `$ns * 50k` |
 | Gems | `$gems` | `$gem` | SkyBlock Gems balance | `$gems * 100` |
 | Soulflow | `$soulflow`, `$sflow` | `$sf` | Soulflow count | `$soulflow * 5k` |
 
 #### Player & Dungeon Stats
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| SkyBlock Level | `$skyblocklevel`, `$sblevel`, `$sblvl` | `$sb` | Current SkyBlock Level | `$sblevel * 100k` |
-| Level Progress | `$sblevelprogress`, `$sblevelprog` | `$sbprog` | Progress to next SB Level | `100 - $sbprog` |
+| SkyBlock Level | `$skyblocklevel`, `$sblevel`, `$sblvl`, `$sblev`, `$level` | `$sb` | Current SkyBlock Level | `$sblevel * 100k` |
+| Level Progress | `$sblevelprogress`, `$sblevelprog`, `$levelprogress`, `$levelprog` | `$sbprog` | Progress to next SB Level | `100 - $sbprog` |
 | Faction Reputation | `$reputation` | `$rep` | Nether Faction Reputation | `$rep / 1000` |
 | Health | `$health` | `$hp` | Current Health points | `$hp / $maxhp` |
-| Max Health | `$maxhealth` | `$maxhp` | Maximum Health points | `$maxhp + 500` |
-| Defense | `$defense` | `$def` | Current Defense stat | `$def / ($def + 100)` |
+| Max Health | `$maxhealth`, `$mhp` | `$maxhp` | Maximum Health points | `$maxhp + 500` |
+| Defense | `$defense`, `$defence` | `$def` | Current Defense stat | `$def / ($def + 100)` |
 | Intelligence / Mana | `$intelligence`, `$intel` | `$mana` | Current Mana points | `$mana * 2` |
-| Max Mana | `$maxintel` | `$maxmana`, `$mmana` | Maximum Mana points | `$maxmana - 500` |
+| Max Mana | `$maxintel`, `$maxintelligence` | `$maxmana`, `$mmana` | Maximum Mana points | `$maxmana - 500` |
 | Overflow Mana | `$overflowmana` | `$ofmana` | Current Overflow Mana | `$ofmana * 10` |
 | Vitality | `$vitality` | `$vit` | Current Vitality stat | `$vit + 50` |
 | Max Vitality | `$maxvitality` | `$mvit` | Maximum Vitality stat | `$mvit` |
@@ -153,21 +163,25 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Vanilla XP Level | `$xplevel`, `$xplvl` | `$xp` | Vanilla Minecraft XP Level | `$xp * 100` |
 | Catacombs Level | `$catacombslevel`, `$catacombs`, `$catalvl` | `$cata` | Dungeons Catacombs Level | `$cata * 10` |
 | Catacombs XP | `$catacombsxp`, `$cataxp` | `$cxp` | Dungeons Catacombs XP | `$cxp / 1m` |
-| Dungeon Secrets | `$secretcount`, `$secrets` | `$sec` | Total Dungeon Secrets found | `$secrets / $cata` |
+| Dungeon Secrets | `$secretcount`, `$secrets`, `$secret` | `$sec` | Total Dungeon Secrets found | `$secrets / $cata` |
 | Class Level | `$dungeonclass`, `$classlvl` | `$classlevel`, `$dclass` | Active Dungeon Class Level | `$classlevel * 5` |
 | Dungeon Party Size | `$dungeonparty`, `$party` | `$partysize` | Current Dungeon Party Size | `5 - $partysize` |
 
-#### Mining & HOTM
+#### Mining, HOTM & HOTF
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Mithril Powder | `$mithrilpowder`, `$mithril` | `$mpowder` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
-| Gemstone Powder | `$gemstonepowder`, `$gemstone` | `$gpowder` | Current Gemstone Powder | `1m - $gpowder` |
-| Glacite Powder | `$glacitepowder`, `$glacite` | `$glpowder` | Current Glacite Powder | `500k - $glpowder` |
-| Total Mithril | `$totalmithrilpowder`, `$totmithril` | `$totmpowder` | Lifetime Total Mithril | `$totmpowder / 1m` |
-| Total Gemstone | `$totalgemstonepowder`, `$totgemstone` | `$totgpowder` | Lifetime Total Gemstone | `$totgpowder / 1m` |
-| Total Glacite | `$totalglacitepowder`, `$totglacite` | `$totglpowder` | Lifetime Total Glacite | `$totglpowder / 1m` |
+| Mithril Powder | `$mithrilpowder`, `$mithril`, `$mith`, `$mpowd` | `$mpowder` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
+| Gemstone Powder | `$gemstonepowder`, `$gemstone`, `$gpowd` | `$gpowder` | Current Gemstone Powder | `1m - $gpowder` |
+| Glacite Powder | `$glacitepowder`, `$glacite`, `$glac`, `$glpowd` | `$glpowder` | Current Glacite Powder | `500k - $glpowder` |
+| Total Mithril | `$totalmithrilpowder`, `$totmithril`, `$totmith` | `$totmpowder` | Lifetime Total Mithril | `$totmpowder / 1m` |
+| Total Gemstone | `$totalgemstonepowder`, `$totgemstone`, `$totgem` | `$totgpowder` | Lifetime Total Gemstone | `$totgpowder / 1m` |
+| Total Glacite | `$totalglacitepowder`, `$totglacite`, `$totglac` | `$totglpowder` | Lifetime Total Glacite | `$totglpowder / 1m` |
 | HOTM Tier | `$hotmtier` | `$hotm` | Heart of the Mountain Tier | `10 - $hotm` |
-| HOTM Tokens | `$hotmtokens` | `$tokens` | Available HOTM Tokens | `$tokens * 2` |
+| HOTM Tokens | `$hotmtokens`, `$token` | `$tokens` | Available HOTM Tokens | `$tokens * 2` |
+| HOTF Tier | `$hotftier`, `$hotf` | `$htier` | Heart of the Forest Tier | `$hotf + 1` |
+| HOTF Tokens | `$hotftokens`, `$htoken` | `$htokens` | Available HOTF Tokens | `$htokens * 10` |
+| Forest Whispers | `$forestwhispers`, `$whispers`, `$whisper`, `$fwhispers`, `$fwhisper` | `$whisp` | Current Forest Whispers | `$whispers / 100` |
+| Desert Whispers | `$desertwhispers`, `$dwhisper` | `$dwhispers` | Current Desert Whispers | `$dwhispers / 50` |
 
 #### Essences
 | Essence | Full Identifier(s) | Short Alias | Description | Example Input |
@@ -192,32 +206,33 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Gold Trophy | `$goldtrophyfish`, `$goldtrophy` | `$gtrophy` | Gold Trophy Fish count | `$gtrophy * 50k` |
 | Silver Trophy | `$silvertrophyfish`, `$silvertrophy` | `$strophy` | Silver Trophy Fish count | `$strophy * 20k` |
 | Bronze Trophy | `$bronzetrophyfish`, `$bronzetrophy` | `$btrophy` | Bronze Trophy Fish count | `$btrophy * 10k` |
-| Accessory Power | `$magicalpower`, `$accessorypower` | `$mp` | Maxwell Magical Power | `$mp * 100k` |
+| Accessory Power | `$magicalpower`, `$accessorypower`, `$power` | `$mp` | Maxwell Magical Power | `$mp * 100k` |
 
 #### Skills
 | Skill | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Farming | `$farming`, `$farminglvl` / `$farm` | `$farmingxp` / `$farmxp` | Farming Skill Level & XP | `$farm * 100k` |
-| Mining | `$mining`, `$mininglvl` / `$mine` | `$miningxp` / `$minexp` | Mining Skill Level & XP | `$mine * 100k` |
-| Combat | `$combat`, `$combatlvl` / `$cmbt` | `$combatxp` / `$cmbtxp` | Combat Skill Level & XP | `$cmbt * 100k` |
-| Foraging | `$foraging`, `$foraginglvl` / `$forag` | `$foragingxp` / `$foragxp` | Foraging Skill Level & XP | `$forag * 100k` |
-| Fishing | `$fishing`, `$fishinglvl` / `$fish` | `$fishingxp` / `$fishxp` | Fishing Skill Level & XP | `$fish * 100k` |
-| Enchanting | `$enchanting`, `$enchantinglvl` / `$ench` | `$enchantingxp` / `$enchxp` | Enchanting Skill Level & XP | `$ench * 100k` |
-| Alchemy | `$alchemy`, `$alchemylvl` / `$alch` | `$alchemyxp` / `$alchxp` | Alchemy Skill Level & XP | `$alch * 100k` |
-| Taming | `$taming`, `$taminglvl` / `$tame` | `$tamingxp` / `$tamexp` | Taming Skill Level & XP | `$tame * 100k` |
-| Carpentry | `$carpentry`, `$carpentrylvl` / `$carp` | `$carpentryxp` / `$carpxp` | Carpentry Skill Level & XP | `$carp * 100k` |
-| Runecrafting | `$runecrafting`, `$runecraftinglvl` / `$rune` | `$runecraftingxp` / `$runexp` | Runecrafting Level & XP | `$rune * 100k` |
-| Social | `$social`, `$sociallvl` / `$soc` | `$socialxp` / `$socxp` | Social Skill Level & XP | `$soc * 100k` |
+| Farming | `$farming`, `$farminglvl`, `$farmlvl` / `$farm` | `$farmingxp` / `$farmxp` | Farming Skill Level & XP | `$farm * 100k` |
+| Mining | `$mining`, `$mininglvl`, `$minelvl` / `$mine` | `$miningxp` / `$minexp` | Mining Skill Level & XP | `$mine * 100k` |
+| Combat | `$combat`, `$combatlvl`, `$cmbtlvl` / `$cmbt` | `$combatxp` / `$cmbtxp` | Combat Skill Level & XP | `$cmbt * 100k` |
+| Foraging | `$foraging`, `$foraginglvl`, `$foraglvl` / `$forag` | `$foragingxp` / `$foragxp` | Foraging Skill Level & XP | `$forag * 100k` |
+| Fishing | `$fishing`, `$fishinglvl`, `$fishlvl` / `$fish` | `$fishingxp` / `$fishxp` | Fishing Skill Level & XP | `$fish * 100k` |
+| Enchanting | `$enchanting`, `$enchantinglvl`, `$enchlvl` / `$ench` | `$enchantingxp` / `$enchxp` | Enchanting Skill Level & XP | `$ench * 100k` |
+| Alchemy | `$alchemy`, `$alchemylvl`, `$alchlvl` / `$alch` | `$alchemyxp` / `$alchxp` | Alchemy Skill Level & XP | `$alch * 100k` |
+| Taming | `$taming`, `$taminglvl`, `$tamelvl` / `$tame` | `$tamingxp` / `$tamexp` | Taming Skill Level & XP | `$tame * 100k` |
+| Carpentry | `$carpentry`, `$carpentrylvl`, `$carplvl` / `$carp` | `$carpentryxp` / `$carpxp` | Carpentry Skill Level & XP | `$carp * 100k` |
+| Runecrafting | `$runecrafting`, `$runecraftinglvl`, `$runelvl` / `$rune` | `$runecraftingxp` / `$runexp` | Runecrafting Level & XP | `$rune * 100k` |
+| Social | `$social`, `$sociallvl`, `$soclvl` / `$soc` | `$socialxp` / `$socxp` | Social Skill Level & XP | `$soc * 100k` |
+| Hunting | `$hunting`, `$huntinglvl`, `$huntlvl` / `$hunt` | `$huntingxp` / `$huntxp` | Hunting Skill Level & XP | `$hunt * 100k` |
 
 #### Slayers
 | Slayer Boss | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Revenant (Zombie) | `$zombieslayer`, `$revslayer`, `$rev` | `$zombieslayerxp`, `$revxp` | Zombie Slayer Level & XP | `$rev * 50k` |
-| Tarantula (Spider) | `$spiderslayer`, `$taraslayer`, `$tara` | `$spiderslayerxp`, `$taraxp` | Spider Slayer Level & XP | `$tara * 50k` |
-| Sven (Wolf) | `$wolfslayer`, `$svenslayer`, `$sven` | `$wolfslayerxp`, `$svenxp` | Wolf Slayer Level & XP | `$sven * 50k` |
-| Voidgloom (Enderman) | `$endermanslayer`, `$emanslayer`, `$eman` | `$endermanslayerxp`, `$emanxp` | Enderman Slayer Level & XP | `$eman * 50k` |
-| Infernal (Blaze) | `$blazeslayer`, `$blaze` | `$blazeslayerxp`, `$blazexp` | Blaze Slayer Level & XP | `$blaze * 50k` |
-| Riftstalker (Vampire) | `$vampireslayer`, `$vamp` | `$vampireslayerxp`, `$vampxp` | Vampire Slayer Level & XP | `$vamp * 50k` |
+| Revenant (Zombie) | `$zombieslayer`, `$revslayer`, `$zombie` / `$rev` | `$zombieslayerxp`, `$zombiexp` / `$revxp` | Zombie Slayer Level & XP | `$rev * 50k` |
+| Tarantula (Spider) | `$spiderslayer`, `$taraslayer`, `$taralvl`, `$spiderlvl` / `$tara` | `$spiderslayerxp`, `$spiderxp` / `$taraxp` | Spider Slayer Level & XP | `$tara * 50k` |
+| Sven (Wolf) | `$wolfslayer`, `$svenslayer`, `$wolf`, `$svenlvl`, `$wolflvl` / `$sven` | `$wolfslayerxp`, `$wolfxp` / `$svenxp` | Wolf Slayer Level & XP | `$sven * 50k` |
+| Voidgloom (Enderman) | `$endermanslayer`, `$emanslayer`, `$enderman`, `$voidgloom`, `$emanlvl` / `$eman` | `$endermanslayerxp`, `$endermanxp`, `$voidgloomxp` / `$emanxp` | Enderman Slayer Level & XP | `$eman * 50k` |
+| Infernal (Blaze) | `$blazeslayer`, `$inferno`, `$blazelvl` / `$blaze` | `$blazeslayerxp`, `$infernoxp` / `$blazexp` | Blaze Slayer Level & XP | `$blaze * 50k` |
+| Riftstalker (Vampire) | `$vampireslayer`, `$vampslayer`, `$riftstalker`, `$vamplvl` / `$vamp` | `$vampireslayerxp`, `$riftstalkerxp` / `$vampxp` | Vampire Slayer Level & XP | `$vamp * 50k` |
 
 </details>
 
@@ -235,6 +250,28 @@ Type calculations directly in the search bar and get instant results! Works insi
 | `motes("ITEM")` | `motessell("ITEM")` | Rift Motes sell price | `motes("RIFT_ITEM")` |
 | `price("ITEM")` | N/A | Lowest price across Bazaar & BIN | `price(HYPERION)` |
 | `sack("ITEM")` | `sackcount("ITEM")` | Item count in player sacks | `sack(COBBLESTONE)` |
+
+</details>
+
+<details>
+<summary><strong>Live Syntax Highlighting & Color Palette</strong></summary>
+
+| Syntax Category | Minecraft Color Code | Example Elements |
+| :--- | :--- | :--- |
+| **Numbers & Decimals** | `§f` (Pure White) | `42`, `100.5`, `3.14159` |
+| **Quantities & Suffix Units** | `§b` (Vibrant Aqua) | `k`, `m`, `b`, `t`, `st`, `stack`, `dc`, `eb` |
+| **Mathematical Functions** | `§e` (Bright Yellow) | `sqrt()`, `abs()`, `floor()`, `sin()`, `min()`, `max()`, `avg()`, `clamp()`, `gcd()`, `lcm()` |
+| **Progression, Slayers & Perks** | `§6` (Vibrant Gold) | `skillxp()`, `huntingxp()`, `cataxp()`, `slayerxp()`, `emanxp()`, `vampirexp()`, `perk()` |
+| **Market, Auctions & Taxes** | `§9` (Royal Blue) | `bzb()`, `bzsell()`, `lowestbin()`, `npc()`, `price()`, `sack()`, `ah()`, `ahbin()` |
+| **Radix Literals & Functions** | `§d` (Light Purple / Magenta) | `0xFF`, `0b1010`, `0o77`, `hex()`, `bin()`, `oct()`, `pct()` |
+| **Built-in Variables & Constants** | `§b` (Vibrant Aqua) | `ans`, `pi`, `e`, `$purse`, `$mana`, `$hp`, `$mithril`, `$hunting`, `$cata` |
+| **Custom Variables** | `§a` (Bright Lime Green) | `$myset`, `$tax`, `$profit`, `$goal` |
+| **Variable Prefix ($)** | `§6` (Vibrant Gold) | `$` prefix preceding any variable |
+| **Item IDs & Quoted Strings** | `§d` (Light Purple / Pink) | `"HYPERION"`, `'SUPERBOOM_TNT'`, `COBBLESTONE` |
+| **Mathematical Operators** | `§c` (Light Red) | `+`, `-`, `*`, `/`, `^`, `%`, `x`, `!`, `&`, `\|`, `~`, `<<`, `>>` |
+| **Delimiters & Parentheses** | `§7` (Neutral Light Gray) | `(`, `)`, `,` |
+| **Result Equals Sign (=)** | `§6` (Vibrant Gold) | `=` separator preceding calculated output |
+| **Calculated Result Value** | `§1` (Dark Blue) | `50,000,000` |
 
 </details>
 
@@ -298,10 +335,10 @@ Type calculations directly in the search bar and get instant results! Works insi
 | :--- | :--- | :--- |
 | Main Menu | `/calchelp` | Main menu with all help topics and shortcuts |
 | Operators | `/calchelp operators` | +, -, *, /, ^, %, !, bitwise operators (&, |, ~, <<, >>), and base literals (0b, 0x, 0o) |
-| Functions | `/calchelp functions` | Math, logarithm, trig, min/max, clamp, avg, pct, gcd, lcm, and base conversions |
+| Functions | `/calchelp functions` | Math, logarithm, trig, min/max, clamp, avg, pct, gcd, lcm, base conversions, XP tables (`skillxp`, `huntingxp`, `runecraftingxp`, `socialxp`, `cataxp`, `slayerxp`, `emanxp`, `vampirexp`), and live perk levels (`perk`) |
 | Units | `/calchelp units` | Coin multipliers (k, m, b, t) and container storage amounts (s, e, h, sc, dc, eb) |
 | Variables | `/calchelp variables` | Built-in constants (ans, pi, e), custom variables ($name), and SkyBlock API stats |
-| Player Stats | `/calchelp stats` | Currencies, powders, essences, pets, bestiary, trophy fish, player stats, skills, and slayers |
+| Player Stats | `/calchelp stats` | Currencies, powders, essences, pets, bestiary, trophy fish, player stats, skills, slayers, and Heart of the Forest stats ($hotf, $whispers) |
 | Market Queries | `/calchelp market` | Bazaar, Lowest BIN, NPC, Motes, and Sack query functions |
 | Tax Formulas | `/calchelp tax` | Bazaar payout and Auction House BIN listing/claim tax formulas |
 | Examples | `/calchelp examples` | Practical flipping, crafting, mining, and inventory calculation examples |
@@ -472,4 +509,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 19-08-2026*
+*Last updated: 21-08-2026*

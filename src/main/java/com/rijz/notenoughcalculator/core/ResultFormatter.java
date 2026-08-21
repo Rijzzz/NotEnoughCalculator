@@ -19,6 +19,8 @@
 package com.rijz.notenoughcalculator.core;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
+import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
@@ -33,13 +35,17 @@ public class ResultFormatter {
     }
 
     public static String getEqualsSign() {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        if (!config.enableSyntaxHighlighting) {
+            return " §f= ";
+        }
         try {
             String val = I18n.get("notenoughcalculator.result.equals");
             if (val != null && !val.equals("notenoughcalculator.result.equals")) {
                 return val;
             }
         } catch (Throwable ignored) {}
-        return " = ";
+        return " §6= ";
     }
 
     // Format with commas (preserves arbitrary precision without double-casting loss).
@@ -86,9 +92,9 @@ public class ResultFormatter {
     }
 
     // Format result considering radix mode (hex, bin, oct) or decimal commas
-    public static String formatResult(ExpressionEvaluator.EvalResult evalResult) {
+    public static String formatResult(EvalResult evalResult) {
         if (evalResult == null) return "0";
-        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT && evalResult.radixMode != ExpressionEvaluator.RadixMode.NONE) {
+        if (evalResult.radixMode != null && evalResult.radixMode != RadixMode.DEFAULT && evalResult.radixMode != RadixMode.NONE) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
         }
         CalculatorConfig config = CalculatorConfig.getInstance();
@@ -99,9 +105,9 @@ public class ResultFormatter {
     }
 
     // Convert value to base 16 (0xFF), base 2 (0b1010), or base 8 (0o77)
-    public static String formatWithRadix(BigDecimal value, ExpressionEvaluator.RadixMode radixMode) {
+    public static String formatWithRadix(BigDecimal value, RadixMode radixMode) {
         if (value == null) return "0";
-        if (radixMode == null || radixMode == ExpressionEvaluator.RadixMode.DEFAULT || radixMode == ExpressionEvaluator.RadixMode.NONE) {
+        if (radixMode == null || radixMode == RadixMode.DEFAULT || radixMode == RadixMode.NONE) {
             return formatWithCommas(value);
         }
         try {
@@ -125,9 +131,9 @@ public class ResultFormatter {
     }
 
     // Format with units OR radix representation
-    public static String formatResultWithUnits(ExpressionEvaluator.EvalResult evalResult) {
+    public static String formatResultWithUnits(EvalResult evalResult) {
         if (evalResult == null) return "0";
-        if (evalResult.radixMode != null && evalResult.radixMode != ExpressionEvaluator.RadixMode.DEFAULT && evalResult.radixMode != ExpressionEvaluator.RadixMode.NONE) {
+        if (evalResult.radixMode != null && evalResult.radixMode != RadixMode.DEFAULT && evalResult.radixMode != RadixMode.NONE) {
             return formatWithRadix(evalResult.value, evalResult.radixMode);
         }
         return formatWithUnits(evalResult.value);

@@ -21,6 +21,7 @@ package com.rijz.notenoughcalculator.client.gui.overlay;
 import com.rijz.notenoughcalculator.client.CalculatorManager;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
+import com.rijz.notenoughcalculator.client.util.REIHelper;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
@@ -55,24 +56,29 @@ public class CalculatorOverlayRenderer {
                 TextField searchField = runtime.getSearchTextField();
                 if (searchField == null) return;
 
-                ReflectionUtils.clampSearchField(searchField);
+                REIHelper.clampSearchField(searchField);
 
                 String searchText = searchField.getText();
                 calcManager.formatSearchBar(searchText);
 
-                if (!CalculatorManager.looksLikeCalculation(searchText) || !calcManager.hasResult()) {
+                if (!CalculatorManager.looksLikeCalculation(searchText)) {
                     return;
                 }
 
                 REIOverlayRenderer.render(context, overlay, searchField, searchText, mc.font, calcManager);
-            } else if (IntegrationManager.isItemListLoaded()) {
+            } else if (IntegrationManager.isItemListLoaded() && !CalculatorConfig.getInstance().enableItemListIntegration) {
+                // SkyBlock Item List is loaded and integration is OFF: let Item List use its native calculator and skip NEC rendering
                 return;
-            } else if (IntegrationManager.isStandaloneActive()) {
+            } else {
                 SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
                 if (adapter == null) return;
 
                 String searchText = adapter.getText();
                 calcManager.formatSearchBar(searchText);
+
+                if (!CalculatorManager.looksLikeCalculation(searchText)) {
+                    return;
+                }
 
                 StandaloneOverlayRenderer.render(context, adapter, searchText, mc.font, calcManager);
             }
@@ -86,8 +92,7 @@ public class CalculatorOverlayRenderer {
                 && ReflectionUtils.getCurrentScreen(mc) == screen
                 && mc.level != null
                 && mc.player != null
-                && shouldRender
-                && CalculatorConfig.getInstance().showInlineResults;
+                && shouldRender;
     }
 
     public static boolean isNonGameplayScreen(Screen screen) {

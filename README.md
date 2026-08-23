@@ -263,7 +263,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Syntax Category | Minecraft Color Code | Example Elements |
 | :--- | :--- | :--- |
-| **Numbers & Decimals** | `§f` (Pure White) | `42`, `100.5`, `3.14159` |
+| **Numbers & Decimals** | `§3` (Cyan / Dark Aqua) | `42`, `100.5`, `3.14159` |
 | **Quantities & Suffix Units** | `§b` (Vibrant Aqua) | `k`, `m`, `b`, `t`, `st`, `stack`, `dc`, `eb` |
 | **Mathematical Functions** | `§e` (Bright Yellow) | `sqrt()`, `abs()`, `floor()`, `sin()`, `min()`, `max()`, `avg()`, `clamp()`, `gcd()`, `lcm()` |
 | **Progression, Slayers & Perks** | `§6` (Vibrant Gold) | `skillxp()`, `huntingxp()`, `cataxp()`, `slayerxp()`, `emanxp()`, `vampirexp()`, `perk()` |

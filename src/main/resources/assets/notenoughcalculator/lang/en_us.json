@@ -36,7 +36,7 @@
   "notenoughcalculator.result.prefix": "§9[NEC] ",
   "notenoughcalculator.result.equals": " §6= ",
   "notenoughcalculator.result.error_prefix": "§c[Error] ",
-  "notenoughcalculator.color.number": "§f",
+  "notenoughcalculator.color.number": "§3",
   "notenoughcalculator.color.radix_literal": "§d",
   "notenoughcalculator.color.unit": "§b",
   "notenoughcalculator.color.math_function": "§e",

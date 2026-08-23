@@ -32,7 +32,7 @@ public class SyntaxHighlighterTest {
     @Test
     public void testNumberAndUnitHighlighting() {
         String highlighted = SyntaxHighlighter.highlight("100m");
-        assertTrue(highlighted.contains("§f100"), "Numbers should be Pure White (§f)");
+        assertTrue(highlighted.contains("§3100"), "Numbers should be Dark Aqua / Cyan (§3)");
         assertTrue(highlighted.contains("§bm"), "Units should be Vibrant Cyan (§b)");
     }
 
@@ -40,7 +40,7 @@ public class SyntaxHighlighterTest {
     public void testFunctionHighlighting() {
         String highlighted = SyntaxHighlighter.highlight("sqrt(50m)");
         assertTrue(highlighted.contains("§esqrt"), "Math functions should be Bright Yellow (§e)");
-        assertTrue(highlighted.contains("§f50"), "Numbers should be Pure White (§f)");
+        assertTrue(highlighted.contains("§350"), "Numbers should be Dark Aqua / Cyan (§3)");
         assertTrue(highlighted.contains("§bm"), "Units should be Vibrant Cyan (§b)");
 
         String marketHighlighted = SyntaxHighlighter.highlight("bzb(SUPERBOOM_TNT)");

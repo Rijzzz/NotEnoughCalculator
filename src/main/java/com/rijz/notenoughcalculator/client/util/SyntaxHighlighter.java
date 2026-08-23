@@ -39,7 +39,7 @@ public class SyntaxHighlighter {
     }
 
     public static String getColorNumber() {
-        return getColor("notenoughcalculator.color.number", "§f");
+        return getColor("notenoughcalculator.color.number", "§3");
     }
 
     public static String getColorRadixLiteral() {

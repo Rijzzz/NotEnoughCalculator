@@ -46,10 +46,6 @@ public class CalculatorHelpFormatter {
         ctx.getSource().getPlayer().sendSystemMessage(msg);
     }
 
-    private static void sendLiteral(CommandContext<FabricClientCommandSource> ctx, String text) {
-        ctx.getSource().getPlayer().sendSystemMessage(Component.literal(text));
-    }
-
     private static void sendEmpty(CommandContext<FabricClientCommandSource> ctx) {
         ctx.getSource().getPlayer().sendSystemMessage(Component.literal(""));
     }
@@ -106,6 +102,7 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.main.cmd_calcclear");
         send(ctx, "notenoughcalculator.help.main.cmd_calcset");
         send(ctx, "notenoughcalculator.help.main.cmd_calcconfig");
+        send(ctx, "notenoughcalculator.help.main.cmd_calcpos");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.help_pages");
@@ -124,6 +121,7 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_1");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_2");
         send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_3");
+        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_4");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.main.footer");
@@ -382,7 +380,7 @@ public class CalculatorHelpFormatter {
 
         send(ctx, "notenoughcalculator.help.variables.current");
         String vars = NotEnoughCalculatorClient.getCalculatorManager().getVariablesInfo();
-        sendLiteral(ctx, "§7" + vars);
+        send(ctx, "notenoughcalculator.help.variables.current_format", vars);
         sendEmpty(ctx);
 
         sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
@@ -447,6 +445,8 @@ public class CalculatorHelpFormatter {
         send(ctx, "notenoughcalculator.help.config.file_edit_1");
         send(ctx, "notenoughcalculator.help.config.file_edit_2");
         send(ctx, "notenoughcalculator.help.config.file_edit_3");
+        send(ctx, "notenoughcalculator.help.config.file_edit_4");
+        send(ctx, "notenoughcalculator.help.config.file_edit_5");
         sendEmpty(ctx);
 
         send(ctx, "notenoughcalculator.help.config.current");

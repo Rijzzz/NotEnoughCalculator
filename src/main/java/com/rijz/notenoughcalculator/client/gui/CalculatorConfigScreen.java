@@ -55,6 +55,9 @@ public class CalculatorConfigScreen extends Screen {
     public boolean enableSyntaxHighlighting;
     public boolean enableFullEquationCopy;
     public boolean enableItemListIntegration;
+    public boolean forceStandaloneMode;
+    public int standaloneX;
+    public int standaloneY;
     public int decimalPrecision;
     public int bazaarFlipperLevel;
     public final Map<String, String> workingCustomVariables = new LinkedHashMap<>();
@@ -80,6 +83,9 @@ public class CalculatorConfigScreen extends Screen {
         this.enableSyntaxHighlighting = config.enableSyntaxHighlighting;
         this.enableFullEquationCopy = config.enableFullEquationCopy;
         this.enableItemListIntegration = config.enableItemListIntegration;
+        this.forceStandaloneMode = config.forceStandaloneMode;
+        this.standaloneX = config.standaloneX;
+        this.standaloneY = config.standaloneY;
         this.decimalPrecision = config.decimalPrecision;
         this.bazaarFlipperLevel = config.bazaarFlipperLevel;
         if (config.customVariables != null) {
@@ -103,15 +109,40 @@ public class CalculatorConfigScreen extends Screen {
         selectBazaarLevel(level);
     }
 
+    public Minecraft getMinecraftInstancePublic() {
+        return this.minecraft;
+    }
+
+    private boolean showUnsavedWarning = false;
+
+    public int getPanelWidth() {
+        return 320;
+    }
+
+    public int getContentBottomY(int startY) {
+        int contentH = (activeTab == 0) ? settingsTab.getContentHeight(this) : variablesTab.getContentHeight();
+        return startY + contentH;
+    }
+
+    public int getPanelHeight() {
+        int contentH = (activeTab == 0) ? settingsTab.getContentHeight(this) : variablesTab.getContentHeight();
+        return 48 + contentH + 53;
+    }
+
+    public int getPanelX() {
+        return (this.width - getPanelWidth()) / 2;
+    }
+
+    public int getPanelY() {
+        return Math.max(2, (this.height - getPanelHeight()) / 2);
+    }
+
     @Override
     protected void init() {
         clearWidgets();
 
-        int extraHeight = IntegrationManager.isItemListLoaded() ? 20 : 0;
-        int panelWidth = 320;
-        int panelHeight = 295 + extraHeight;
-        int panelX = (this.width - panelWidth) / 2;
-        int panelY = (this.height - panelHeight) / 2;
+        int panelX = getPanelX();
+        int panelY = getPanelY();
 
         int buttonWidth = 280;
         int buttonHeight = 16;
@@ -140,19 +171,20 @@ public class CalculatorConfigScreen extends Screen {
             variablesTab.init(this, this.font, panelX, startY, this::init);
         }
 
-        int bottomY = panelY + panelHeight - 24;
+        int contentBottom = getContentBottomY(startY);
+        int bottomY = contentBottom + 21;
         int gap = 10;
         int saveWidth = (buttonWidth - gap) / 2;
 
         addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.save"), btn -> {
             saveConfig();
-            closeScreen();
+            forceClose();
         }).bounds(panelX + 20, bottomY, saveWidth, 18)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.save")))
                 .build());
 
         addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.screen.cancel"), btn -> {
-            closeScreen();
+            forceClose();
         }).bounds(panelX + 20 + saveWidth + gap, bottomY, saveWidth, 18)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.cancel")))
                 .build());
@@ -205,11 +237,10 @@ public class CalculatorConfigScreen extends Screen {
             }
             wasMouseDown = isMouseDown;
         }
-        int extraHeight = IntegrationManager.isItemListLoaded() ? 20 : 0;
-        int panelWidth = 320;
-        int panelHeight = 295 + extraHeight;
-        int panelX = (this.width - panelWidth) / 2;
-        int panelY = (this.height - panelHeight) / 2;
+        int panelWidth = getPanelWidth();
+        int panelHeight = getPanelHeight();
+        int panelX = getPanelX();
+        int panelY = getPanelY();
 
         graphics.fill(0, 0, this.width, this.height, 0xD0040711);
         graphics.fill(panelX - 1, panelY - 1, panelX + panelWidth + 1, panelY + panelHeight + 1, 0xFF1E293B);
@@ -228,7 +259,46 @@ public class CalculatorConfigScreen extends Screen {
             variablesTab.renderContent(graphics, this.font, this, panelX, startY);
         }
 
+        if (showUnsavedWarning && hasUnsavedChanges()) {
+            Component warn = Component.translatable("notenoughcalculator.config.screen.unsaved_warning");
+            int contentBottom = getContentBottomY(startY);
+            int bannerY = contentBottom + 4;
+            int bannerX = panelX + 20;
+            int bannerWidth = 280;
+            int bannerHeight = 13;
+
+            // Sleek ruby translucent banner with border
+            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + bannerHeight, 0xD02A0808);
+            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + 1, 0xFFDC2626);
+            graphics.fill(bannerX, bannerY + bannerHeight - 1, bannerX + bannerWidth, bannerY + bannerHeight, 0xFFDC2626);
+            graphics.fill(bannerX, bannerY, bannerX + 1, bannerY + bannerHeight, 0xFFDC2626);
+            graphics.fill(bannerX + bannerWidth - 1, bannerY, bannerX + bannerWidth, bannerY + bannerHeight, 0xFFDC2626);
+
+            int textX = bannerX + (bannerWidth - this.font.width(warn)) / 2;
+            int textY = bannerY + 3;
+            graphics.text(this.font, warn, textX, textY, 0xFFFFFFFF, true);
+        }
+
         super.extractRenderState(graphics, mouseX, mouseY, delta);
+    }
+
+    public boolean hasUnsavedChanges() {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        if (this.showInlineResults != config.showInlineResults) return true;
+        if (this.showUnitSuggestions != config.showUnitSuggestions) return true;
+        if (this.enableCommaFormatting != config.enableCommaFormatting) return true;
+        if (this.enableHistoryNavigation != config.enableHistoryNavigation) return true;
+        if (this.enableShorthandResults != config.enableShorthandResults) return true;
+        if (this.enableSyntaxHighlighting != config.enableSyntaxHighlighting) return true;
+        if (this.enableFullEquationCopy != config.enableFullEquationCopy) return true;
+        if (this.enableItemListIntegration != config.enableItemListIntegration) return true;
+        if (this.forceStandaloneMode != config.forceStandaloneMode) return true;
+        if (this.standaloneX != config.standaloneX) return true;
+        if (this.standaloneY != config.standaloneY) return true;
+        if (this.decimalPrecision != config.decimalPrecision) return true;
+        if (this.bazaarFlipperLevel != config.bazaarFlipperLevel) return true;
+        Map<String, String> savedVars = config.customVariables != null ? config.customVariables : Map.of();
+        return !this.workingCustomVariables.equals(savedVars);
     }
 
     private void saveConfig() {
@@ -241,6 +311,9 @@ public class CalculatorConfigScreen extends Screen {
         config.enableSyntaxHighlighting = this.enableSyntaxHighlighting;
         config.enableFullEquationCopy = this.enableFullEquationCopy;
         config.enableItemListIntegration = this.enableItemListIntegration;
+        config.forceStandaloneMode = this.forceStandaloneMode;
+        config.standaloneX = this.standaloneX;
+        config.standaloneY = this.standaloneY;
         config.decimalPrecision = this.decimalPrecision;
         config.bazaarFlipperLevel = this.bazaarFlipperLevel;
         if (config.customVariables == null) {
@@ -260,13 +333,17 @@ public class CalculatorConfigScreen extends Screen {
         ReflectionUtils.openScreen(minecraft, screen);
     }
 
-    private void closeScreen() {
+    private void forceClose() {
         Screen target = (this.parent instanceof ChatScreen) ? null : this.parent;
         openScreen(this.minecraft, target);
     }
 
     @Override
     public void onClose() {
-        closeScreen();
+        if (hasUnsavedChanges()) {
+            this.showUnsavedWarning = true;
+            return;
+        }
+        forceClose();
     }
 }

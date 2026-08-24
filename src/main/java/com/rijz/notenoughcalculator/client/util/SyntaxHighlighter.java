@@ -27,45 +27,72 @@ import java.util.regex.Pattern;
 
 public class SyntaxHighlighter {
 
-    public static final String COLOR_NUMBER = "§f"; // Pure White
-    public static final String COLOR_RADIX_LITERAL = "§d"; // Light Purple / Magenta
-    public static final String COLOR_UNIT = "§b"; // Vibrant Aqua / Cyan
-    public static final String COLOR_MATH_FUNC = "§e"; // Bright Yellow
-    public static final String COLOR_PROGRESSION_FUNC = "§6"; // Vibrant Gold
-    public static final String COLOR_MARKET_FUNC = "§9"; // Royal Blue
-    public static final String COLOR_BUILTIN_VAR = "§b"; // Vibrant Aqua
-    public static final String COLOR_CUSTOM_VAR = "§a"; // Bright Lime Green
-    public static final String COLOR_DOLLAR_SIGN = "§6"; // Vibrant Gold
-    public static final String COLOR_STRING_ITEM = "§d"; // Light Purple / Pink
-    public static final String COLOR_OP = "§c"; // Bright Light Red
-    public static final String COLOR_DELIM = "§7"; // Neutral Light Gray
-    public static final String COLOR_ERROR = "§c"; // Bright Light Red
-    public static final String COLOR_CHAT_RESULT = "§1"; // Dark Blue
-
     public static String getColor(String key, String defaultColor) {
         try {
             String val = I18n.get(key);
             if (val != null && !val.equals(key)) {
                 return val;
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return defaultColor;
     }
 
-    public static String getColorNumber() { return getColor("notenoughcalculator.color.number", COLOR_NUMBER); }
-    public static String getColorRadixLiteral() { return getColor("notenoughcalculator.color.radix_literal", COLOR_RADIX_LITERAL); }
-    public static String getColorUnit() { return getColor("notenoughcalculator.color.unit", COLOR_UNIT); }
-    public static String getColorMathFunc() { return getColor("notenoughcalculator.color.math_function", COLOR_MATH_FUNC); }
-    public static String getColorProgressionFunc() { return getColor("notenoughcalculator.color.progression_function", COLOR_PROGRESSION_FUNC); }
-    public static String getColorMarketFunc() { return getColor("notenoughcalculator.color.market_function", COLOR_MARKET_FUNC); }
-    public static String getColorBuiltinVar() { return getColor("notenoughcalculator.color.builtin_variable", COLOR_BUILTIN_VAR); }
-    public static String getColorCustomVar() { return getColor("notenoughcalculator.color.custom_variable", COLOR_CUSTOM_VAR); }
-    public static String getColorDollarSign() { return getColor("notenoughcalculator.color.dollar_sign", COLOR_DOLLAR_SIGN); }
-    public static String getColorStringItem() { return getColor("notenoughcalculator.color.string_item", COLOR_STRING_ITEM); }
-    public static String getColorOp() { return getColor("notenoughcalculator.color.operator", COLOR_OP); }
-    public static String getColorDelim() { return getColor("notenoughcalculator.color.delimiter", COLOR_DELIM); }
-    public static String getColorError() { return getColor("notenoughcalculator.color.error", COLOR_ERROR); }
-    public static String getColorResult() { return getColor("notenoughcalculator.color.result", COLOR_CHAT_RESULT); }
+    public static String getColorNumber() {
+        return getColor("notenoughcalculator.color.number", "§f");
+    }
+
+    public static String getColorRadixLiteral() {
+        return getColor("notenoughcalculator.color.radix_literal", "§d");
+    }
+
+    public static String getColorUnit() {
+        return getColor("notenoughcalculator.color.unit", "§b");
+    }
+
+    public static String getColorMathFunc() {
+        return getColor("notenoughcalculator.color.math_function", "§e");
+    }
+
+    public static String getColorProgressionFunc() {
+        return getColor("notenoughcalculator.color.progression_function", "§6");
+    }
+
+    public static String getColorMarketFunc() {
+        return getColor("notenoughcalculator.color.market_function", "§9");
+    }
+
+    public static String getColorBuiltinVar() {
+        return getColor("notenoughcalculator.color.builtin_variable", "§b");
+    }
+
+    public static String getColorCustomVar() {
+        return getColor("notenoughcalculator.color.custom_variable", "§a");
+    }
+
+    public static String getColorDollarSign() {
+        return getColor("notenoughcalculator.color.dollar_sign", "§6");
+    }
+
+    public static String getColorStringItem() {
+        return getColor("notenoughcalculator.color.string_item", "§d");
+    }
+
+    public static String getColorOp() {
+        return getColor("notenoughcalculator.color.operator", "§c");
+    }
+
+    public static String getColorDelim() {
+        return getColor("notenoughcalculator.color.delimiter", "§7");
+    }
+
+    public static String getColorError() {
+        return getColor("notenoughcalculator.color.error", "§c");
+    }
+
+    public static String getColorResult() {
+        return getColor("notenoughcalculator.color.result", "§a");
+    }
 
     public static final Set<String> MARKET_FUNCTIONS = ExpressionEvaluator.MARKET_FUNCTIONS;
     public static final Set<String> PROGRESSION_FUNCTIONS = ExpressionEvaluator.PROGRESSION_FUNCTIONS;

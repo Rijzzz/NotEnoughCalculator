@@ -68,11 +68,39 @@ class CalculatorConfigTest {
     @Test
     void testResultColorCodes() {
         config.enableSyntaxHighlighting = true;
-        assertEquals("§1", config.getResultColorCode());
-        assertEquals("§1", config.getChatResultColorCode());
+        assertEquals("§a", config.getResultColorCode());
+        assertEquals("§a", config.getChatResultColorCode());
 
         config.enableSyntaxHighlighting = false;
         assertEquals("§f", config.getResultColorCode());
         assertEquals("§f", config.getChatResultColorCode());
+    }
+
+    @Test
+    void testStandaloneModeAndPositioning() {
+        assertFalse(config.forceStandaloneMode);
+        assertEquals(-1, config.standaloneX);
+        assertEquals(-1, config.standaloneY);
+        assertFalse(config.isCustomPositionSet());
+
+        config.setPosition(150, 250);
+        assertTrue(config.isCustomPositionSet());
+        assertEquals(150, config.standaloneX);
+        assertEquals(250, config.standaloneY);
+
+        config.resetPosition();
+        assertFalse(config.isCustomPositionSet());
+        assertEquals(-1, config.standaloneX);
+        assertEquals(-1, config.standaloneY);
+
+        config.forceStandaloneMode = true;
+        assertTrue(config.forceStandaloneMode);
+    }
+
+    @Test
+    void testCustomVariablesMap() {
+        config.customVariables.put("profit", "100m");
+        assertEquals("100m", config.customVariables.get("profit"));
+        assertEquals(1, config.customVariables.size());
     }
 }

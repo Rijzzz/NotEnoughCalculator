@@ -46,9 +46,11 @@ public class CalculatorOverlayRenderer {
         if (!shouldRenderCalculator(screen, mc, shouldRender)) return;
 
         try {
-            if (IntegrationManager.isREILoaded()) {
+            if (CalculatorConfig.getInstance().forceStandaloneMode) {
+                renderStandalone(context, calcManager, mc);
+            } else if (IntegrationManager.isREILoaded()) {
                 REIRuntime runtime = REIRuntime.getInstance();
-                if (runtime == null || !runtime.isOverlayVisible()) return;
+                if (runtime == null) return;
 
                 ScreenOverlay overlay = runtime.getOverlay().orElse(null);
                 if (overlay == null) return;
@@ -70,19 +72,19 @@ public class CalculatorOverlayRenderer {
                 // SkyBlock Item List is loaded and integration is OFF: let Item List use its native calculator and skip NEC rendering
                 return;
             } else {
-                SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
-                if (adapter == null) return;
-
-                String searchText = adapter.getText();
-                calcManager.formatSearchBar(searchText);
-
-                if (!CalculatorManager.looksLikeCalculation(searchText)) {
-                    return;
-                }
-
-                StandaloneOverlayRenderer.render(context, adapter, searchText, mc.font, calcManager);
+                renderStandalone(context, calcManager, mc);
             }
         } catch (Exception ignored) {}
+    }
+
+    private static void renderStandalone(GuiGraphicsExtractor context, CalculatorManager calcManager, Minecraft mc) {
+        SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
+        if (adapter == null) return;
+
+        String searchText = adapter.getText();
+        calcManager.formatSearchBar(searchText);
+
+        StandaloneOverlayRenderer.render(context, adapter, searchText, mc.font, calcManager);
     }
 
     private static boolean shouldRenderCalculator(Screen screen, Minecraft mc, boolean shouldRender) {

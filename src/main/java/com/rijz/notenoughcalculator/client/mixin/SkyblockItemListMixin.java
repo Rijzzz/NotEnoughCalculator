@@ -35,7 +35,7 @@ public class SkyblockItemListMixin {
 
     @Inject(method = "isExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void onIsExpression(String text, CallbackInfoReturnable<Boolean> cir) {
-        if (CalculatorConfig.getInstance().enableItemListIntegration) {
+        if (CalculatorConfig.getInstance().enableItemListIntegration && !CalculatorConfig.getInstance().forceStandaloneMode) {
             // Return false so SkyBlock Item List does not draw its basic native yellow text.
             // StandaloneOverlayRenderer will render mostly everything
             cir.setReturnValue(false);
@@ -44,21 +44,21 @@ public class SkyblockItemListMixin {
 
     @Inject(method = "isExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void onIsExpressionStatic(String text, CallbackInfoReturnable<Boolean> cir) {
-        if (CalculatorConfig.getInstance().enableItemListIntegration) {
+        if (CalculatorConfig.getInstance().enableItemListIntegration && !CalculatorConfig.getInstance().forceStandaloneMode) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "calculateExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void onCalculateExpression(String text, CallbackInfoReturnable<Pair<String, Boolean>> cir) {
-        if (CalculatorConfig.getInstance().enableItemListIntegration) {
+        if (CalculatorConfig.getInstance().enableItemListIntegration && !CalculatorConfig.getInstance().forceStandaloneMode) {
             handleCalculateExpression(text, cir);
         }
     }
 
     @Inject(method = "calculateExpression", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void onCalculateExpressionStatic(String text, CallbackInfoReturnable<Pair<String, Boolean>> cir) {
-        if (CalculatorConfig.getInstance().enableItemListIntegration) {
+        if (CalculatorConfig.getInstance().enableItemListIntegration && !CalculatorConfig.getInstance().forceStandaloneMode) {
             handleCalculateExpression(text, cir);
         }
     }

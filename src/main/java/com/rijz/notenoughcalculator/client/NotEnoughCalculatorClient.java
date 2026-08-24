@@ -18,15 +18,16 @@
 
 package com.rijz.notenoughcalculator.client;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.rijz.notenoughcalculator.client.command.CalculatorCommands;
 import com.rijz.notenoughcalculator.client.gui.overlay.CalculatorOverlayRenderer;
+import com.rijz.notenoughcalculator.client.integration.CalculatorBounds;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.client.util.REIHelper;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ResultFormatter;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import net.fabricmc.api.ClientModInitializer;
@@ -50,8 +51,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
     // Track world state for session-based history resets
     private static boolean wasInWorld = false;
+    private static boolean wasInScreen = false;
     private static boolean shouldRender = false;
-    private static boolean wasREIVisible = false;
 
     @Override
     public void onInitializeClient() {
@@ -71,40 +72,63 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
     private void registerWorldStateTracking() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             boolean isInWorld = client.level != null && client.player != null;
+            boolean hasScreen = ReflectionUtils.getCurrentScreen(client) != null;
 
             if (wasInWorld && !isInWorld) {
                 LOGGER.info("Player left world - resetting calculator session");
                 calcManager.reset();
                 calcManager.clearHistory();
                 shouldRender = false;
-                clearREISearchField();
+                clearSearchField();
             }
 
-            wasInWorld = isInWorld;
-
-            boolean isREIVisibleNow = isREIVisible();
-
-            // Commit current calculation when closing inventory/REI overlay
-            if (wasREIVisible && !isREIVisibleNow) {
-                LOGGER.debug("REI overlay closed - committing pending calculation");
+            // Commit current calculation when closing inventory screen
+            if (wasInWorld && wasInScreen && !hasScreen) {
+                LOGGER.debug("Screen closed - committing pending calculation");
                 calcManager.commitPendingCalculationPublic();
             }
 
-            wasREIVisible = isREIVisibleNow;
-            shouldRender = isInWorld && isREIVisibleNow;
+            wasInWorld = isInWorld;
+            wasInScreen = hasScreen;
+            shouldRender = isInWorld;
         });
     }
-
 
     private void registerScreenRendering() {
         ScreenEvents.BEFORE_INIT.register((client, screen, sw, sh) -> {
             ScreenEvents.afterExtract(screen).register((scr, context, mouseX, mouseY, delta) -> {
+                if (IntegrationManager.isStandaloneActive()) {
+                    var sf = IntegrationManager.getStandaloneField();
+                    if (sf.isDragging()) {
+                        sf.updateDrag(mouseX, mouseY);
+                    }
+                }
                 CalculatorOverlayRenderer.renderOverlay(scr, context, calcManager, shouldRender);
             });
 
-            ScreenMouseEvents.afterMouseClick(screen).register((scr, click, handled) -> {
-                if (!IntegrationManager.isREILoaded()) {
-                    IntegrationManager.getStandaloneField().mouseClicked(click.x(), click.y(), click.button());
+            ScreenMouseEvents.allowMouseClick(screen).register((scr, click) -> {
+                if (IntegrationManager.isStandaloneActive()) {
+                    var sf = IntegrationManager.getStandaloneField();
+                    CalculatorBounds bounds = sf.getBounds();
+                    if (click.x() >= bounds.x && click.x() <= bounds.getMaxX() && click.y() >= bounds.y && click.y() <= bounds.getMaxY()) {
+                        sf.mouseClicked(click.x(), click.y(), click.button());
+                        long window = Minecraft.getInstance().getWindow().handle();
+                        boolean shiftDown = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS ||
+                                GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS;
+                        if (shiftDown || click.button() == 1) {
+                            sf.startDragging(click.x(), click.y());
+                        }
+                        return false;
+                    } else {
+                        sf.setFocused(false);
+                    }
+                }
+                return true;
+            });
+
+            ScreenMouseEvents.afterMouseRelease(screen).register((scr, release, handled) -> {
+                if (IntegrationManager.isStandaloneActive()) {
+                    IntegrationManager.getStandaloneField().mouseReleased(release.x(), release.y(), release.button());
                 }
                 return true;
             });
@@ -113,9 +137,21 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
                 return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(), keyInput.modifiers());
             });
+
+            // Intercept character typing when standalone field is focused so it doesn't leak to screen widgets
+            ScreenKeyboardEvents.allowCharType(screen).register((scr, charInput) -> {
+                if (IntegrationManager.isStandaloneActive() && IntegrationManager.getStandaloneField().isFocused()) {
+                    char ch = (char) charInput.codepoint();
+                    boolean handled = IntegrationManager.getStandaloneField().charTyped(ch, 0);
+                    if (handled) {
+                        calcManager.formatSearchBar(IntegrationManager.getStandaloneField().getText());
+                    }
+                    return false;
+                }
+                return true;
+            });
         });
     }
-
 
     private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
         Minecraft mc = Minecraft.getInstance();
@@ -129,9 +165,9 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         }
 
         try {
-            if (IntegrationManager.isREILoaded()) {
+            if (!IntegrationManager.isStandaloneActive() && IntegrationManager.isREILoaded()) {
                 REIRuntime runtime = REIRuntime.getInstance();
-                if (runtime != null && runtime.isOverlayVisible()) {
+                if (runtime != null) {
                     TextField searchField = runtime.getSearchTextField();
                     if (searchField != null) {
                         String searchText = searchField.getText();
@@ -159,7 +195,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && REIHelper.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
-                                String copyText = enableFullCopy ? (searchText + " = " + result) : result;
+                                String copyText = enableFullCopy ? ResultFormatter.formatEquationForCopy(searchText, result) : result;
                                 Minecraft.getInstance().keyboardHandler.setClipboard(copyText);
                                 LOGGER.debug("Copied '{}' to clipboard", copyText);
                                 return false;
@@ -169,7 +205,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                         if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && REIHelper.isNoSelection(searchField)) {
                             String result = calcManager.getLastFormattedResult();
                             if (result != null && !result.isEmpty()) {
-                                String cutText = enableFullCopy ? (searchText + " = " + result) : result;
+                                String cutText = enableFullCopy ? ResultFormatter.formatEquationForCopy(searchText, result) : result;
                                 Minecraft.getInstance().keyboardHandler.setClipboard(cutText);
                                 searchField.setText("");
                                 REIHelper.clampSearchField(searchField);
@@ -213,7 +249,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
-                            String copyText = enableFullCopy ? (searchText + " = " + result) : result;
+                            String copyText = enableFullCopy ? ResultFormatter.formatEquationForCopy(searchText, result) : result;
                             Minecraft.getInstance().keyboardHandler.setClipboard(copyText);
                             LOGGER.debug("Copied '{}' to clipboard", copyText);
                             return false;
@@ -223,7 +259,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult && ReflectionUtils.isNoSelection(adapter)) {
                         String result = calcManager.getLastFormattedResult();
                         if (result != null && !result.isEmpty()) {
-                            String cutText = enableFullCopy ? (searchText + " = " + result) : result;
+                            String cutText = enableFullCopy ? ResultFormatter.formatEquationForCopy(searchText, result) : result;
                             Minecraft.getInstance().keyboardHandler.setClipboard(cutText);
                             adapter.setText("");
                             adapter.clamp();
@@ -238,18 +274,14 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                     }
 
                     if (IntegrationManager.isStandaloneActive() && IntegrationManager.getStandaloneField().isFocused()) {
-                        if (mc.options.keyInventory.matches(InputConstants.Type.KEYSYM.getOrCreate(key))) {
-                            IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
-                            String text = IntegrationManager.getStandaloneField().getText();
-                            calcManager.formatSearchBar(text);
-                            return false;
+                        if (key == GLFW.GLFW_KEY_ESCAPE) {
+                            IntegrationManager.getStandaloneField().setFocused(false);
+                            return true;
                         }
-                    }
-
-                    boolean handled = IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
-                    if (handled) {
+                        IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
                         String text = IntegrationManager.getStandaloneField().getText();
                         calcManager.formatSearchBar(text);
+                        return false;
                     }
                 }
             }
@@ -259,7 +291,6 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
         return true;
     }
-
 
     private void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -275,7 +306,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
             dispatcher.register(ClientCommands.literal("calcset")
                     .then(ClientCommands.argument("variable", StringArgumentType.word())
                             .then(ClientCommands.argument("value", StringArgumentType.greedyString())
-                                    .executes(CalculatorCommands::executeSet))));
+                                     .executes(CalculatorCommands::executeSet))));
 
             dispatcher.register(ClientCommands.literal("calchelp")
                     .executes(CalculatorCommands::executeHelp)
@@ -285,7 +316,12 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
                             .executes(CalculatorCommands::executeHelpPage)));
 
             dispatcher.register(ClientCommands.literal("calcconfig")
-                    .executes(CalculatorCommands::executeConfig));
+                    .executes(CalculatorCommands::executeConfig)
+                    .then(ClientCommands.literal("position")
+                            .executes(CalculatorCommands::executePosition)));
+
+            dispatcher.register(ClientCommands.literal("calcpos")
+                    .executes(CalculatorCommands::executePosition));
 
             dispatcher.register(ClientCommands.literal("calccopy")
                     .then(ClientCommands.argument("text", StringArgumentType.greedyString())
@@ -293,19 +329,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
         });
     }
 
-    private boolean isREIVisible() {
-        if (!IntegrationManager.isREILoaded()) {
-            return true;
-        }
-        try {
-            REIRuntime runtime = REIRuntime.getInstance();
-            return runtime != null && runtime.isOverlayVisible();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private void clearREISearchField() {
+    private void clearSearchField() {
         try {
             SearchFieldAdapter adapter = IntegrationManager.getActiveAdapter();
             if (adapter != null) {

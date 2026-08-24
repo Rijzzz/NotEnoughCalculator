@@ -22,6 +22,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.rijz.notenoughcalculator.client.NotEnoughCalculatorClient;
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
+import com.rijz.notenoughcalculator.client.gui.PositionConfigScreen;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
@@ -68,8 +69,8 @@ public class CalculatorCommands {
         try {
             EvalResult evalRes = NotEnoughCalculatorClient.getCalculatorManager().calculateResult(expr);
             String formatted = ResultFormatter.formatResultWithUnits(evalRes);
-            String copyText = config.enableFullEquationCopy ? (expr + " = " + formatted) : formatted;
-            String highlightedExpr = config.enableSyntaxHighlighting ? SyntaxHighlighter.highlight(expr) : "§f" + expr;
+            String copyText = config.enableFullEquationCopy ? ResultFormatter.formatEquationForCopy(expr, formatted) : formatted;
+            String highlightedExpr = config.enableSyntaxHighlighting ? SyntaxHighlighter.highlight(expr) : SyntaxHighlighter.getColorNumber() + expr;
 
             MutableComponent msg = Component.literal(prefix + highlightedExpr +
                     ResultFormatter.getEqualsSign() +
@@ -169,6 +170,15 @@ public class CalculatorCommands {
         client.execute(() -> {
             Screen currentScreen = ReflectionUtils.getCurrentScreen(client);
             CalculatorConfigScreen.openScreen(client, new CalculatorConfigScreen(currentScreen));
+        });
+        return 1;
+    }
+
+    public static int executePosition(CommandContext<FabricClientCommandSource> ctx) {
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> {
+            Screen currentScreen = ReflectionUtils.getCurrentScreen(client);
+            ReflectionUtils.openScreen(client, new PositionConfigScreen(currentScreen));
         });
         return 1;
     }

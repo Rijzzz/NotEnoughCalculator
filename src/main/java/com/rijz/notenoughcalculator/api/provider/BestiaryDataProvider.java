@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
+import com.rijz.notenoughcalculator.core.ResultFormatter;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -43,7 +44,7 @@ public class BestiaryDataProvider {
             if (lines != null) {
                 for (String line : lines) {
                     if (line == null) continue;
-                    String clean = line.replaceAll("§[0-9a-fk-orA-FK-OR]", "").trim();
+                    String clean = ResultFormatter.stripMinecraftFormatting(line).trim();
                     Matcher matcher = BESTIARY_LEVEL_PATTERN.matcher(clean);
                     if (matcher.find()) {
                         String numStr = matcher.group(1).replace(",", "");

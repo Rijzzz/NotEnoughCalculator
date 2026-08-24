@@ -18,8 +18,11 @@
 
 package com.rijz.notenoughcalculator.client.gui.tab;
 
+import com.rijz.notenoughcalculator.client.gui.PositionConfigScreen;
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
+import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -39,7 +42,23 @@ public class SettingsTab {
     private Button bazaarLvl2Btn;
     private Button historyBtn;
     private Button fullCopyBtn;
+    private Button standaloneBtn;
     private Button itemListBtn;
+
+    public int getContentHeight(CalculatorConfigScreen screen) {
+        int height = 218;
+        boolean hasOtherIntegrations = IntegrationManager.isREILoaded() || IntegrationManager.isItemListLoaded();
+        if (hasOtherIntegrations) {
+            height += 18;
+        }
+        if (!hasOtherIntegrations || screen.forceStandaloneMode) {
+            height += 18;
+        }
+        if (IntegrationManager.isItemListLoaded()) {
+            height += 18;
+        }
+        return height;
+    }
 
     public void init(CalculatorConfigScreen screen, int panelX, int startY, int buttonWidth, int buttonHeight, Runnable reinitAction) {
         inlineBtn = screen.addRenderableWidgetPublic(Button.builder(Component.empty(), btn -> {
@@ -105,27 +124,70 @@ public class SettingsTab {
                 .tooltip(bazaarTooltip)
                 .build());
 
+        int currY = startY + 182;
         historyBtn = screen.addRenderableWidgetPublic(Button.builder(Component.empty(), btn -> {
             screen.enableHistoryNavigation = !screen.enableHistoryNavigation;
             screen.updateButtonLabelsPublic();
-        }).bounds(panelX + 20, startY + 182, buttonWidth, buttonHeight)
+        }).bounds(panelX + 20, currY, buttonWidth, buttonHeight)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.history_navigation")))
                 .build());
+        currY += 18;
 
         fullCopyBtn = screen.addRenderableWidgetPublic(Button.builder(Component.empty(), btn -> {
             screen.enableFullEquationCopy = !screen.enableFullEquationCopy;
             screen.updateButtonLabelsPublic();
-        }).bounds(panelX + 20, startY + 200, buttonWidth, buttonHeight)
+        }).bounds(panelX + 20, currY, buttonWidth, buttonHeight)
                 .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.full_equation_copy")))
                 .build());
+        currY += 18;
+
+        boolean hasOtherIntegrations = IntegrationManager.isREILoaded() || IntegrationManager.isItemListLoaded();
+        if (hasOtherIntegrations) {
+            standaloneBtn = screen.addRenderableWidgetPublic(Button.builder(Component.empty(), btn -> {
+                screen.forceStandaloneMode = !screen.forceStandaloneMode;
+                if (reinitAction != null) {
+                    reinitAction.run();
+                } else {
+                    screen.updateButtonLabelsPublic();
+                }
+            }).bounds(panelX + 20, currY, buttonWidth, buttonHeight)
+                    .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.force_standalone_mode")))
+                    .build());
+            currY += 18;
+        } else {
+            standaloneBtn = null;
+        }
+
+        if (!hasOtherIntegrations || screen.forceStandaloneMode) {
+            int resetWidth = 20;
+            int editWidth = buttonWidth - resetWidth - 4;
+            screen.addRenderableWidgetPublic(Button.builder(Component.translatable("notenoughcalculator.config.screen.edit_gui"), btn -> {
+                ReflectionUtils.openScreen(screen.getMinecraftInstancePublic(), new PositionConfigScreen(screen));
+            }).bounds(panelX + 20, currY, editWidth, buttonHeight)
+                    .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.edit_gui")))
+                    .build());
+
+            screen.addRenderableWidgetPublic(Button.builder(Component.translatable("notenoughcalculator.config.screen.reset_symbol"), btn -> {
+                screen.standaloneX = -1;
+                screen.standaloneY = -1;
+                CalculatorConfig.getInstance().resetPosition();
+                CalculatorConfig.getInstance().save();
+                screen.updateButtonLabelsPublic();
+            }).bounds(panelX + 20 + editWidth + 4, currY, resetWidth, buttonHeight)
+                    .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.reset_position")))
+                    .build());
+            currY += 18;
+        }
 
         if (IntegrationManager.isItemListLoaded()) {
             itemListBtn = screen.addRenderableWidgetPublic(Button.builder(Component.empty(), btn -> {
                 screen.enableItemListIntegration = !screen.enableItemListIntegration;
                 screen.updateButtonLabelsPublic();
-            }).bounds(panelX + 20, startY + 218, buttonWidth, buttonHeight)
+            }).bounds(panelX + 20, currY, buttonWidth, buttonHeight)
                     .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.itemlist_integration")))
                     .build());
+        } else {
+            itemListBtn = null;
         }
     }
 
@@ -134,31 +196,52 @@ public class SettingsTab {
         Component offText = Component.translatable("notenoughcalculator.config.screen.off");
 
         if (inlineBtn != null) {
-            inlineBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.inline_results").copy().append(": ").append(screen.showInlineResults ? onText : offText));
+            inlineBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.inline_results"),
+                    screen.showInlineResults ? onText : offText));
         }
         if (unitBtn != null) {
-            unitBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.unit_suggestions").copy().append(": ").append(screen.showUnitSuggestions ? onText : offText));
+            unitBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.unit_suggestions"),
+                    screen.showUnitSuggestions ? onText : offText));
         }
         if (commaBtn != null) {
-            commaBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.comma_formatting").copy().append(": ").append(screen.enableCommaFormatting ? onText : offText));
+            commaBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.comma_formatting"),
+                    screen.enableCommaFormatting ? onText : offText));
         }
         if (shorthandBtn != null) {
-            shorthandBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.shorthand_results").copy().append(": ").append(screen.enableShorthandResults ? onText : offText));
+            shorthandBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.shorthand_results"),
+                    screen.enableShorthandResults ? onText : offText));
         }
         if (syntaxBtn != null) {
-            syntaxBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.syntax_highlighting").copy().append(": ").append(screen.enableSyntaxHighlighting ? onText : offText));
+            syntaxBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.syntax_highlighting"),
+                    screen.enableSyntaxHighlighting ? onText : offText));
         }
         if (precisionBtn != null) {
-            precisionBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.decimal_precision").copy().append(": §e§l").append(String.valueOf(screen.decimalPrecision)));
+            precisionBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.decimal_precision").copy().append(Component.translatable("notenoughcalculator.config.screen.decimal_precision_format", String.valueOf(screen.decimalPrecision))));
         }
         if (historyBtn != null) {
-            historyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.history_navigation").copy().append(": ").append(screen.enableHistoryNavigation ? onText : offText));
+            historyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.history_navigation"),
+                    screen.enableHistoryNavigation ? onText : offText));
         }
         if (fullCopyBtn != null) {
-            fullCopyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.full_equation_copy").copy().append(": ").append(screen.enableFullEquationCopy ? onText : offText));
+            fullCopyBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.full_equation_copy"),
+                    screen.enableFullEquationCopy ? onText : offText));
+        }
+        if (standaloneBtn != null) {
+            standaloneBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.force_standalone_mode"),
+                    screen.forceStandaloneMode ? onText : offText));
         }
         if (itemListBtn != null) {
-            itemListBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.itemlist_integration").copy().append(": ").append(screen.enableItemListIntegration ? onText : offText));
+            itemListBtn.setMessage(Component.translatable("notenoughcalculator.config.screen.toggle_format",
+                    Component.translatable("notenoughcalculator.config.screen.itemlist_integration"),
+                    screen.enableItemListIntegration ? onText : offText));
         }
 
         if (bazaarLvl0Btn != null) {

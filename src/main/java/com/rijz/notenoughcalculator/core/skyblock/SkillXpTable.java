@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.core.skyblock;
 
 import java.math.BigDecimal;
+import java.util.function.IntFunction;
 
 public final class SkillXpTable {
 
@@ -74,19 +75,7 @@ public final class SkillXpTable {
     }
 
     public static BigDecimal getSkillXpBetween(int fromLevel, int toLevel) {
-        if (fromLevel < 0) {
-            fromLevel = 0;
-        }
-        if (toLevel < 0) {
-            toLevel = 0;
-        }
-        if (fromLevel >= toLevel) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal startXp = getSkillXp(fromLevel);
-        BigDecimal targetXp = getSkillXp(toLevel);
-        return targetXp.subtract(startXp);
+        return calculateBetween(SkillXpTable::getSkillXp, fromLevel, toLevel);
     }
 
     public static BigDecimal getRunecraftingXp(int toLevel) {
@@ -100,19 +89,7 @@ public final class SkillXpTable {
     }
 
     public static BigDecimal getRunecraftingXpBetween(int fromLevel, int toLevel) {
-        if (fromLevel < 0) {
-            fromLevel = 0;
-        }
-        if (toLevel < 0) {
-            toLevel = 0;
-        }
-        if (fromLevel >= toLevel) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal startXp = getRunecraftingXp(fromLevel);
-        BigDecimal targetXp = getRunecraftingXp(toLevel);
-        return targetXp.subtract(startXp);
+        return calculateBetween(SkillXpTable::getRunecraftingXp, fromLevel, toLevel);
     }
 
     public static BigDecimal getSocialXp(int toLevel) {
@@ -126,19 +103,7 @@ public final class SkillXpTable {
     }
 
     public static BigDecimal getSocialXpBetween(int fromLevel, int toLevel) {
-        if (fromLevel < 0) {
-            fromLevel = 0;
-        }
-        if (toLevel < 0) {
-            toLevel = 0;
-        }
-        if (fromLevel >= toLevel) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal startXp = getSocialXp(fromLevel);
-        BigDecimal targetXp = getSocialXp(toLevel);
-        return targetXp.subtract(startXp);
+        return calculateBetween(SkillXpTable::getSocialXp, fromLevel, toLevel);
     }
 
     public static BigDecimal getCataXp(int toLevel) {
@@ -154,19 +119,7 @@ public final class SkillXpTable {
     }
 
     public static BigDecimal getCataXpBetween(int fromLevel, int toLevel) {
-        if (fromLevel < 0) {
-            fromLevel = 0;
-        }
-        if (toLevel < 0) {
-            toLevel = 0;
-        }
-        if (fromLevel >= toLevel) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal startXp = getCataXp(fromLevel);
-        BigDecimal targetXp = getCataXp(toLevel);
-        return targetXp.subtract(startXp);
+        return calculateBetween(SkillXpTable::getCataXp, fromLevel, toLevel);
     }
 
     public static BigDecimal getHuntingXp(int toLevel) {
@@ -180,24 +133,19 @@ public final class SkillXpTable {
     }
 
     public static BigDecimal getHuntingXpBetween(int fromLevel, int toLevel) {
+        return calculateBetween(SkillXpTable::getHuntingXp, fromLevel, toLevel);
+    }
+
+    private static BigDecimal calculateBetween(IntFunction<BigDecimal> xpFunction, int fromLevel, int toLevel) {
         if (fromLevel < 0) {
             fromLevel = 0;
         }
         if (toLevel < 0) {
             toLevel = 0;
         }
-        if (fromLevel > 50) {
-            fromLevel = 50;
-        }
-        if (toLevel > 50) {
-            toLevel = 50;
-        }
         if (fromLevel >= toLevel) {
             return BigDecimal.ZERO;
         }
-
-        BigDecimal startXp = getHuntingXp(fromLevel);
-        BigDecimal targetXp = getHuntingXp(toLevel);
-        return targetXp.subtract(startXp);
+        return xpFunction.apply(toLevel).subtract(xpFunction.apply(fromLevel));
     }
 }

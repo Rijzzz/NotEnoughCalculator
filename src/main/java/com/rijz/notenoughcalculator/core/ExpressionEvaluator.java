@@ -348,8 +348,8 @@ public class ExpressionEvaluator {
         Collections.sort(sortedKeys);
 
         for (String key : sortedKeys) {
-            sb.append("  $").append(key).append(" = ")
-                    .append(ResultFormatter.formatWithCommas(variables.get(key))).append("\n");
+            sb.append(tr("notenoughcalculator.variable.item_format", key,
+                    ResultFormatter.formatWithCommas(variables.get(key)))).append("\n");
         }
         return sb.toString().trim();
     }

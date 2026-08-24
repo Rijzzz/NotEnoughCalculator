@@ -221,4 +221,22 @@ class ResultFormatterTest {
         assertEquals(" §f= ", ResultFormatter.getEqualsSign());
         config.enableSyntaxHighlighting = true;
     }
+
+    @Test
+    @DisplayName("Strip Minecraft formatting codes correctly")
+    void testStripMinecraftFormatting() {
+        assertEquals("Hello World", ResultFormatter.stripMinecraftFormatting("§aHello §c§lWorld"));
+        assertEquals("", ResultFormatter.stripMinecraftFormatting(null));
+        assertEquals("100m", ResultFormatter.stripMinecraftFormatting("§e100m§r"));
+    }
+
+    @Test
+    @DisplayName("Format equation for copying")
+    void testFormatEquationForCopy() {
+        String eq = ResultFormatter.formatEquationForCopy("100m - 50m", "50,000,000");
+        assertNotNull(eq);
+        assertTrue(eq.contains("100m - 50m"));
+        assertTrue(eq.contains("50,000,000"));
+        assertTrue(eq.contains("="));
+    }
 }

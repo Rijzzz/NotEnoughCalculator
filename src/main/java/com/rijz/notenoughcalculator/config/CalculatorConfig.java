@@ -63,7 +63,24 @@ public class CalculatorConfig {
     public boolean enableSyntaxHighlighting = true;
     public boolean enableFullEquationCopy = true;
     public boolean enableItemListIntegration = true;
+    public boolean forceStandaloneMode = false;
+    public int standaloneX = -1;
+    public int standaloneY = -1;
     public Map<String, String> customVariables = new LinkedHashMap<>();
+
+    public boolean isCustomPositionSet() {
+        return standaloneX >= 0 && standaloneY >= 0;
+    }
+
+    public void resetPosition() {
+        this.standaloneX = -1;
+        this.standaloneY = -1;
+    }
+
+    public void setPosition(int x, int y) {
+        this.standaloneX = x;
+        this.standaloneY = y;
+    }
 
     public static CalculatorConfig getInstance() {
         // Poll for external config file edits every 2 seconds

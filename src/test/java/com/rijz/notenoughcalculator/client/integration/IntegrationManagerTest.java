@@ -18,6 +18,7 @@
 
 package com.rijz.notenoughcalculator.client.integration;
 
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,5 +32,16 @@ class IntegrationManagerTest {
         assertTrue(IntegrationManager.isStandaloneActive());
         assertNotNull(IntegrationManager.getStandaloneField());
         assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
+    }
+
+    @Test
+    void testForceStandaloneMode() {
+        CalculatorConfig config = CalculatorConfig.getInstance();
+        config.forceStandaloneMode = true;
+
+        assertTrue(IntegrationManager.isStandaloneActive());
+        assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
+
+        config.forceStandaloneMode = false;
     }
 }

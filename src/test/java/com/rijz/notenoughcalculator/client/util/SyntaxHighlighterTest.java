@@ -83,4 +83,10 @@ public class SyntaxHighlighterTest {
         String quoteHighlighted = SyntaxHighlighter.highlight("bzb(\"HYPERION\")");
         assertTrue(quoteHighlighted.contains("§d\"HYPERION\""), "Quoted string should be Light Purple (§d)");
     }
+
+    @Test
+    public void testResultAndErrorColorCodes() {
+        assertEquals("§a", SyntaxHighlighter.getColorResult());
+        assertEquals("§c", SyntaxHighlighter.getColorError());
+    }
 }

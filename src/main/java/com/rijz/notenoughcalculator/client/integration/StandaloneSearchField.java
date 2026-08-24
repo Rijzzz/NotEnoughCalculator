@@ -18,16 +18,109 @@
 
 package com.rijz.notenoughcalculator.client.integration;
 
+import com.rijz.notenoughcalculator.client.util.REIHelper;
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.REIRuntime;
+import me.shedaniel.rei.api.client.gui.widgets.TextField;
+import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import org.lwjgl.glfw.GLFW;
 
 public class StandaloneSearchField implements SearchFieldAdapter {
 
+    public static final int DEFAULT_WIDTH = 160;
+    public static final int DEFAULT_HEIGHT = 18;
+
     private String text = "";
     private int cursorPosition = 0;
     private int selectionEnd = 0;
     private boolean focused = true;
+
+    private boolean isDragging = false;
+    private int dragOffsetX = 0;
+    private int dragOffsetY = 0;
+
+    public boolean isDragging() {
+        return isDragging;
+    }
+
+    public boolean startDragging(double mouseX, double mouseY) {
+        CalculatorBounds bounds = getBounds();
+        if (bounds != null && mouseX >= bounds.x && mouseX <= bounds.getMaxX() && mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
+            this.isDragging = true;
+            this.dragOffsetX = (int) mouseX - bounds.x;
+            this.dragOffsetY = (int) mouseY - bounds.y;
+            return true;
+        }
+        return false;
+    }
+
+    public static int[] getMatchedDimensions() {
+        if (IntegrationManager.isREILoaded()) {
+            try {
+                REIRuntime runtime = REIRuntime.getInstance();
+                if (runtime != null) {
+                    TextField reiField = runtime.getSearchTextField();
+                    if (reiField != null) {
+                        Rectangle rect = REIHelper.getSearchFieldBounds(reiField);
+                        if (rect != null && rect.width > 0 && rect.height > 0) {
+                            return new int[]{rect.width, rect.height};
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        if (IntegrationManager.isItemListLoaded()) {
+            try {
+                SkyblockItemListAdapter itemAdapter = new SkyblockItemListAdapter();
+                CalculatorBounds itemBounds = itemAdapter.getBounds();
+                if (itemBounds != null && itemBounds.width > 0 && itemBounds.height > 0) {
+                    return new int[]{itemBounds.width, itemBounds.height};
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        return new int[]{DEFAULT_WIDTH, DEFAULT_HEIGHT};
+    }
+
+    public void updateDrag(double mouseX, double mouseY) {
+        if (!isDragging) return;
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc != null && mc.getWindow() != null) {
+                int screenWidth = mc.getWindow().getGuiScaledWidth();
+                int screenHeight = mc.getWindow().getGuiScaledHeight();
+                int[] dims = getMatchedDimensions();
+                int width = dims[0];
+                int height = dims[1];
+
+                int newX = (int) mouseX - dragOffsetX;
+                int newY = (int) mouseY - dragOffsetY;
+                newX = Math.max(0, Math.min(newX, screenWidth - width));
+                newY = Math.max(0, Math.min(newY, screenHeight - height));
+
+                CalculatorConfig.getInstance().setPosition(newX, newY);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    public void stopDragging() {
+        if (isDragging) {
+            this.isDragging = false;
+            CalculatorConfig.getInstance().save();
+        }
+    }
+
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (isDragging) {
+            stopDragging();
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public String getText() {
@@ -107,15 +200,100 @@ public class StandaloneSearchField implements SearchFieldAdapter {
                 int screenWidth = mc.getWindow().getGuiScaledWidth();
                 int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-                int width = 160;
-                int height = 18;
-                int x = (screenWidth - width) / 2;
-                int y = screenHeight - 22;
+                int[] dims = getMatchedDimensions();
+                int width = dims[0];
+                int height = dims[1];
 
-                return new CalculatorBounds(x, y, width, height);
+                CalculatorConfig config = CalculatorConfig.getInstance();
+                if (config.isCustomPositionSet()) {
+                    int customX = Math.max(0, Math.min(config.standaloneX, screenWidth - width));
+                    int customY = Math.max(0, Math.min(config.standaloneY, screenHeight - height));
+                    return new CalculatorBounds(customX, customY, width, height);
+                }
+
+                return getDefaultBounds(screenWidth, screenHeight);
             }
         } catch (Exception ignored) {}
-        return new CalculatorBounds(320, 500, 160, 18);
+        int[] dims = getMatchedDimensions();
+        return new CalculatorBounds(320, 500, dims[0], dims[1]);
+    }
+
+    public static CalculatorBounds getDefaultBounds(int screenWidth, int screenHeight) {
+        int[] dims = getMatchedDimensions();
+        int width = dims[0];
+        int height = dims[1];
+
+        // Case A: If REI is loaded, position just beside REI search bar
+        if (IntegrationManager.isREILoaded()) {
+            try {
+                REIRuntime runtime = REIRuntime.getInstance();
+                if (runtime != null) {
+                    TextField reiField = runtime.getSearchTextField();
+                    if (reiField != null) {
+                        Rectangle rect = REIHelper.getSearchFieldBounds(reiField);
+                        if (rect != null && rect.width > 0 && rect.height > 0) {
+                            int candX = rect.x - width - 4;
+                            int candY = rect.y;
+                            if (candX < 4) {
+                                candX = rect.getMaxX() + 4;
+                            }
+                            if (candX + width > screenWidth) {
+                                candX = rect.x;
+                                candY = Math.max(0, rect.y - height - 4);
+                            }
+                            return new CalculatorBounds(candX, candY, width, height);
+                        }
+                    }
+                    ScreenOverlay overlay = runtime.getOverlay().orElse(null);
+                    if (overlay != null) {
+                        Rectangle ob = overlay.getBounds();
+                        int reiSearchX = ob.x + 2;
+                        int reiSearchY = ob.getMaxY() - 18;
+                        int candX = reiSearchX - width - 4;
+                        int candY = reiSearchY;
+                        if (candX < 4) {
+                            candX = ob.getMaxX() + 4;
+                        }
+                        if (candX + width > screenWidth) {
+                            candX = reiSearchX;
+                            candY = Math.max(0, reiSearchY - height - 4);
+                        }
+                        return new CalculatorBounds(candX, candY, width, height);
+                    }
+                }
+            } catch (Throwable ignored) {}
+            int fallbackX = Math.max(0, screenWidth - (width * 2) - 10);
+            int fallbackY = screenHeight - 22;
+            return new CalculatorBounds(fallbackX, fallbackY, width, height);
+        }
+
+        // Case B: If Skyblock Item List is loaded, position just beside Item List search bar
+        if (IntegrationManager.isItemListLoaded()) {
+            try {
+                SkyblockItemListAdapter itemAdapter = new SkyblockItemListAdapter();
+                CalculatorBounds itemBounds = itemAdapter.getBounds();
+                if (itemBounds != null && itemBounds.width > 0 && itemBounds.height > 0) {
+                    int candX = itemBounds.x - width - 4;
+                    int candY = itemBounds.y;
+                    if (candX < 4) {
+                        candX = itemBounds.getMaxX() + 4;
+                    }
+                    if (candX + width > screenWidth) {
+                        candX = itemBounds.x;
+                        candY = Math.max(0, itemBounds.y - height - 4);
+                    }
+                    return new CalculatorBounds(candX, candY, width, height);
+                }
+            } catch (Throwable ignored) {}
+            int fallbackX = Math.max(0, screenWidth - (width * 2) - 10);
+            int fallbackY = screenHeight - 22;
+            return new CalculatorBounds(fallbackX, fallbackY, width, height);
+        }
+
+        // Case C: Standard standalone centered at bottom of inventory screens
+        int x = (screenWidth - width) / 2;
+        int y = screenHeight - 22;
+        return new CalculatorBounds(x, y, width, height);
     }
 
     @Override
@@ -270,12 +448,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
             return true;
         }
 
-        char ch = getCharFromKey(key, isShift);
-        if (ch != 0 && !isCtrlOrCmd) {
-            return charTyped(ch, modifiers);
-        }
-
-        return false;
+        return focused;
     }
 
     private int findWordStart(String str, int fromIndex) {
@@ -303,47 +476,6 @@ public class StandaloneSearchField implements SearchFieldAdapter {
         return Math.min(len, idx);
     }
 
-    private char getCharFromKey(int key, boolean shift) {
-        if (key >= GLFW.GLFW_KEY_A && key <= GLFW.GLFW_KEY_Z) {
-            char base = (char) ('a' + (key - GLFW.GLFW_KEY_A));
-            return shift ? Character.toUpperCase(base) : base;
-        }
-        if (key >= GLFW.GLFW_KEY_0 && key <= GLFW.GLFW_KEY_9) {
-            if (!shift) {
-                return (char) ('0' + (key - GLFW.GLFW_KEY_0));
-            } else {
-                switch (key) {
-                    case GLFW.GLFW_KEY_1: return '!';
-                    case GLFW.GLFW_KEY_4: return '$';
-                    case GLFW.GLFW_KEY_5: return '%';
-                    case GLFW.GLFW_KEY_6: return '^';
-                    case GLFW.GLFW_KEY_7: return '&';
-                    case GLFW.GLFW_KEY_8: return '*';
-                    case GLFW.GLFW_KEY_9: return '(';
-                    case GLFW.GLFW_KEY_0: return ')';
-                    default: return (char) ('0' + (key - GLFW.GLFW_KEY_0));
-                }
-            }
-        }
-        if (key >= GLFW.GLFW_KEY_KP_0 && key <= GLFW.GLFW_KEY_KP_9) {
-            return (char) ('0' + (key - GLFW.GLFW_KEY_KP_0));
-        }
-        switch (key) {
-            case GLFW.GLFW_KEY_SPACE: return ' ';
-            case GLFW.GLFW_KEY_EQUAL: return shift ? '+' : '=';
-            case GLFW.GLFW_KEY_MINUS: return shift ? '_' : '-';
-            case GLFW.GLFW_KEY_SLASH: return shift ? '?' : '/';
-            case GLFW.GLFW_KEY_PERIOD: return shift ? '>' : '.';
-            case GLFW.GLFW_KEY_COMMA: return shift ? '<' : ',';
-            case GLFW.GLFW_KEY_GRAVE_ACCENT: return shift ? '~' : '`';
-            case GLFW.GLFW_KEY_KP_ADD: return '+';
-            case GLFW.GLFW_KEY_KP_SUBTRACT: return '-';
-            case GLFW.GLFW_KEY_KP_MULTIPLY: return '*';
-            case GLFW.GLFW_KEY_KP_DIVIDE: return '/';
-            case GLFW.GLFW_KEY_KP_DECIMAL: return '.';
-            default: return 0;
-        }
-    }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         CalculatorBounds bounds = getBounds();
@@ -351,24 +483,30 @@ public class StandaloneSearchField implements SearchFieldAdapter {
             focused = true;
 
 
-            Font font = Minecraft.getInstance().font;
-            String currentStr = getText();
-            int clickX = (int) mouseX - bounds.x - 4;
+            Minecraft mc = Minecraft.getInstance();
+            if (mc != null && mc.font != null) {
+                Font font = mc.font;
+                String currentStr = getText();
+                int clickX = (int) mouseX - bounds.x - 4;
 
-            int bestIndex = 0;
-            int bestDist = Integer.MAX_VALUE;
+                int bestIndex = 0;
+                int bestDist = Integer.MAX_VALUE;
 
-            for (int i = 0; i <= currentStr.length(); i++) {
-                int w = font.width(currentStr.substring(0, i));
-                int dist = Math.abs(w - clickX);
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    bestIndex = i;
+                for (int i = 0; i <= currentStr.length(); i++) {
+                    int w = font.width(currentStr.substring(0, i));
+                    int dist = Math.abs(w - clickX);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIndex = i;
+                    }
                 }
-            }
 
-            cursorPosition = bestIndex;
-            selectionEnd = bestIndex;
+                cursorPosition = bestIndex;
+                selectionEnd = bestIndex;
+            } else {
+                cursorPosition = getText().length();
+                selectionEnd = cursorPosition;
+            }
             return true;
         } else {
             focused = false;

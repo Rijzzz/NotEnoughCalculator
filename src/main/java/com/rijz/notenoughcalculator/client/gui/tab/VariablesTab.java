@@ -42,6 +42,10 @@ public class VariablesTab {
     private String varStatusMessage = "";
     private final List<Button> removeVarBtns = new ArrayList<>();
 
+    public int getContentHeight() {
+        return 180;
+    }
+
     public void init(CalculatorConfigScreen screen, Font font, int panelX, int startY, Runnable reinitAction) {
         removeVarBtns.clear();
         int inputY = startY + 16;

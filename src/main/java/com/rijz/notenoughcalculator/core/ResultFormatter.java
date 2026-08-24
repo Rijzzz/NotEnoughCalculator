@@ -26,12 +26,27 @@ import net.minecraft.client.resources.language.I18n;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.regex.Pattern;
 
 public class ResultFormatter {
 
 
     private static String tr(String key, Object... args) {
-        return I18n.get(key, args);
+        try {
+            String translated = I18n.get(key, args);
+            if (translated != null && !translated.equals(key)) {
+                return translated;
+            }
+        } catch (Exception | NoClassDefFoundError ignored) {}
+        if ("notenoughcalculator.unit.suggestion_suffix".equals(key) && args.length > 0) {
+            return " (" + args[0] + ")";
+        }
+        if (args.length > 0) {
+            try {
+                return String.format(key, args);
+            } catch (Exception ignored) {}
+        }
+        return key;
     }
 
     public static String getEqualsSign() {
@@ -46,6 +61,13 @@ public class ResultFormatter {
             }
         } catch (Throwable ignored) {}
         return " §6= ";
+    }
+
+    // Format full equation for copying to clipboard (e.g. "1+1 = 2")
+    public static String formatEquationForCopy(String expr, String formattedResult) {
+        String cleanEquals = stripMinecraftFormatting(getEqualsSign());
+        if (cleanEquals.isEmpty()) cleanEquals = " = ";
+        return expr + cleanEquals + formattedResult;
     }
 
     // Format with commas (preserves arbitrary precision without double-casting loss).
@@ -155,7 +177,7 @@ public class ResultFormatter {
         if (config.showUnitSuggestions && !config.enableShorthandResults) {
             String unitSuggestion = suggestUnit(value);
             if (unitSuggestion != null) {
-                result.append(" (").append(unitSuggestion).append(")");
+                result.append(tr("notenoughcalculator.unit.suggestion_suffix", unitSuggestion));
             }
         }
 
@@ -261,6 +283,13 @@ public class ResultFormatter {
         }
 
         return null;
+    }
+
+    private static final Pattern MINECRAFT_COLOR_PATTERN = Pattern.compile("§[0-9a-fk-orA-FK-OR]");
+
+    // Strip Minecraft color and formatting codes (§a, §l, etc.)
+    public static String stripMinecraftFormatting(String input) {
+        return input == null ? "" : MINECRAFT_COLOR_PATTERN.matcher(input).replaceAll("");
     }
 
     // Remove any weird formatting characters from user input

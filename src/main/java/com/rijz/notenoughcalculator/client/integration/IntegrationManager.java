@@ -19,7 +19,6 @@
 package com.rijz.notenoughcalculator.client.integration;
 
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import me.shedaniel.rei.api.client.REIRuntime;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,25 +63,21 @@ public class IntegrationManager {
         return standaloneField;
     }
 
-    public static boolean isREIOverlayVisible() {
-        if (!isREILoaded()) return false;
-        try {
-            REIRuntime runtime = REIRuntime.getInstance();
-            if (runtime != null) {
-                return runtime.isOverlayVisible();
-            }
-        } catch (Throwable ignored) {}
-        return false;
-    }
-
     public static boolean isStandaloneActive() {
-        if (isREILoaded() && isREIOverlayVisible()) return false;
-        if (isItemListLoaded()) return false;
+        if (CalculatorConfig.getInstance().forceStandaloneMode)
+            return true;
+        if (isREILoaded())
+            return false;
+        if (isItemListLoaded() && CalculatorConfig.getInstance().enableItemListIntegration)
+            return false;
         return true;
     }
 
     public static SearchFieldAdapter getActiveAdapter() {
-        if (isREILoaded() && isREIOverlayVisible()) {
+        if (CalculatorConfig.getInstance().forceStandaloneMode) {
+            return getStandaloneField();
+        }
+        if (isREILoaded()) {
             if (activeAdapter == null || !(activeAdapter instanceof REISearchAdapter)) {
                 activeAdapter = createREISearchAdapter();
             }
@@ -102,7 +97,9 @@ public class IntegrationManager {
         try {
             return new REISearchAdapter();
         } catch (Throwable e) {
-            LOGGER.warn("Failed to initialize Roughly Enough Items (REI) search adapter (falling back to Standalone search bar): {}", e.getMessage());
+            LOGGER.warn(
+                    "Failed to initialize Roughly Enough Items search adapter (falling back to Standalone search bar): {}",
+                    e.getMessage());
             return getStandaloneField();
         }
     }
@@ -111,7 +108,9 @@ public class IntegrationManager {
         try {
             return new SkyblockItemListAdapter();
         } catch (Throwable e) {
-            LOGGER.warn("Failed to initialize Skyblock Item Viewer search adapter (falling back to Standalone search bar): {}", e.getMessage());
+            LOGGER.warn(
+                    "Failed to initialize Skyblock Item Viewer search adapter (falling back to Standalone search bar): {}",
+                    e.getMessage());
             return getStandaloneField();
         }
     }

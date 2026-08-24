@@ -151,4 +151,74 @@ public class StandaloneSearchFieldTest {
         field.keyPressed(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL);
         assertEquals(6, field.getCursorPosition());
     }
+
+    @Test
+    public void testDraggingAndCustomBounds() {
+        assertFalse(field.isDragging());
+
+        CalculatorBounds bounds = field.getBounds();
+        assertNotNull(bounds);
+
+        boolean started = field.startDragging(bounds.x + 5, bounds.y + 5);
+        assertTrue(started);
+        assertTrue(field.isDragging());
+
+        field.updateDrag(bounds.x + 50, bounds.y + 60);
+        assertTrue(field.isDragging());
+
+        field.mouseReleased(bounds.x + 50, bounds.y + 60, 0);
+        assertFalse(field.isDragging());
+    }
+
+    @Test
+    public void testMatchedDimensionsDefault() {
+        int[] dims = StandaloneSearchField.getMatchedDimensions();
+        assertNotNull(dims);
+        assertEquals(2, dims.length);
+        assertEquals(StandaloneSearchField.DEFAULT_WIDTH, dims[0]);
+        assertEquals(StandaloneSearchField.DEFAULT_HEIGHT, dims[1]);
+    }
+
+    @Test
+    public void testDragBoundsClamping() {
+        CalculatorBounds bounds = field.getBounds();
+        assertNotNull(bounds);
+        assertTrue(bounds.width > 0);
+        assertTrue(bounds.height > 0);
+    }
+
+    @Test
+    public void testMouseClickedFocus() {
+        CalculatorBounds bounds = field.getBounds();
+        assertNotNull(bounds);
+
+        boolean inside = field.mouseClicked(bounds.x + 5, bounds.y + 5, 0);
+        assertTrue(inside);
+        assertTrue(field.isFocused());
+
+        boolean outside = field.mouseClicked(bounds.x - 50, bounds.y - 50, 0);
+        assertFalse(outside);
+        assertFalse(field.isFocused());
+    }
+
+    @Test
+    public void testKeyPressedFocusHandling() {
+        field.setFocused(true);
+        assertTrue(field.keyPressed(GLFW.GLFW_KEY_1, 0, 0));
+
+        field.setFocused(false);
+        assertFalse(field.keyPressed(GLFW.GLFW_KEY_1, 0, 0));
+    }
+
+    @Test
+    public void testGetDefaultBounds() {
+        CalculatorBounds def = StandaloneSearchField.getDefaultBounds(800, 600);
+        assertNotNull(def);
+        assertEquals(StandaloneSearchField.DEFAULT_WIDTH, def.width);
+        assertEquals(StandaloneSearchField.DEFAULT_HEIGHT, def.height);
+        assertTrue(def.x >= 0);
+        assertTrue(def.y >= 0);
+        assertEquals((800 - StandaloneSearchField.DEFAULT_WIDTH) / 2, def.x);
+        assertEquals(600 - 22, def.y);
+    }
 }

@@ -21,88 +21,31 @@ package com.rijz.notenoughcalculator.api.provider;
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 import tech.thatgravyboat.skyblockapi.api.profile.hotf.HotfAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.hotf.WhispersAPI;
-import tech.thatgravyboat.skyblockapi.api.profile.skilltree.SkillTreePerk;
 
 import java.math.BigDecimal;
-import java.util.Locale;
-import java.util.Map;
 
 public class HotfDataProvider {
 
     public static BigDecimal getHotfTier() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(HotfAPI.INSTANCE.getTier());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTier()));
     }
 
     public static BigDecimal getHotfTokens() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(HotfAPI.INSTANCE.getTokens());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTokens()));
     }
 
     public static BigDecimal getForestWhispers() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(WhispersAPI.INSTANCE.getForest());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getForest()));
     }
 
     public static BigDecimal getDesertWhispers() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(WhispersAPI.INSTANCE.getDesert());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getDesert()));
     }
 
     public static BigDecimal getPerkLevel(String perkName) {
         if (!SkyblockApiIntegration.isAvailable() || perkName == null || perkName.isEmpty()) {
             return null;
         }
-
-        String normalizedQuery = normalizePerkName(perkName);
-
-        try {
-            Map<String, ? extends SkillTreePerk> hotfPerks = HotfAPI.INSTANCE.getPerks();
-            if (hotfPerks != null) {
-                for (Map.Entry<String, ? extends SkillTreePerk> entry : hotfPerks.entrySet()) {
-                    if (normalizePerkName(entry.getKey()).equals(normalizedQuery)) {
-                        SkillTreePerk perk = entry.getValue();
-                        if (perk != null && perk.getUnlocked()) {
-                            return BigDecimal.valueOf(perk.getLevel());
-                        }
-                        return BigDecimal.ZERO;
-                    }
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-
-        return null;
-    }
-
-    public static String normalizePerkName(String name) {
-        if (name == null) {
-            return "";
-        }
-        return name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+        return HotmDataProvider.lookupPerkLevel(HotfAPI.INSTANCE.getPerks(), perkName);
     }
 }

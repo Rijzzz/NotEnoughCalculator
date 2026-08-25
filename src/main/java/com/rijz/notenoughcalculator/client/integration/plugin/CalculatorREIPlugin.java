@@ -19,28 +19,6 @@
 package com.rijz.notenoughcalculator.client.integration.plugin;
 
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
-import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
-import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
-import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CalculatorREIPlugin implements REIClientPlugin {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorREIPlugin.class);
-
-    @Override
-    public void registerCategories(CategoryRegistry registry) {
-        LOGGER.debug("Not Enough Calculator - REI Categories registered");
-    }
-
-    @Override
-    public void registerDisplays(DisplayRegistry registry) {
-        LOGGER.debug("Not Enough Calculator - REI Displays registered");
-    }
-
-    @Override
-    public void registerEntries(EntryRegistry registry) {
-        LOGGER.debug("Not Enough Calculator - REI Entries registered");
-    }
 }

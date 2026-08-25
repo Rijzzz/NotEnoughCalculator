@@ -18,8 +18,8 @@
 
 package com.rijz.notenoughcalculator.client.util;
 
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
-import net.minecraft.client.resources.language.I18n;
 
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -27,71 +27,60 @@ import java.util.regex.Pattern;
 
 public class SyntaxHighlighter {
 
-    public static String getColor(String key, String defaultColor) {
-        try {
-            String val = I18n.get(key);
-            if (val != null && !val.equals(key)) {
-                return val;
-            }
-        } catch (Throwable ignored) {
-        }
-        return defaultColor;
-    }
-
     public static String getColorNumber() {
-        return getColor("notenoughcalculator.color.number", "§3");
+        return ColorConstants.NUMBER;
     }
 
     public static String getColorRadixLiteral() {
-        return getColor("notenoughcalculator.color.radix_literal", "§d");
+        return ColorConstants.RADIX_LITERAL;
     }
 
     public static String getColorUnit() {
-        return getColor("notenoughcalculator.color.unit", "§b");
+        return ColorConstants.UNIT;
     }
 
     public static String getColorMathFunc() {
-        return getColor("notenoughcalculator.color.math_function", "§e");
+        return ColorConstants.MATH_FUNCTION;
     }
 
     public static String getColorProgressionFunc() {
-        return getColor("notenoughcalculator.color.progression_function", "§6");
+        return ColorConstants.PROGRESSION_FUNCTION;
     }
 
     public static String getColorMarketFunc() {
-        return getColor("notenoughcalculator.color.market_function", "§9");
+        return ColorConstants.MARKET_FUNCTION;
     }
 
     public static String getColorBuiltinVar() {
-        return getColor("notenoughcalculator.color.builtin_variable", "§b");
+        return ColorConstants.BUILTIN_VARIABLE;
     }
 
     public static String getColorCustomVar() {
-        return getColor("notenoughcalculator.color.custom_variable", "§a");
+        return ColorConstants.CUSTOM_VARIABLE;
     }
 
     public static String getColorDollarSign() {
-        return getColor("notenoughcalculator.color.dollar_sign", "§6");
+        return ColorConstants.DOLLAR_SIGN;
     }
 
     public static String getColorStringItem() {
-        return getColor("notenoughcalculator.color.string_item", "§d");
+        return ColorConstants.STRING_ITEM;
     }
 
     public static String getColorOp() {
-        return getColor("notenoughcalculator.color.operator", "§c");
+        return ColorConstants.OPERATOR;
     }
 
     public static String getColorDelim() {
-        return getColor("notenoughcalculator.color.delimiter", "§7");
+        return ColorConstants.DELIMITER;
     }
 
     public static String getColorError() {
-        return getColor("notenoughcalculator.color.error", "§c");
+        return ColorConstants.ERROR;
     }
 
     public static String getColorResult() {
-        return getColor("notenoughcalculator.color.result", "§a");
+        return ColorConstants.RESULT;
     }
 
     public static final Set<String> MARKET_FUNCTIONS = ExpressionEvaluator.MARKET_FUNCTIONS;
@@ -176,7 +165,6 @@ public class SyntaxHighlighter {
     }
 
     private static void splitNumberAndUnit(String numUnitStr, StringBuilder sb) {
-        // Separate leading number from trailing unit (e.g. "100m", "2.5dc")
         int idx = 0;
         int len = numUnitStr.length();
         while (idx < len && (Character.isDigit(numUnitStr.charAt(idx)) || numUnitStr.charAt(idx) == '.'

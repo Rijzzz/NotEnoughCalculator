@@ -497,7 +497,7 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 ## Credits
 
 - Original calculator concept inspired by **[NotEnoughUpdates (NEU)](https://modrinth.com/mod/notenoughupdates)**.
-- Uses **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)** to fetch SkyBlock stats, skills, slayers, essences, and market data.
+- Uses **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)** to fetch/retrieve Hypixel Skyblock data.
 
 ---
 

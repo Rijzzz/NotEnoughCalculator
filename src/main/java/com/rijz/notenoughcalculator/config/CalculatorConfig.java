@@ -18,13 +18,8 @@
 
 package com.rijz.notenoughcalculator.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.core.ColorConstants;
-import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,127 +27,133 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.fabricmc.loader.api.FabricLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CalculatorConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = getConfigPath();
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final Path CONFIG_PATH = getConfigPath();
 
-    private static Path getConfigPath() {
-        try {
-            if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
-                return FabricLoader.getInstance().getConfigDir().resolve("notenoughcalculator.json");
-            }
-        } catch (Throwable ignored) {
-        }
-        return Path.of("build", "tmp", "notenoughcalculator.json");
-    }
+	private static Path getConfigPath() {
+		try {
+			if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
+				return FabricLoader.getInstance().getConfigDir().resolve("notenoughcalculator.json");
+			}
+		} catch (Throwable ignored) {
+		}
+		return Path.of("build", "tmp", "notenoughcalculator.json");
+	}
 
-    private static CalculatorConfig INSTANCE;
-    private static long lastModified = 0;
-    private static long lastChecked = 0;
-    private static final long CHECK_INTERVAL_MS = 2000;
+	private static CalculatorConfig INSTANCE;
+	private static long lastModified = 0;
+	private static long lastChecked = 0;
+	private static final long CHECK_INTERVAL_MS = 2000;
 
-    public int decimalPrecision = 10;
-    public boolean showUnitSuggestions = true;
-    public boolean enableHistoryNavigation = true;
-    public boolean showInlineResults = true;
-    public boolean enableCommaFormatting = true;
-    public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
-    public boolean enableShorthandResults = false;
-    public boolean enableSyntaxHighlighting = true;
-    public boolean enableFullEquationCopy = true;
-    public boolean enableItemListIntegration = true;
-    public boolean forceStandaloneMode = false;
-    public int standaloneX = -1;
-    public int standaloneY = -1;
-    public Map<String, String> customVariables = new LinkedHashMap<>();
+	public int decimalPrecision = 10;
+	public boolean showUnitSuggestions = true;
+	public boolean enableHistoryNavigation = true;
+	public boolean showInlineResults = true;
+	public boolean enableCommaFormatting = true;
+	public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
+	public boolean enableShorthandResults = false;
+	public boolean enableSyntaxHighlighting = true;
+	public boolean enableFullEquationCopy = true;
+	public boolean enableItemListIntegration = true;
+	public boolean forceStandaloneMode = false;
+	public int standaloneX = -1;
+	public int standaloneY = -1;
+	public Map<String, String> customVariables = new LinkedHashMap<>();
 
-    public boolean isCustomPositionSet() {
-        return standaloneX >= 0 && standaloneY >= 0;
-    }
+	public boolean isCustomPositionSet() {
+		return standaloneX >= 0 && standaloneY >= 0;
+	}
 
-    public void resetPosition() {
-        this.standaloneX = -1;
-        this.standaloneY = -1;
-    }
+	public void resetPosition() {
+		this.standaloneX = -1;
+		this.standaloneY = -1;
+	}
 
-    public void setPosition(int x, int y) {
-        this.standaloneX = x;
-        this.standaloneY = y;
-    }
+	public void setPosition(int x, int y) {
+		this.standaloneX = x;
+		this.standaloneY = y;
+	}
 
-    public static CalculatorConfig getInstance() {
-        long now = System.currentTimeMillis();
-        if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
-            lastChecked = now;
-            if (Files.exists(CONFIG_PATH)) {
-                try {
-                    long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-                    if (currentModified > lastModified) {
-                        LOGGER.info("Config file changed, reloading...");
-                        INSTANCE = load();
-                    }
-                } catch (IOException ignored) {
-                }
-            }
-        }
+	public static CalculatorConfig getInstance() {
+		long now = System.currentTimeMillis();
+		if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
+			lastChecked = now;
+			if (Files.exists(CONFIG_PATH)) {
+				try {
+					long currentModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
+					if (currentModified > lastModified) {
+						LOGGER.info("Config file changed, reloading...");
+						INSTANCE = load();
+					}
+				} catch (IOException ignored) {
+				}
+			}
+		}
 
-        if (INSTANCE == null) {
-            INSTANCE = load();
-        }
-        return INSTANCE;
-    }
+		if (INSTANCE == null) {
+			INSTANCE = load();
+		}
+		return INSTANCE;
+	}
 
-    private static CalculatorConfig load() {
-        try {
-            if (Files.exists(CONFIG_PATH)) {
-                String json = Files.readString(CONFIG_PATH);
-                CalculatorConfig config = GSON.fromJson(json, CalculatorConfig.class);
-                lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-                LOGGER.info("Loaded config from {}", CONFIG_PATH);
-                return config;
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Failed to load configuration file from '{}' (falling back to default settings): {}",
-                    CONFIG_PATH, e.getMessage());
-        }
+	private static CalculatorConfig load() {
+		try {
+			if (Files.exists(CONFIG_PATH)) {
+				String json = Files.readString(CONFIG_PATH);
+				CalculatorConfig config = GSON.fromJson(json, CalculatorConfig.class);
+				lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
+				LOGGER.info("Loaded config from {}", CONFIG_PATH);
+				return config;
+			}
+		} catch (IOException e) {
+			LOGGER.warn("Failed to load configuration file from '{}' (falling back to default settings): {}",
+					CONFIG_PATH, e.getMessage());
+		}
 
-        CalculatorConfig config = new CalculatorConfig();
-        config.save();
-        return config;
-    }
+		CalculatorConfig config = new CalculatorConfig();
+		config.save();
+		return config;
+	}
 
-    public void save() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            String json = GSON.toJson(this);
-            Files.writeString(CONFIG_PATH, json);
-            lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
-            LOGGER.info("Saved config to {}", CONFIG_PATH);
-        } catch (IOException e) {
-            LOGGER.error("Failed to save configuration file to '{}': {}", CONFIG_PATH, e.getMessage());
-        }
-    }
+	public void save() {
+		try {
+			Files.createDirectories(CONFIG_PATH.getParent());
+			String json = GSON.toJson(this);
+			Files.writeString(CONFIG_PATH, json);
+			lastModified = Files.getLastModifiedTime(CONFIG_PATH).toMillis();
+			LOGGER.info("Saved config to {}", CONFIG_PATH);
+		} catch (IOException e) {
+			LOGGER.error("Failed to save configuration file to '{}': {}", CONFIG_PATH, e.getMessage());
+		}
+	}
 
-    public String getResultColorCode() {
-        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
-    }
+	public String getResultColorCode() {
+		return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
+	}
 
-    public String getChatResultColorCode() {
-        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
-    }
+	public String getChatResultColorCode() {
+		return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
+	}
 
-    public String getErrorColorCode() {
-        return SyntaxHighlighter.getColorError();
-    }
+	public String getErrorColorCode() {
+		return SyntaxHighlighter.getColorError();
+	}
 
-    public String getOperatorColorCode() {
-        return SyntaxHighlighter.getColorOp();
-    }
+	public String getOperatorColorCode() {
+		return SyntaxHighlighter.getColorOp();
+	}
 
-    public double getBazaarTaxRate() {
-        int level = Math.max(0, Math.min(2, bazaarFlipperLevel));
-        return 1.25 - (level * 0.125);
-    }
+	public double getBazaarTaxRate() {
+		int level = Math.max(0, Math.min(2, bazaarFlipperLevel));
+		return 1.25 - (level * 0.125);
+	}
 }

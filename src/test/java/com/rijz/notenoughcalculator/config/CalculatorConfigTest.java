@@ -18,89 +18,89 @@
 
 package com.rijz.notenoughcalculator.config;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CalculatorConfigTest {
 
-    private CalculatorConfig config;
+	private CalculatorConfig config;
 
-    @BeforeEach
-    void setUp() {
-        config = new CalculatorConfig();
-    }
+	@BeforeEach
+	void setUp() {
+		config = new CalculatorConfig();
+	}
 
-    @Test
-    void testDefaultValues() {
-        assertTrue(config.showInlineResults);
-        assertTrue(config.showUnitSuggestions);
-        assertTrue(config.enableCommaFormatting);
-        assertTrue(config.enableHistoryNavigation);
-        assertFalse(config.enableShorthandResults);
-        assertTrue(config.enableSyntaxHighlighting);
-        assertTrue(config.enableFullEquationCopy);
-        assertTrue(config.enableItemListIntegration);
-        assertEquals(10, config.decimalPrecision);
-        assertEquals(0, config.bazaarFlipperLevel);
-        assertNotNull(config.customVariables);
-    }
+	@Test
+	void testDefaultValues() {
+		assertTrue(config.showInlineResults);
+		assertTrue(config.showUnitSuggestions);
+		assertTrue(config.enableCommaFormatting);
+		assertTrue(config.enableHistoryNavigation);
+		assertFalse(config.enableShorthandResults);
+		assertTrue(config.enableSyntaxHighlighting);
+		assertTrue(config.enableFullEquationCopy);
+		assertTrue(config.enableItemListIntegration);
+		assertEquals(10, config.decimalPrecision);
+		assertEquals(0, config.bazaarFlipperLevel);
+		assertNotNull(config.customVariables);
+	}
 
-    @Test
-    void testBazaarTaxRates() {
-        config.bazaarFlipperLevel = 0;
-        assertEquals(1.25, config.getBazaarTaxRate(), 0.001);
+	@Test
+	void testBazaarTaxRates() {
+		config.bazaarFlipperLevel = 0;
+		assertEquals(1.25, config.getBazaarTaxRate(), 0.001);
 
-        config.bazaarFlipperLevel = 1;
-        assertEquals(1.125, config.getBazaarTaxRate(), 0.001);
+		config.bazaarFlipperLevel = 1;
+		assertEquals(1.125, config.getBazaarTaxRate(), 0.001);
 
-        config.bazaarFlipperLevel = 2;
-        assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
+		config.bazaarFlipperLevel = 2;
+		assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
 
-        config.bazaarFlipperLevel = 99;
-        assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
+		config.bazaarFlipperLevel = 99;
+		assertEquals(1.0, config.getBazaarTaxRate(), 0.001);
 
-        config.bazaarFlipperLevel = -5;
-        assertEquals(1.25, config.getBazaarTaxRate(), 0.001);
-    }
+		config.bazaarFlipperLevel = -5;
+		assertEquals(1.25, config.getBazaarTaxRate(), 0.001);
+	}
 
-    @Test
-    void testResultColorCodes() {
-        config.enableSyntaxHighlighting = true;
-        assertEquals("§a", config.getResultColorCode());
-        assertEquals("§a", config.getChatResultColorCode());
+	@Test
+	void testResultColorCodes() {
+		config.enableSyntaxHighlighting = true;
+		assertEquals("§a", config.getResultColorCode());
+		assertEquals("§a", config.getChatResultColorCode());
 
-        config.enableSyntaxHighlighting = false;
-        assertEquals("§f", config.getResultColorCode());
-        assertEquals("§f", config.getChatResultColorCode());
-    }
+		config.enableSyntaxHighlighting = false;
+		assertEquals("§f", config.getResultColorCode());
+		assertEquals("§f", config.getChatResultColorCode());
+	}
 
-    @Test
-    void testStandaloneModeAndPositioning() {
-        assertFalse(config.forceStandaloneMode);
-        assertEquals(-1, config.standaloneX);
-        assertEquals(-1, config.standaloneY);
-        assertFalse(config.isCustomPositionSet());
+	@Test
+	void testStandaloneModeAndPositioning() {
+		assertFalse(config.forceStandaloneMode);
+		assertEquals(-1, config.standaloneX);
+		assertEquals(-1, config.standaloneY);
+		assertFalse(config.isCustomPositionSet());
 
-        config.setPosition(150, 250);
-        assertTrue(config.isCustomPositionSet());
-        assertEquals(150, config.standaloneX);
-        assertEquals(250, config.standaloneY);
+		config.setPosition(150, 250);
+		assertTrue(config.isCustomPositionSet());
+		assertEquals(150, config.standaloneX);
+		assertEquals(250, config.standaloneY);
 
-        config.resetPosition();
-        assertFalse(config.isCustomPositionSet());
-        assertEquals(-1, config.standaloneX);
-        assertEquals(-1, config.standaloneY);
+		config.resetPosition();
+		assertFalse(config.isCustomPositionSet());
+		assertEquals(-1, config.standaloneX);
+		assertEquals(-1, config.standaloneY);
 
-        config.forceStandaloneMode = true;
-        assertTrue(config.forceStandaloneMode);
-    }
+		config.forceStandaloneMode = true;
+		assertTrue(config.forceStandaloneMode);
+	}
 
-    @Test
-    void testCustomVariablesMap() {
-        config.customVariables.put("profit", "100m");
-        assertEquals("100m", config.customVariables.get("profit"));
-        assertEquals(1, config.customVariables.size());
-    }
+	@Test
+	void testCustomVariablesMap() {
+		config.customVariables.put("profit", "100m");
+		assertEquals("100m", config.customVariables.get("profit"));
+		assertEquals(1, config.customVariables.size());
+	}
 }

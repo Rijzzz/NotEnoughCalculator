@@ -20,108 +20,112 @@ package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.profile.ProfileAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.reputation.ReputationAPI;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+
 import java.math.BigDecimal;
 
 public class PlayerStatsDataProvider {
 
-    public static BigDecimal getHealth() {
-        BigDecimal health = SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getHealth()));
-        if (health != null) return health;
-        try {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null)
-                return BigDecimal.valueOf((long) player.getHealth());
-        } catch (Throwable ignored) {
-        }
-        return null;
-    }
+	public static BigDecimal getHealth() {
+		BigDecimal health = SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getHealth()));
+		if (health != null)
+			return health;
+		try {
+			LocalPlayer player = Minecraft.getInstance().player;
+			if (player != null)
+				return BigDecimal.valueOf((long) player.getHealth());
+		} catch (Throwable ignored) {
+		}
+		return null;
+	}
 
-    public static BigDecimal getMaxHealth() {
-        BigDecimal maxHealth = SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxHealth()));
-        if (maxHealth != null) return maxHealth;
-        try {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null)
-                return BigDecimal.valueOf((long) player.getMaxHealth());
-        } catch (Throwable ignored) {
-        }
-        return null;
-    }
+	public static BigDecimal getMaxHealth() {
+		BigDecimal maxHealth = SkyblockApiIntegration
+				.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxHealth()));
+		if (maxHealth != null)
+			return maxHealth;
+		try {
+			LocalPlayer player = Minecraft.getInstance().player;
+			if (player != null)
+				return BigDecimal.valueOf((long) player.getMaxHealth());
+		} catch (Throwable ignored) {
+		}
+		return null;
+	}
 
-    public static BigDecimal getDefense() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getDefense()));
-    }
+	public static BigDecimal getDefense() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getDefense()));
+	}
 
-    public static BigDecimal getMana() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMana()));
-    }
+	public static BigDecimal getMana() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMana()));
+	}
 
-    public static BigDecimal getMaxMana() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxMana()));
-    }
+	public static BigDecimal getMaxMana() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxMana()));
+	}
 
-    public static BigDecimal getOverflowMana() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getOverflowMana()));
-    }
+	public static BigDecimal getOverflowMana() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getOverflowMana()));
+	}
 
-    public static BigDecimal getVitality() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getVitality()));
-    }
+	public static BigDecimal getVitality() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getVitality()));
+	}
 
-    public static BigDecimal getMaxVitality() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxVitality()));
-    }
+	public static BigDecimal getMaxVitality() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(StatsAPI.INSTANCE.getMaxVitality()));
+	}
 
-    public static BigDecimal getSkyBlockLevel() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevel()));
-    }
+	public static BigDecimal getSkyBlockLevel() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevel()));
+	}
 
-    public static BigDecimal getSkyBlockLevelProgress() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevelProgress()));
-    }
+	public static BigDecimal getSkyBlockLevelProgress() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(ProfileAPI.INSTANCE.getSbLevelProgress()));
+	}
 
-    public static BigDecimal getReputation() {
-        return SkyblockApiIntegration
-                .safeQuery(() -> BigDecimal.valueOf(ReputationAPI.INSTANCE.getCurrentReputation()));
-    }
+	public static BigDecimal getReputation() {
+		return SkyblockApiIntegration
+				.safeQuery(() -> BigDecimal.valueOf(ReputationAPI.INSTANCE.getCurrentReputation()));
+	}
 
-    public static BigDecimal getSpeed() {
-        try {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) {
-                return BigDecimal.valueOf((long) (player.getAbilities().getWalkingSpeed() * 1000.0f));
-            }
-        } catch (Throwable ignored) {
-        }
-        return null;
-    }
+	public static BigDecimal getSpeed() {
+		try {
+			LocalPlayer player = Minecraft.getInstance().player;
+			if (player != null) {
+				return BigDecimal.valueOf((long) (player.getAbilities().getWalkingSpeed() * 1000.0f));
+			}
+		} catch (Throwable ignored) {
+		}
+		return null;
+	}
 
-    public static BigDecimal getClassLevel() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(DungeonAPI.INSTANCE.getClassLevel()));
-    }
+	public static BigDecimal getClassLevel() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(DungeonAPI.INSTANCE.getClassLevel()));
+	}
 
-    public static BigDecimal getDungeonPartySize() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(DungeonAPI.INSTANCE.getPartySize()));
-    }
+	public static BigDecimal getDungeonPartySize() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(DungeonAPI.INSTANCE.getPartySize()));
+	}
 
-    public static BigDecimal getCatacombsLevel() {
-        return getClassLevel();
-    }
+	public static BigDecimal getCatacombsLevel() {
+		return getClassLevel();
+	}
 
-    public static BigDecimal getXpLevel() {
-        try {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null)
-                return BigDecimal.valueOf(player.experienceLevel);
-        } catch (Throwable ignored) {
-        }
-        return null;
-    }
+	public static BigDecimal getXpLevel() {
+		try {
+			LocalPlayer player = Minecraft.getInstance().player;
+			if (player != null)
+				return BigDecimal.valueOf(player.experienceLevel);
+		} catch (Throwable ignored) {
+		}
+		return null;
+	}
 }

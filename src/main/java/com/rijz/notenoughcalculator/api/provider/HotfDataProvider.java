@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
+
 import tech.thatgravyboat.skyblockapi.api.profile.hotf.HotfAPI;
 import tech.thatgravyboat.skyblockapi.api.profile.hotf.WhispersAPI;
 
@@ -26,26 +27,26 @@ import java.math.BigDecimal;
 
 public class HotfDataProvider {
 
-    public static BigDecimal getHotfTier() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTier()));
-    }
+	public static BigDecimal getHotfTier() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTier()));
+	}
 
-    public static BigDecimal getHotfTokens() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTokens()));
-    }
+	public static BigDecimal getHotfTokens() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotfAPI.INSTANCE.getTokens()));
+	}
 
-    public static BigDecimal getForestWhispers() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getForest()));
-    }
+	public static BigDecimal getForestWhispers() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getForest()));
+	}
 
-    public static BigDecimal getDesertWhispers() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getDesert()));
-    }
+	public static BigDecimal getDesertWhispers() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(WhispersAPI.INSTANCE.getDesert()));
+	}
 
-    public static BigDecimal getPerkLevel(String perkName) {
-        if (!SkyblockApiIntegration.isAvailable() || perkName == null || perkName.isEmpty()) {
-            return null;
-        }
-        return HotmDataProvider.lookupPerkLevel(HotfAPI.INSTANCE.getPerks(), perkName);
-    }
+	public static BigDecimal getPerkLevel(String perkName) {
+		if (!SkyblockApiIntegration.isAvailable() || perkName == null || perkName.isEmpty()) {
+			return null;
+		}
+		return HotmDataProvider.lookupPerkLevel(HotfAPI.INSTANCE.getPerks(), perkName);
+	}
 }

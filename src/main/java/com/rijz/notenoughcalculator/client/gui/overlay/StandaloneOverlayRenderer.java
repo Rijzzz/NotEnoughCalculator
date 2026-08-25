@@ -25,167 +25,183 @@ import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ColorConstants;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.language.I18n;
+
 import org.joml.Matrix3x2fStack;
 
 public class StandaloneOverlayRenderer {
 
-    public static void render(GuiGraphicsExtractor context, SearchFieldAdapter adapter,
-                              String searchText, Font font, CalculatorManager calcManager) {
-        CalculatorBounds searchBounds = adapter.getBounds();
-        if (searchBounds == null) return;
+	public static void render(GuiGraphicsExtractor context, SearchFieldAdapter adapter, String searchText, Font font,
+			CalculatorManager calcManager) {
+		CalculatorBounds searchBounds = adapter.getBounds();
+		if (searchBounds == null)
+			return;
 
-        adapter.clamp();
+		adapter.clamp();
 
-        Matrix3x2fStack pose = context.pose();
-        pose.pushMatrix();
+		Matrix3x2fStack pose = context.pose();
+		pose.pushMatrix();
 
-        boolean isFocused = adapter.isFocused();
-        drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(), isFocused);
+		boolean isFocused = adapter.isFocused();
+		drawSearchBoxBackground(context, searchBounds.x, searchBounds.y, searchBounds.getMaxX(), searchBounds.getMaxY(),
+				isFocused);
 
-        int innerWidth = searchBounds.width - 8;
-        int cursorPos = adapter.getCursorPosition();
-        String textBeforeCursor = cursorPos > 0 ? searchText.substring(0, Math.min(cursorPos, searchText.length())) : "";
-        int cursorXOffset = font.width(textBeforeCursor);
+		int innerWidth = searchBounds.width - 8;
+		int cursorPos = adapter.getCursorPosition();
+		String textBeforeCursor = cursorPos > 0
+				? searchText.substring(0, Math.min(cursorPos, searchText.length()))
+				: "";
+		int cursorXOffset = font.width(textBeforeCursor);
 
-        int scrollOffset = cursorXOffset > innerWidth - 10 ? cursorXOffset - innerWidth + 10 : 0;
-        int textX = searchBounds.x + 4 - scrollOffset;
-        int textY = searchBounds.y + (searchBounds.height - 8) / 2;
+		int scrollOffset = cursorXOffset > innerWidth - 10 ? cursorXOffset - innerWidth + 10 : 0;
+		int textX = searchBounds.x + 4 - scrollOffset;
+		int textY = searchBounds.y + (searchBounds.height - 8) / 2;
 
-        int selectionEnd = adapter.getSelectionEnd();
-        int selectionStart = Math.min(cursorPos, selectionEnd);
-        int selectionEndPos = Math.max(cursorPos, selectionEnd);
-        boolean hasSelection = selectionStart != selectionEndPos;
+		int selectionEnd = adapter.getSelectionEnd();
+		int selectionStart = Math.min(cursorPos, selectionEnd);
+		int selectionEndPos = Math.max(cursorPos, selectionEnd);
+		boolean hasSelection = selectionStart != selectionEndPos;
 
-        CalculatorOverlayRenderer.enableScissor(context, searchBounds.x + 2, searchBounds.y + 1, searchBounds.getMaxX() - 2, searchBounds.getMaxY() - 1);
+		CalculatorOverlayRenderer.enableScissor(context, searchBounds.x + 2, searchBounds.y + 1,
+				searchBounds.getMaxX() - 2, searchBounds.getMaxY() - 1);
 
-        if (searchText.isEmpty() && !isFocused) {
-            context.text(font, I18n.get("notenoughcalculator.standalone.placeholder"), textX, textY, ColorConstants.TEXT_PLACEHOLDER, true);
-        } else if (hasSelection) {
-            drawTextWithSelection(context, font, searchText, textX, textY, selectionStart, selectionEndPos);
-        } else {
-            String renderText = (CalculatorConfig.getInstance().enableSyntaxHighlighting && CalculatorManager.looksLikeCalculation(searchText))
-                    ? SyntaxHighlighter.highlight(searchText)
-                    : searchText;
-            context.text(font, renderText, textX, textY, ColorConstants.TEXT_WHITE, true);
-        }
+		if (searchText.isEmpty() && !isFocused) {
+			context.text(font, I18n.get("notenoughcalculator.standalone.placeholder"), textX, textY,
+					ColorConstants.TEXT_PLACEHOLDER, true);
+		} else if (hasSelection) {
+			drawTextWithSelection(context, font, searchText, textX, textY, selectionStart, selectionEndPos);
+		} else {
+			String renderText = (CalculatorConfig.getInstance().enableSyntaxHighlighting
+					&& CalculatorManager.looksLikeCalculation(searchText))
+							? SyntaxHighlighter.highlight(searchText)
+							: searchText;
+			context.text(font, renderText, textX, textY, ColorConstants.TEXT_WHITE, true);
+		}
 
-        boolean resultFitsInline = false;
-        boolean showInline = CalculatorConfig.getInstance().showInlineResults;
-        if (calcManager.hasResult() && showInline) {
-            String result = calcManager.getLastFormattedResult();
-            String resultDisplay = ResultFormatter.getEqualsSign() +
-                    CalculatorConfig.getInstance().getResultColorCode() + result;
-            int queryWidth = font.width(searchText);
-            int resultX = textX + queryWidth;
-            int resultWidth = font.width(resultDisplay);
+		boolean resultFitsInline = false;
+		boolean showInline = CalculatorConfig.getInstance().showInlineResults;
+		if (calcManager.hasResult() && showInline) {
+			String result = calcManager.getLastFormattedResult();
+			String resultDisplay = ResultFormatter.getEqualsSign() + CalculatorConfig.getInstance().getResultColorCode()
+					+ result;
+			int queryWidth = font.width(searchText);
+			int resultX = textX + queryWidth;
+			int resultWidth = font.width(resultDisplay);
 
-            if (resultX + resultWidth <= searchBounds.getMaxX() - 4) {
-                context.text(font, resultDisplay, resultX, textY, ColorConstants.TEXT_WHITE, true);
-                resultFitsInline = true;
-            }
-        }
+			if (resultX + resultWidth <= searchBounds.getMaxX() - 4) {
+				context.text(font, resultDisplay, resultX, textY, ColorConstants.TEXT_WHITE, true);
+				resultFitsInline = true;
+			}
+		}
 
-        if (!hasSelection && isFocused) {
-            drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2, searchBounds.getMaxX() - 3);
-        }
+		if (!hasSelection && isFocused) {
+			drawCursor(context, searchText, font, textX, textY, cursorPos, searchBounds.x + 2,
+					searchBounds.getMaxX() - 3);
+		}
 
-        CalculatorOverlayRenderer.disableScissor(context);
+		CalculatorOverlayRenderer.disableScissor(context);
 
-        if (calcManager.hasResult() && !resultFitsInline && showInline) {
-            String result = calcManager.getLastFormattedResult();
-            String resultDisplay = ResultFormatter.getEqualsSign() +
-                    CalculatorConfig.getInstance().getResultColorCode() + result;
+		if (calcManager.hasResult() && !resultFitsInline && showInline) {
+			String result = calcManager.getLastFormattedResult();
+			String resultDisplay = ResultFormatter.getEqualsSign() + CalculatorConfig.getInstance().getResultColorCode()
+					+ result;
 
-            int resultWidth = font.width(resultDisplay);
-            int maxBoxWidth = Math.max(searchBounds.width, 160);
-            int bgHeight = 12;
-            int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
+			int resultWidth = font.width(resultDisplay);
+			int maxBoxWidth = Math.max(searchBounds.width, 160);
+			int bgHeight = 12;
+			int bgWidth = Math.min(resultWidth + 8, maxBoxWidth);
 
-            int aboveY = searchBounds.y - 14;
-            int aboveX = searchBounds.x + (searchBounds.width - bgWidth) / 2;
+			int aboveY = searchBounds.y - 14;
+			int aboveX = searchBounds.x + (searchBounds.width - bgWidth) / 2;
 
-            int resultScroll = 0;
-            int visibleWidth = bgWidth - 8;
-            if (resultWidth > visibleWidth) {
-                int overflowPixels = resultWidth - visibleWidth;
-                long time = System.currentTimeMillis();
-                double cycle = (time % 4000) / 4000.0;
-                double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
-                resultScroll = (int) (overflowPixels * normalized);
-            }
+			int resultScroll = 0;
+			int visibleWidth = bgWidth - 8;
+			if (resultWidth > visibleWidth) {
+				int overflowPixels = resultWidth - visibleWidth;
+				long time = System.currentTimeMillis();
+				double cycle = (time % 4000) / 4000.0;
+				double normalized = (Math.sin(cycle * Math.PI * 2.0) + 1.0) / 2.0;
+				resultScroll = (int) (overflowPixels * normalized);
+			}
 
-            context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth + 2, aboveY + bgHeight - 2, ColorConstants.BG_TOOLTIP);
+			context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth + 2, aboveY + bgHeight - 2,
+					ColorConstants.BG_TOOLTIP);
 
-            CalculatorOverlayRenderer.enableScissor(context, aboveX - 1, aboveY - 2, aboveX + bgWidth + 1, aboveY + bgHeight);
-            context.text(font, resultDisplay, aboveX + 2 - resultScroll, aboveY, ColorConstants.TEXT_WHITE, true);
-            CalculatorOverlayRenderer.disableScissor(context);
-        }
+			CalculatorOverlayRenderer.enableScissor(context, aboveX - 1, aboveY - 2, aboveX + bgWidth + 1,
+					aboveY + bgHeight);
+			context.text(font, resultDisplay, aboveX + 2 - resultScroll, aboveY, ColorConstants.TEXT_WHITE, true);
+			CalculatorOverlayRenderer.disableScissor(context);
+		}
 
-        pose.popMatrix();
-    }
+		pose.popMatrix();
+	}
 
-    private static void drawTextWithSelection(GuiGraphicsExtractor context, Font font,
-                                               String text, int x, int y, int selStart, int selEnd) {
-        if (text == null || text.isEmpty()) return;
+	private static void drawTextWithSelection(GuiGraphicsExtractor context, Font font, String text, int x, int y,
+			int selStart, int selEnd) {
+		if (text == null || text.isEmpty())
+			return;
 
-        int len = text.length();
-        selStart = Math.min(Math.max(0, selStart), len);
-        selEnd = Math.min(Math.max(0, selEnd), len);
-        if (selStart > selEnd) {
-            int temp = selStart;
-            selStart = selEnd;
-            selEnd = temp;
-        }
+		int len = text.length();
+		selStart = Math.min(Math.max(0, selStart), len);
+		selEnd = Math.min(Math.max(0, selEnd), len);
+		if (selStart > selEnd) {
+			int temp = selStart;
+			selStart = selEnd;
+			selEnd = temp;
+		}
 
-        String beforeSelection = selStart > 0 ? text.substring(0, selStart) : "";
-        String selectedText = selEnd > selStart ? text.substring(selStart, selEnd) : "";
-        String afterSelection = selEnd < len ? text.substring(selEnd) : "";
+		String beforeSelection = selStart > 0 ? text.substring(0, selStart) : "";
+		String selectedText = selEnd > selStart ? text.substring(selStart, selEnd) : "";
+		String afterSelection = selEnd < len ? text.substring(selEnd) : "";
 
-        int currentX = x;
+		int currentX = x;
 
-        if (!beforeSelection.isEmpty()) {
-            context.text(font, beforeSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
-            currentX += font.width(beforeSelection);
-        }
+		if (!beforeSelection.isEmpty()) {
+			context.text(font, beforeSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
+			currentX += font.width(beforeSelection);
+		}
 
-        if (!selectedText.isEmpty()) {
-            int selectionWidth = font.width(selectedText);
-            context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, ColorConstants.SELECTION_HIGHLIGHT);
-            context.text(font, selectedText, currentX, y, ColorConstants.TEXT_WHITE, true);
-            currentX += selectionWidth;
-        }
+		if (!selectedText.isEmpty()) {
+			int selectionWidth = font.width(selectedText);
+			context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, ColorConstants.SELECTION_HIGHLIGHT);
+			context.text(font, selectedText, currentX, y, ColorConstants.TEXT_WHITE, true);
+			currentX += selectionWidth;
+		}
 
-        if (!afterSelection.isEmpty()) {
-            context.text(font, afterSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
-        }
-    }
+		if (!afterSelection.isEmpty()) {
+			context.text(font, afterSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
+		}
+	}
 
-    private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY, boolean isFocused) {
-        int borderColor = isFocused ? ColorConstants.BORDER_FOCUSED : ColorConstants.BORDER_UNFOCUSED;
-        context.fill(minX, minY, maxX, maxY, borderColor);
-        context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, ColorConstants.BG_BLACK);
-    }
+	private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY,
+			boolean isFocused) {
+		int borderColor = isFocused ? ColorConstants.BORDER_FOCUSED : ColorConstants.BORDER_UNFOCUSED;
+		context.fill(minX, minY, maxX, maxY, borderColor);
+		context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, ColorConstants.BG_BLACK);
+	}
 
-    private static void drawCursor(GuiGraphicsExtractor context, String text, Font font, int textX, int textY,
-                                   int cursorPos, int minX, int maxX) {
-        try {
-            if (text == null) text = "";
-            int len = text.length();
-            cursorPos = Math.min(Math.max(0, cursorPos), len);
+	private static void drawCursor(GuiGraphicsExtractor context, String text, Font font, int textX, int textY,
+			int cursorPos, int minX, int maxX) {
+		try {
+			if (text == null)
+				text = "";
+			int len = text.length();
+			cursorPos = Math.min(Math.max(0, cursorPos), len);
 
-            long time = System.currentTimeMillis();
-            if ((time / 500) % 2 == 0) {
-                String textBeforeCursor = cursorPos > 0 ? text.substring(0, cursorPos) : "";
-                int cursorX = textX + font.width(textBeforeCursor);
-                int cursorY = textY - 1;
+			long time = System.currentTimeMillis();
+			if ((time / 500) % 2 == 0) {
+				String textBeforeCursor = cursorPos > 0 ? text.substring(0, cursorPos) : "";
+				int cursorX = textX + font.width(textBeforeCursor);
+				int cursorY = textY - 1;
 
-                if (cursorX >= minX && cursorX <= maxX) {
-                    context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, ColorConstants.TEXT_WHITE);
-                }
-            }
-        } catch (Exception ignored) {}
-    }
+				if (cursorX >= minX && cursorX <= maxX) {
+					context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, ColorConstants.TEXT_WHITE);
+				}
+			}
+		} catch (Exception ignored) {
+		}
+	}
 }

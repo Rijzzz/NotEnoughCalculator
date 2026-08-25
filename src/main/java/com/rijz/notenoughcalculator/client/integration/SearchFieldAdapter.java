@@ -19,13 +19,13 @@
 package com.rijz.notenoughcalculator.client.integration;
 
 public interface SearchFieldAdapter {
-    String getText();
-    void setText(String text);
-    boolean isFocused();
-    void setFocused(boolean focused);
-    int getCursorPosition();
-    int getSelectionEnd();
-    void clamp();
-    CalculatorBounds getBounds();
-    CalculatorBounds getOverlayBounds();
+	String getText();
+	void setText(String text);
+	boolean isFocused();
+	void setFocused(boolean focused);
+	int getCursorPosition();
+	int getSelectionEnd();
+	void clamp();
+	CalculatorBounds getBounds();
+	CalculatorBounds getOverlayBounds();
 }

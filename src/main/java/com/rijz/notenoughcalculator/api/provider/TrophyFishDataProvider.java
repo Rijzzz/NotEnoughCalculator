@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
+
 import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishTier;
 import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishType;
 import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishingAPI;
@@ -28,40 +29,43 @@ import java.util.Map;
 
 public class TrophyFishDataProvider {
 
-    private static long countByTier(TrophyFishTier targetTier) {
-        long total = 0;
-        for (TrophyFishType type : TrophyFishType.values()) {
-            Map<TrophyFishTier, Integer> caught = TrophyFishingAPI.INSTANCE.getCaught(type);
-            if (caught == null) continue;
-            if (targetTier == null) {
-                for (Integer count : caught.values()) {
-                    if (count != null) total += count;
-                }
-            } else {
-                Integer count = caught.get(targetTier);
-                if (count != null) total += count;
-            }
-        }
-        return total;
-    }
+	private static long countByTier(TrophyFishTier targetTier) {
+		long total = 0;
+		for (TrophyFishType type : TrophyFishType.values()) {
+			Map<TrophyFishTier, Integer> caught = TrophyFishingAPI.INSTANCE.getCaught(type);
+			if (caught == null)
+				continue;
+			if (targetTier == null) {
+				for (Integer count : caught.values()) {
+					if (count != null)
+						total += count;
+				}
+			} else {
+				Integer count = caught.get(targetTier);
+				if (count != null)
+					total += count;
+			}
+		}
+		return total;
+	}
 
-    public static BigDecimal getTrophyFishCount() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(null)));
-    }
+	public static BigDecimal getTrophyFishCount() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(null)));
+	}
 
-    public static BigDecimal getDiamondTrophyCount() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.DIAMOND)));
-    }
+	public static BigDecimal getDiamondTrophyCount() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.DIAMOND)));
+	}
 
-    public static BigDecimal getGoldTrophyCount() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.GOLD)));
-    }
+	public static BigDecimal getGoldTrophyCount() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.GOLD)));
+	}
 
-    public static BigDecimal getSilverTrophyCount() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.SILVER)));
-    }
+	public static BigDecimal getSilverTrophyCount() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.SILVER)));
+	}
 
-    public static BigDecimal getBronzeTrophyCount() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.BRONZE)));
-    }
+	public static BigDecimal getBronzeTrophyCount() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.BRONZE)));
+	}
 }

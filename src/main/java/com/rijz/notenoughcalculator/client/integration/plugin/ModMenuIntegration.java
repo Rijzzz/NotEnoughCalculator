@@ -19,13 +19,14 @@
 package com.rijz.notenoughcalculator.client.integration.plugin;
 
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
+
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 
 public class ModMenuIntegration implements ModMenuApi {
 
-    @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return CalculatorConfigScreen::new;
-    }
+	@Override
+	public ConfigScreenFactory<?> getModConfigScreenFactory() {
+		return CalculatorConfigScreen::new;
+	}
 }

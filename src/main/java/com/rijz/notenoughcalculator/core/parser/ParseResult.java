@@ -23,28 +23,27 @@ import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
 import java.math.BigDecimal;
 
 public class ParseResult {
-    public final BigDecimal value;
-    public final int nextPos;
-    public final RadixMode radixMode;
-    public final boolean isPercentage;
+	public final BigDecimal value;
+	public final int nextPos;
+	public final RadixMode radixMode;
+	public final boolean isPercentage;
 
-    public ParseResult(BigDecimal value, int nextPos) {
-        this(value, nextPos, RadixMode.DEFAULT, false);
-    }
+	public ParseResult(BigDecimal value, int nextPos) {
+		this(value, nextPos, RadixMode.DEFAULT, false);
+	}
 
-    public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode) {
-        this(value, nextPos, radixMode, false);
-    }
+	public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode) {
+		this(value, nextPos, radixMode, false);
+	}
 
-    public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode, boolean isPercentage) {
-        this.value = value;
-        this.nextPos = nextPos;
-        this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
-        this.isPercentage = isPercentage;
-    }
+	public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode, boolean isPercentage) {
+		this.value = value;
+		this.nextPos = nextPos;
+		this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
+		this.isPercentage = isPercentage;
+	}
 
-    public ParseResult withPercentage(boolean isPercentage) {
-        return new ParseResult(this.value, this.nextPos, this.radixMode, isPercentage);
-    }
+	public ParseResult withPercentage(boolean isPercentage) {
+		return new ParseResult(this.value, this.nextPos, this.radixMode, isPercentage);
+	}
 }
-

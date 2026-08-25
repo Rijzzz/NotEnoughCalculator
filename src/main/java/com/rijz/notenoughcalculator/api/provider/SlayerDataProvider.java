@@ -29,19 +29,32 @@ import java.util.Map;
 
 public class SlayerDataProvider {
 
-    public static BigDecimal getSlayerXp(SlayerType type) {
-        return SkyblockApiIntegration.safeQuery(() -> {
-            Map<SlayerType, SlayerEntry> data = SlayerProgressAPI.INSTANCE.getSlayerData();
-            if (data == null) return null;
-            SlayerEntry entry = data.get(type);
-            return entry != null ? BigDecimal.valueOf(entry.getXp()) : null;
-        });
-    }
+	public static BigDecimal getSlayerXp(SlayerType type) {
+		return SkyblockApiIntegration.safeQuery(() -> {
+			Map<SlayerType, SlayerEntry> data = SlayerProgressAPI.INSTANCE.getSlayerData();
+			if (data == null)
+				return null;
+			SlayerEntry entry = data.get(type);
+			return entry != null ? BigDecimal.valueOf(entry.getXp()) : null;
+		});
+	}
 
-    public static BigDecimal getZombieSlayerXp()   { return getSlayerXp(SlayerType.REVENANT_HORROR); }
-    public static BigDecimal getSpiderSlayerXp()   { return getSlayerXp(SlayerType.TARANTULA_BROODFATHER); }
-    public static BigDecimal getWolfSlayerXp()     { return getSlayerXp(SlayerType.SVEN_PACKMASTER); }
-    public static BigDecimal getEndermanSlayerXp() { return getSlayerXp(SlayerType.VOIDGLOOM_SERAPH); }
-    public static BigDecimal getBlazeSlayerXp()    { return getSlayerXp(SlayerType.INFERNO_DEMONLORD); }
-    public static BigDecimal getVampireSlayerXp()  { return getSlayerXp(SlayerType.RIFTSTALKER_BLOODFIEND); }
+	public static BigDecimal getZombieSlayerXp() {
+		return getSlayerXp(SlayerType.REVENANT_HORROR);
+	}
+	public static BigDecimal getSpiderSlayerXp() {
+		return getSlayerXp(SlayerType.TARANTULA_BROODFATHER);
+	}
+	public static BigDecimal getWolfSlayerXp() {
+		return getSlayerXp(SlayerType.SVEN_PACKMASTER);
+	}
+	public static BigDecimal getEndermanSlayerXp() {
+		return getSlayerXp(SlayerType.VOIDGLOOM_SERAPH);
+	}
+	public static BigDecimal getBlazeSlayerXp() {
+		return getSlayerXp(SlayerType.INFERNO_DEMONLORD);
+	}
+	public static BigDecimal getVampireSlayerXp() {
+		return getSlayerXp(SlayerType.RIFTSTALKER_BLOODFIEND);
+	}
 }

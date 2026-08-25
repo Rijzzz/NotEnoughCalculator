@@ -20,8 +20,8 @@ package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
+import tech.thatgravyboat.skyblockapi.api.events.info.TabWidget;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,16 +31,9 @@ public class BestiaryDataProvider {
 
     private static final Pattern BESTIARY_LEVEL_PATTERN = Pattern.compile("(?i)(?:overall|tier|level|bestiary|milestone)\\s*[:\\-]?\\s*([\\d,]+)");
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static BigDecimal getBestiaryLevel() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-
-        try {
-            Class<?> tabWidgetClass = Class.forName("tech.thatgravyboat.skyblockapi.api.events.info.TabWidget");
-            Object bestiaryEnum = Enum.valueOf((Class<Enum>) tabWidgetClass, "BESTIARY");
-            Method getCurrentLinesMethod = tabWidgetClass.getMethod("getCurrentLines");
-            List<String> lines = (List<String>) getCurrentLinesMethod.invoke(bestiaryEnum);
-
+        return SkyblockApiIntegration.safeQuery(() -> {
+            List<String> lines = TabWidget.BESTIARY.getCurrentLines();
             if (lines != null) {
                 for (String line : lines) {
                     if (line == null) continue;
@@ -52,9 +45,7 @@ public class BestiaryDataProvider {
                     }
                 }
             }
-        } catch (Throwable ignored) {
-        }
-
-        return null;
+            return null;
+        });
     }
 }

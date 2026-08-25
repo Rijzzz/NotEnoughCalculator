@@ -50,6 +50,25 @@ public class CalculatorHelpFormatter {
         ctx.getSource().getPlayer().sendSystemMessage(Component.literal(""));
     }
 
+    /**
+     * Sends a block of translation keys, separated by empty lines at null entries.
+     * Entries starting with "@" are clickable page links in format "@pageName:translationKey".
+     */
+    private static void sendBlock(CommandContext<FabricClientCommandSource> ctx, String... entries) {
+        for (String entry : entries) {
+            if (entry == null) {
+                sendEmpty(ctx);
+            } else if (entry.startsWith("@")) {
+                int colon = entry.indexOf(':');
+                String page = entry.substring(1, colon);
+                String key = entry.substring(colon + 1);
+                sendClickablePage(ctx, page, key);
+            } else {
+                send(ctx, entry);
+            }
+        }
+    }
+
     public static int showHelpPage(CommandContext<FabricClientCommandSource> ctx, String page) {
         switch (page.toLowerCase()) {
             case "operators":
@@ -88,371 +107,328 @@ public class CalculatorHelpFormatter {
     }
 
     public static void showMainHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.main.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.main.quick_start");
-        send(ctx, "notenoughcalculator.help.main.quick_start_1");
-        send(ctx, "notenoughcalculator.help.main.quick_start_2");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.main.commands");
-        send(ctx, "notenoughcalculator.help.main.cmd_calc");
-        send(ctx, "notenoughcalculator.help.main.cmd_calchist");
-        send(ctx, "notenoughcalculator.help.main.cmd_calcclear");
-        send(ctx, "notenoughcalculator.help.main.cmd_calcset");
-        send(ctx, "notenoughcalculator.help.main.cmd_calcconfig");
-        send(ctx, "notenoughcalculator.help.main.cmd_calcpos");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.main.help_pages");
-        sendClickablePage(ctx, "operators", "notenoughcalculator.help.main.page_operators");
-        sendClickablePage(ctx, "functions", "notenoughcalculator.help.main.page_functions");
-        sendClickablePage(ctx, "units", "notenoughcalculator.help.main.page_units");
-        sendClickablePage(ctx, "variables", "notenoughcalculator.help.main.page_variables");
-        sendClickablePage(ctx, "stats", "notenoughcalculator.help.main.page_stats");
-        sendClickablePage(ctx, "market", "notenoughcalculator.help.main.page_market");
-        sendClickablePage(ctx, "tax", "notenoughcalculator.help.main.page_tax");
-        sendClickablePage(ctx, "examples", "notenoughcalculator.help.main.page_examples");
-        sendClickablePage(ctx, "config", "notenoughcalculator.help.main.page_config");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts");
-        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_1");
-        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_2");
-        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_3");
-        send(ctx, "notenoughcalculator.help.main.keyboard_shortcuts_4");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.main.footer");
+        sendBlock(ctx,
+                "notenoughcalculator.help.main.title",
+                null,
+                "notenoughcalculator.help.main.quick_start",
+                "notenoughcalculator.help.main.quick_start_1",
+                "notenoughcalculator.help.main.quick_start_2",
+                null,
+                "notenoughcalculator.help.main.commands",
+                "notenoughcalculator.help.main.cmd_calc",
+                "notenoughcalculator.help.main.cmd_calchist",
+                "notenoughcalculator.help.main.cmd_calcclear",
+                "notenoughcalculator.help.main.cmd_calcset",
+                "notenoughcalculator.help.main.cmd_calcconfig",
+                "notenoughcalculator.help.main.cmd_calcpos",
+                null,
+                "notenoughcalculator.help.main.help_pages",
+                "@operators:notenoughcalculator.help.main.page_operators",
+                "@functions:notenoughcalculator.help.main.page_functions",
+                "@units:notenoughcalculator.help.main.page_units",
+                "@variables:notenoughcalculator.help.main.page_variables",
+                "@stats:notenoughcalculator.help.main.page_stats",
+                "@market:notenoughcalculator.help.main.page_market",
+                "@tax:notenoughcalculator.help.main.page_tax",
+                "@examples:notenoughcalculator.help.main.page_examples",
+                "@config:notenoughcalculator.help.main.page_config",
+                null,
+                "notenoughcalculator.help.main.keyboard_shortcuts",
+                "notenoughcalculator.help.main.keyboard_shortcuts_1",
+                "notenoughcalculator.help.main.keyboard_shortcuts_2",
+                "notenoughcalculator.help.main.keyboard_shortcuts_3",
+                "notenoughcalculator.help.main.keyboard_shortcuts_4",
+                null,
+                "notenoughcalculator.help.main.footer");
     }
 
     public static void showOperatorsHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.operators.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.operators.basic");
-        send(ctx, "notenoughcalculator.help.operators.add");
-        send(ctx, "notenoughcalculator.help.operators.subtract");
-        send(ctx, "notenoughcalculator.help.operators.multiply");
-        send(ctx, "notenoughcalculator.help.operators.divide");
-        send(ctx, "notenoughcalculator.help.operators.power");
-        send(ctx, "notenoughcalculator.help.operators.modulo");
-        send(ctx, "notenoughcalculator.help.operators.factorial");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.operators.bitwise");
-        send(ctx, "notenoughcalculator.help.operators.bitwise_and");
-        send(ctx, "notenoughcalculator.help.operators.bitwise_or");
-        send(ctx, "notenoughcalculator.help.operators.bitwise_not");
-        send(ctx, "notenoughcalculator.help.operators.bitwise_lshift");
-        send(ctx, "notenoughcalculator.help.operators.bitwise_rshift");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.operators.literals");
-        send(ctx, "notenoughcalculator.help.operators.binary");
-        send(ctx, "notenoughcalculator.help.operators.hex");
-        send(ctx, "notenoughcalculator.help.operators.octal");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.operators.parentheses");
-        send(ctx, "notenoughcalculator.help.operators.parentheses_desc");
-        send(ctx, "notenoughcalculator.help.operators.parentheses_note");
-        send(ctx, "notenoughcalculator.help.operators.parentheses_example");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.operators.pemdas");
-        send(ctx, "notenoughcalculator.help.operators.pemdas_1");
-        send(ctx, "notenoughcalculator.help.operators.pemdas_2");
-        send(ctx, "notenoughcalculator.help.operators.pemdas_3");
-        send(ctx, "notenoughcalculator.help.operators.pemdas_4");
-        send(ctx, "notenoughcalculator.help.operators.pemdas_5");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.operators.title",
+                null,
+                "notenoughcalculator.help.operators.basic",
+                "notenoughcalculator.help.operators.add",
+                "notenoughcalculator.help.operators.subtract",
+                "notenoughcalculator.help.operators.multiply",
+                "notenoughcalculator.help.operators.divide",
+                "notenoughcalculator.help.operators.power",
+                "notenoughcalculator.help.operators.modulo",
+                "notenoughcalculator.help.operators.factorial",
+                null,
+                "notenoughcalculator.help.operators.bitwise",
+                "notenoughcalculator.help.operators.bitwise_and",
+                "notenoughcalculator.help.operators.bitwise_or",
+                "notenoughcalculator.help.operators.bitwise_not",
+                "notenoughcalculator.help.operators.bitwise_lshift",
+                "notenoughcalculator.help.operators.bitwise_rshift",
+                null,
+                "notenoughcalculator.help.operators.literals",
+                "notenoughcalculator.help.operators.binary",
+                "notenoughcalculator.help.operators.hex",
+                "notenoughcalculator.help.operators.octal",
+                null,
+                "notenoughcalculator.help.operators.parentheses",
+                "notenoughcalculator.help.operators.parentheses_desc",
+                "notenoughcalculator.help.operators.parentheses_note",
+                "notenoughcalculator.help.operators.parentheses_example",
+                null,
+                "notenoughcalculator.help.operators.pemdas",
+                "notenoughcalculator.help.operators.pemdas_1",
+                "notenoughcalculator.help.operators.pemdas_2",
+                "notenoughcalculator.help.operators.pemdas_3",
+                "notenoughcalculator.help.operators.pemdas_4",
+                "notenoughcalculator.help.operators.pemdas_5",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showFunctionsHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.functions.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.functions.available");
-        send(ctx, "notenoughcalculator.help.functions.sqrt");
-        send(ctx, "notenoughcalculator.help.functions.abs");
-        send(ctx, "notenoughcalculator.help.functions.floor");
-        send(ctx, "notenoughcalculator.help.functions.ceil");
-        send(ctx, "notenoughcalculator.help.functions.round");
-        send(ctx, "notenoughcalculator.help.functions.log");
-        send(ctx, "notenoughcalculator.help.functions.ln");
-        send(ctx, "notenoughcalculator.help.functions.sin");
-        send(ctx, "notenoughcalculator.help.functions.cos");
-        send(ctx, "notenoughcalculator.help.functions.tan");
-        send(ctx, "notenoughcalculator.help.functions.min");
-        send(ctx, "notenoughcalculator.help.functions.max");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.functions.radix");
-        send(ctx, "notenoughcalculator.help.functions.hex");
-        send(ctx, "notenoughcalculator.help.functions.bin");
-        send(ctx, "notenoughcalculator.help.functions.oct");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.functions.math_helpers");
-        send(ctx, "notenoughcalculator.help.functions.pct");
-        send(ctx, "notenoughcalculator.help.functions.gcd");
-        send(ctx, "notenoughcalculator.help.functions.lcm");
-        send(ctx, "notenoughcalculator.help.functions.clamp");
-        send(ctx, "notenoughcalculator.help.functions.avg");
-        send(ctx, "notenoughcalculator.help.functions.xor");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.functions.xp_tables");
-        send(ctx, "notenoughcalculator.help.functions.skillxp");
-        send(ctx, "notenoughcalculator.help.functions.huntingxp");
-        send(ctx, "notenoughcalculator.help.functions.runecraftingxp");
-        send(ctx, "notenoughcalculator.help.functions.socialxp");
-        send(ctx, "notenoughcalculator.help.functions.cataxp");
-        send(ctx, "notenoughcalculator.help.functions.slayerxp");
-        send(ctx, "notenoughcalculator.help.functions.emanxp");
-        send(ctx, "notenoughcalculator.help.functions.vampirexp");
-        send(ctx, "notenoughcalculator.help.functions.perk");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.functions.title",
+                null,
+                "notenoughcalculator.help.functions.available",
+                "notenoughcalculator.help.functions.sqrt",
+                "notenoughcalculator.help.functions.abs",
+                "notenoughcalculator.help.functions.floor",
+                "notenoughcalculator.help.functions.ceil",
+                "notenoughcalculator.help.functions.round",
+                "notenoughcalculator.help.functions.log",
+                "notenoughcalculator.help.functions.ln",
+                "notenoughcalculator.help.functions.sin",
+                "notenoughcalculator.help.functions.cos",
+                "notenoughcalculator.help.functions.tan",
+                "notenoughcalculator.help.functions.min",
+                "notenoughcalculator.help.functions.max",
+                null,
+                "notenoughcalculator.help.functions.radix",
+                "notenoughcalculator.help.functions.hex",
+                "notenoughcalculator.help.functions.bin",
+                "notenoughcalculator.help.functions.oct",
+                null,
+                "notenoughcalculator.help.functions.math_helpers",
+                "notenoughcalculator.help.functions.pct",
+                "notenoughcalculator.help.functions.gcd",
+                "notenoughcalculator.help.functions.lcm",
+                "notenoughcalculator.help.functions.clamp",
+                "notenoughcalculator.help.functions.avg",
+                "notenoughcalculator.help.functions.xor",
+                null,
+                "notenoughcalculator.help.functions.xp_tables",
+                "notenoughcalculator.help.functions.skillxp",
+                "notenoughcalculator.help.functions.huntingxp",
+                "notenoughcalculator.help.functions.runecraftingxp",
+                "notenoughcalculator.help.functions.socialxp",
+                "notenoughcalculator.help.functions.cataxp",
+                "notenoughcalculator.help.functions.slayerxp",
+                "notenoughcalculator.help.functions.emanxp",
+                "notenoughcalculator.help.functions.vampirexp",
+                "notenoughcalculator.help.functions.perk",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showStatsHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.stats.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.currency");
-        send(ctx, "notenoughcalculator.help.stats.currency_desc");
-        send(ctx, "notenoughcalculator.help.stats.currency_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.powders");
-        send(ctx, "notenoughcalculator.help.stats.powders_desc");
-        send(ctx, "notenoughcalculator.help.stats.powders_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.essences");
-        send(ctx, "notenoughcalculator.help.stats.essences_desc");
-        send(ctx, "notenoughcalculator.help.stats.essences_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.pets_bestiary");
-        send(ctx, "notenoughcalculator.help.stats.pets_bestiary_desc");
-        send(ctx, "notenoughcalculator.help.stats.pets_bestiary_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.player");
-        send(ctx, "notenoughcalculator.help.stats.player_desc");
-        send(ctx, "notenoughcalculator.help.stats.player_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.stats.skills");
-        send(ctx, "notenoughcalculator.help.stats.skills_desc");
-        send(ctx, "notenoughcalculator.help.stats.slayer_desc");
-        send(ctx, "notenoughcalculator.help.stats.skills_ex");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.stats.title",
+                null,
+                "notenoughcalculator.help.stats.currency",
+                "notenoughcalculator.help.stats.currency_desc",
+                "notenoughcalculator.help.stats.currency_ex",
+                null,
+                "notenoughcalculator.help.stats.powders",
+                "notenoughcalculator.help.stats.powders_desc",
+                "notenoughcalculator.help.stats.powders_ex",
+                null,
+                "notenoughcalculator.help.stats.essences",
+                "notenoughcalculator.help.stats.essences_desc",
+                "notenoughcalculator.help.stats.essences_ex",
+                null,
+                "notenoughcalculator.help.stats.pets_bestiary",
+                "notenoughcalculator.help.stats.pets_bestiary_desc",
+                "notenoughcalculator.help.stats.pets_bestiary_ex",
+                null,
+                "notenoughcalculator.help.stats.player",
+                "notenoughcalculator.help.stats.player_desc",
+                "notenoughcalculator.help.stats.player_ex",
+                null,
+                "notenoughcalculator.help.stats.skills",
+                "notenoughcalculator.help.stats.skills_desc",
+                "notenoughcalculator.help.stats.slayer_desc",
+                "notenoughcalculator.help.stats.skills_ex",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showMarketHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.market.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.market.queries");
-        send(ctx, "notenoughcalculator.help.market.bzb");
-        send(ctx, "notenoughcalculator.help.market.bzs");
-        send(ctx, "notenoughcalculator.help.market.bzm");
-        send(ctx, "notenoughcalculator.help.market.lb");
-        send(ctx, "notenoughcalculator.help.market.lba");
-        send(ctx, "notenoughcalculator.help.market.npc");
-        send(ctx, "notenoughcalculator.help.market.motes");
-        send(ctx, "notenoughcalculator.help.market.price");
-        send(ctx, "notenoughcalculator.help.market.sack");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.market.quotes_note");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.market.title",
+                null,
+                "notenoughcalculator.help.market.queries",
+                "notenoughcalculator.help.market.bzb",
+                "notenoughcalculator.help.market.bzs",
+                "notenoughcalculator.help.market.bzm",
+                "notenoughcalculator.help.market.lb",
+                "notenoughcalculator.help.market.lba",
+                "notenoughcalculator.help.market.npc",
+                "notenoughcalculator.help.market.motes",
+                "notenoughcalculator.help.market.price",
+                "notenoughcalculator.help.market.sack",
+                null,
+                "notenoughcalculator.help.market.quotes_note",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showTaxHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.tax.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.tax.bazaar");
-        send(ctx, "notenoughcalculator.help.tax.bz_desc");
-        send(ctx, "notenoughcalculator.help.tax.bz_ex1");
-        send(ctx, "notenoughcalculator.help.tax.bz_ex2");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.tax.ah");
-        send(ctx, "notenoughcalculator.help.tax.ah_desc");
-        send(ctx, "notenoughcalculator.help.tax.ah_ex1");
-        send(ctx, "notenoughcalculator.help.tax.ah_ex2");
-        send(ctx, "notenoughcalculator.help.tax.ah_ex3");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.tax.title",
+                null,
+                "notenoughcalculator.help.tax.bazaar",
+                "notenoughcalculator.help.tax.bz_desc",
+                "notenoughcalculator.help.tax.bz_ex1",
+                "notenoughcalculator.help.tax.bz_ex2",
+                null,
+                "notenoughcalculator.help.tax.ah",
+                "notenoughcalculator.help.tax.ah_desc",
+                "notenoughcalculator.help.tax.ah_ex1",
+                "notenoughcalculator.help.tax.ah_ex2",
+                "notenoughcalculator.help.tax.ah_ex3",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showUnitsHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.units.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.units.currency");
-        send(ctx, "notenoughcalculator.help.units.currency_k");
-        send(ctx, "notenoughcalculator.help.units.currency_m");
-        send(ctx, "notenoughcalculator.help.units.currency_b");
-        send(ctx, "notenoughcalculator.help.units.currency_t");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.units.item");
-        send(ctx, "notenoughcalculator.help.units.item_s");
-        send(ctx, "notenoughcalculator.help.units.item_e");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.units.storage");
-        send(ctx, "notenoughcalculator.help.units.storage_h");
-        send(ctx, "notenoughcalculator.help.units.storage_sc");
-        send(ctx, "notenoughcalculator.help.units.storage_dc");
-        send(ctx, "notenoughcalculator.help.units.storage_eb");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.units.usage");
-        send(ctx, "notenoughcalculator.help.units.usage_1");
-        send(ctx, "notenoughcalculator.help.units.usage_2");
-        send(ctx, "notenoughcalculator.help.units.usage_3");
-        send(ctx, "notenoughcalculator.help.units.usage_4");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.units.tips");
-        send(ctx, "notenoughcalculator.help.units.tips_1");
-        send(ctx, "notenoughcalculator.help.units.tips_2");
-        send(ctx, "notenoughcalculator.help.units.tips_3");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.units.title",
+                null,
+                "notenoughcalculator.help.units.currency",
+                "notenoughcalculator.help.units.currency_k",
+                "notenoughcalculator.help.units.currency_m",
+                "notenoughcalculator.help.units.currency_b",
+                "notenoughcalculator.help.units.currency_t",
+                null,
+                "notenoughcalculator.help.units.item",
+                "notenoughcalculator.help.units.item_s",
+                "notenoughcalculator.help.units.item_e",
+                null,
+                "notenoughcalculator.help.units.storage",
+                "notenoughcalculator.help.units.storage_h",
+                "notenoughcalculator.help.units.storage_sc",
+                "notenoughcalculator.help.units.storage_dc",
+                "notenoughcalculator.help.units.storage_eb",
+                null,
+                "notenoughcalculator.help.units.usage",
+                "notenoughcalculator.help.units.usage_1",
+                "notenoughcalculator.help.units.usage_2",
+                "notenoughcalculator.help.units.usage_3",
+                "notenoughcalculator.help.units.usage_4",
+                null,
+                "notenoughcalculator.help.units.tips",
+                "notenoughcalculator.help.units.tips_1",
+                "notenoughcalculator.help.units.tips_2",
+                "notenoughcalculator.help.units.tips_3",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showVariablesHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.variables.title");
+        sendBlock(ctx,
+                "notenoughcalculator.help.variables.title",
+                null,
+                "notenoughcalculator.help.variables.builtin",
+                "notenoughcalculator.help.variables.builtin_ans",
+                "notenoughcalculator.help.variables.builtin_pi",
+                "notenoughcalculator.help.variables.builtin_e",
+                "notenoughcalculator.help.variables.builtin_api",
+                null,
+                "notenoughcalculator.help.variables.custom",
+                "notenoughcalculator.help.variables.custom_desc",
+                null,
+                "notenoughcalculator.help.variables.setting",
+                "notenoughcalculator.help.variables.setting_example_1",
+                "notenoughcalculator.help.variables.setting_example_2",
+                null,
+                "notenoughcalculator.help.variables.using",
+                "notenoughcalculator.help.variables.using_example_1",
+                "notenoughcalculator.help.variables.using_example_2",
+                null,
+                "notenoughcalculator.help.variables.practical",
+                "notenoughcalculator.help.variables.practical_1_title",
+                "notenoughcalculator.help.variables.practical_1_step1",
+                "notenoughcalculator.help.variables.practical_1_step2",
+                "notenoughcalculator.help.variables.practical_1_step3",
+                null,
+                "notenoughcalculator.help.variables.practical_2_title",
+                "notenoughcalculator.help.variables.practical_2_step1",
+                "notenoughcalculator.help.variables.practical_2_step2",
+                "notenoughcalculator.help.variables.practical_2_step3");
         sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.builtin");
-        send(ctx, "notenoughcalculator.help.variables.builtin_ans");
-        send(ctx, "notenoughcalculator.help.variables.builtin_pi");
-        send(ctx, "notenoughcalculator.help.variables.builtin_e");
-        send(ctx, "notenoughcalculator.help.variables.builtin_api");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.custom");
-        send(ctx, "notenoughcalculator.help.variables.custom_desc");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.setting");
-        send(ctx, "notenoughcalculator.help.variables.setting_example_1");
-        send(ctx, "notenoughcalculator.help.variables.setting_example_2");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.using");
-        send(ctx, "notenoughcalculator.help.variables.using_example_1");
-        send(ctx, "notenoughcalculator.help.variables.using_example_2");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.practical");
-        send(ctx, "notenoughcalculator.help.variables.practical_1_title");
-        send(ctx, "notenoughcalculator.help.variables.practical_1_step1");
-        send(ctx, "notenoughcalculator.help.variables.practical_1_step2");
-        send(ctx, "notenoughcalculator.help.variables.practical_1_step3");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.variables.practical_2_title");
-        send(ctx, "notenoughcalculator.help.variables.practical_2_step1");
-        send(ctx, "notenoughcalculator.help.variables.practical_2_step2");
-        send(ctx, "notenoughcalculator.help.variables.practical_2_step3");
-        sendEmpty(ctx);
-
         send(ctx, "notenoughcalculator.help.variables.current");
         String vars = NotEnoughCalculatorClient.getCalculatorManager().getVariablesInfo();
         send(ctx, "notenoughcalculator.help.variables.current_format", vars);
         sendEmpty(ctx);
-
         sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
     }
 
     public static void showExamplesHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.examples.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.auction");
-        send(ctx, "notenoughcalculator.help.examples.auction_1");
-        send(ctx, "notenoughcalculator.help.examples.auction_1_ex");
-        send(ctx, "notenoughcalculator.help.examples.auction_2");
-        send(ctx, "notenoughcalculator.help.examples.auction_2_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.inventory");
-        send(ctx, "notenoughcalculator.help.examples.inventory_1");
-        send(ctx, "notenoughcalculator.help.examples.inventory_1_ex");
-        send(ctx, "notenoughcalculator.help.examples.inventory_2");
-        send(ctx, "notenoughcalculator.help.examples.inventory_2_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.mining");
-        send(ctx, "notenoughcalculator.help.examples.mining_1");
-        send(ctx, "notenoughcalculator.help.examples.mining_1_ex");
-        send(ctx, "notenoughcalculator.help.examples.mining_2");
-        send(ctx, "notenoughcalculator.help.examples.mining_2_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.crafting");
-        send(ctx, "notenoughcalculator.help.examples.crafting_1");
-        send(ctx, "notenoughcalculator.help.examples.crafting_1_ex");
-        send(ctx, "notenoughcalculator.help.examples.crafting_2");
-        send(ctx, "notenoughcalculator.help.examples.crafting_2_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.complex");
-        send(ctx, "notenoughcalculator.help.examples.complex_1");
-        send(ctx, "notenoughcalculator.help.examples.complex_1_ex");
-        send(ctx, "notenoughcalculator.help.examples.complex_2");
-        send(ctx, "notenoughcalculator.help.examples.complex_2_ex");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.examples.tips");
-        send(ctx, "notenoughcalculator.help.examples.tips_1");
-        send(ctx, "notenoughcalculator.help.examples.tips_2");
-        send(ctx, "notenoughcalculator.help.examples.tips_3");
-        send(ctx, "notenoughcalculator.help.examples.tips_4");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.examples.title",
+                null,
+                "notenoughcalculator.help.examples.auction",
+                "notenoughcalculator.help.examples.auction_1",
+                "notenoughcalculator.help.examples.auction_1_ex",
+                "notenoughcalculator.help.examples.auction_2",
+                "notenoughcalculator.help.examples.auction_2_ex",
+                null,
+                "notenoughcalculator.help.examples.inventory",
+                "notenoughcalculator.help.examples.inventory_1",
+                "notenoughcalculator.help.examples.inventory_1_ex",
+                "notenoughcalculator.help.examples.inventory_2",
+                "notenoughcalculator.help.examples.inventory_2_ex",
+                null,
+                "notenoughcalculator.help.examples.mining",
+                "notenoughcalculator.help.examples.mining_1",
+                "notenoughcalculator.help.examples.mining_1_ex",
+                "notenoughcalculator.help.examples.mining_2",
+                "notenoughcalculator.help.examples.mining_2_ex",
+                null,
+                "notenoughcalculator.help.examples.crafting",
+                "notenoughcalculator.help.examples.crafting_1",
+                "notenoughcalculator.help.examples.crafting_1_ex",
+                "notenoughcalculator.help.examples.crafting_2",
+                "notenoughcalculator.help.examples.crafting_2_ex",
+                null,
+                "notenoughcalculator.help.examples.complex",
+                "notenoughcalculator.help.examples.complex_1",
+                "notenoughcalculator.help.examples.complex_1_ex",
+                "notenoughcalculator.help.examples.complex_2",
+                "notenoughcalculator.help.examples.complex_2_ex",
+                null,
+                "notenoughcalculator.help.examples.tips",
+                "notenoughcalculator.help.examples.tips_1",
+                "notenoughcalculator.help.examples.tips_2",
+                "notenoughcalculator.help.examples.tips_3",
+                "notenoughcalculator.help.examples.tips_4",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 
     public static void showConfigHelp(CommandContext<FabricClientCommandSource> ctx) {
-        send(ctx, "notenoughcalculator.help.config.title");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.config.file");
-        send(ctx, "notenoughcalculator.help.config.file_location");
-        send(ctx, "notenoughcalculator.help.config.file_edit");
-        send(ctx, "notenoughcalculator.help.config.file_edit_1");
-        send(ctx, "notenoughcalculator.help.config.file_edit_2");
-        send(ctx, "notenoughcalculator.help.config.file_edit_3");
-        send(ctx, "notenoughcalculator.help.config.file_edit_4");
-        send(ctx, "notenoughcalculator.help.config.file_edit_5");
-        sendEmpty(ctx);
-
-        send(ctx, "notenoughcalculator.help.config.current");
-        send(ctx, "notenoughcalculator.help.config.current_cmd");
-        sendEmpty(ctx);
-
-        sendClickablePage(ctx, "main", "notenoughcalculator.help.back");
+        sendBlock(ctx,
+                "notenoughcalculator.help.config.title",
+                null,
+                "notenoughcalculator.help.config.file",
+                "notenoughcalculator.help.config.file_location",
+                "notenoughcalculator.help.config.file_edit",
+                "notenoughcalculator.help.config.file_edit_1",
+                "notenoughcalculator.help.config.file_edit_2",
+                "notenoughcalculator.help.config.file_edit_3",
+                "notenoughcalculator.help.config.file_edit_4",
+                "notenoughcalculator.help.config.file_edit_5",
+                null,
+                "notenoughcalculator.help.config.current",
+                "notenoughcalculator.help.config.current_cmd",
+                null,
+                "@main:notenoughcalculator.help.back");
     }
 }

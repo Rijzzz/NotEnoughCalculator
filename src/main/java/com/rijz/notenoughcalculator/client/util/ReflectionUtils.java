@@ -21,22 +21,11 @@ package com.rijz.notenoughcalculator.client.util;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class ReflectionUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
-
-    // Cache reflection fields for current screen retrieval
-    private static Field mcScreenField = null;
-    private static Field mcGuiField = null;
-    private static Field guiScreenField = null;
-    private static Method guiScreenMethod = null;
-    private static boolean screenReflectionInitialized = false;
 
     public static int getCursorPosition(Object searchField) {
         if (searchField == null) return 0;
@@ -159,99 +148,74 @@ public class ReflectionUtils {
         return null;
     }
 
-    // Retrieve the current screen using reflection
-    private static void initScreenReflection(Minecraft mc) {
-        if (screenReflectionInitialized) return;
-        screenReflectionInitialized = true;
+    private static Field mcGuiField = null;
+    private static Field guiScreenField = null;
+    private static Method guiScreenMethod = null;
+    private static Method setScreenMethod = null;
+    private static boolean screenInitialized = false;
 
+    private static void initScreenAccessors(Minecraft mc) {
+        if (screenInitialized || mc == null) return;
+        screenInitialized = true;
         try {
-            // Try Minecraft.screen (Minecraft 26.1 and older)
-            mcScreenField = Minecraft.class.getDeclaredField("screen");
-            mcScreenField.setAccessible(true);
-            LOGGER.debug("Cached Minecraft.screen field successfully");
-        } catch (NoSuchFieldException e1) {
-            try {
-                // Try mc.gui (Minecraft 26.2+)
-                mcGuiField = Minecraft.class.getDeclaredField("gui");
-                mcGuiField.setAccessible(true);
-                LOGGER.debug("Cached Minecraft.gui field successfully");
-
-                Object gui = mcGuiField.get(mc);
-                if (gui != null) {
-                    Class<?> guiClass = gui.getClass();
+            mcGuiField = Minecraft.class.getDeclaredField("gui");
+            mcGuiField.setAccessible(true);
+            Object gui = mcGuiField.get(mc);
+            if (gui != null) {
+                Class<?> guiClass = gui.getClass();
+                try {
+                    guiScreenField = guiClass.getDeclaredField("screen");
+                    guiScreenField.setAccessible(true);
+                } catch (NoSuchFieldException e) {
                     try {
-                        // Try gui.screen field
-                        guiScreenField = guiClass.getDeclaredField("screen");
-                        guiScreenField.setAccessible(true);
-                        LOGGER.debug("Cached Gui.screen field successfully");
-                    } catch (NoSuchFieldException e2) {
-                        try {
-                            // Try gui.screen() method
-                            guiScreenMethod = guiClass.getDeclaredMethod("screen");
-                            guiScreenMethod.setAccessible(true);
-                            LOGGER.debug("Cached Gui.screen() method successfully");
-                        } catch (NoSuchMethodException e3) {
-                            LOGGER.error("Failed to find screen field or method in Gui class (Minecraft 26.2+ compatibility lookup failed)");
-                        }
-                    }
+                        guiScreenMethod = guiClass.getDeclaredMethod("screen");
+                        guiScreenMethod.setAccessible(true);
+                    } catch (NoSuchMethodException ignored) {}
                 }
-            } catch (Exception e3) {
-                LOGGER.error("Failed to initialize Minecraft 26.2+ screen reflection accessors: {}", e3.getMessage(), e3);
+                try {
+                    setScreenMethod = guiClass.getMethod("setScreen", Screen.class);
+                } catch (NoSuchMethodException ignored) {}
             }
+        } catch (Throwable ignored) {}
+
+        if (setScreenMethod == null) {
+            try {
+                setScreenMethod = Minecraft.class.getMethod("setScreen", Screen.class);
+            } catch (Throwable ignored) {}
         }
     }
 
     public static Screen getCurrentScreen(Minecraft mc) {
         if (mc == null) return null;
-        initScreenReflection(mc);
-
-        if (mcScreenField != null) {
-            try {
-                return (Screen) mcScreenField.get(mc);
-            } catch (Exception ignored) {}
-        }
-
-        if (mcGuiField != null) {
-            try {
+        initScreenAccessors(mc);
+        try {
+            if (mcGuiField != null) {
                 Object gui = mcGuiField.get(mc);
                 if (gui != null) {
-                    if (guiScreenField != null) {
-                        return (Screen) guiScreenField.get(gui);
-                    }
-                    if (guiScreenMethod != null) {
-                        return (Screen) guiScreenMethod.invoke(gui);
-                    }
+                    if (guiScreenField != null) return (Screen) guiScreenField.get(gui);
+                    if (guiScreenMethod != null) return (Screen) guiScreenMethod.invoke(gui);
                 }
-            } catch (Exception ignored) {}
-        }
-
+            }
+        } catch (Throwable ignored) {}
         return null;
     }
 
     public static void openScreen(Minecraft mc, Screen screen) {
         if (mc == null) return;
         mc.execute(() -> {
+            initScreenAccessors(mc);
             try {
-                Method m = Minecraft.class.getMethod("setScreen", Screen.class);
-                m.invoke(mc, screen);
-                return;
-            } catch (Exception ignored) {}
-
-            try {
-                Field guiField = Minecraft.class.getDeclaredField("gui");
-                guiField.setAccessible(true);
-                Object gui = guiField.get(mc);
-                if (gui != null) {
-                    Method m = gui.getClass().getMethod("setScreen", Screen.class);
-                    m.invoke(gui, screen);
-                    return;
+                if (setScreenMethod != null) {
+                    if (setScreenMethod.getDeclaringClass().equals(Minecraft.class)) {
+                        setScreenMethod.invoke(mc, screen);
+                    } else if (mcGuiField != null) {
+                        Object gui = mcGuiField.get(mc);
+                        if (gui != null) {
+                            setScreenMethod.invoke(gui, screen);
+                        }
+                    }
                 }
-            } catch (Exception ignored) {}
-
-            try {
-                Method m = Minecraft.class.getMethod("setScreenAndShow", Screen.class);
-                m.invoke(mc, screen);
-            } catch (Exception ignored) {}
+            } catch (Throwable ignored) {}
         });
     }
 }

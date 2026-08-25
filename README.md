@@ -110,7 +110,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Hunting XP | `huntingxp(lvl, [toLvl])` | `hunting_xp`, `huntingtable` | Hunting XP milestones & level deltas (1–50) | `huntingxp(50)` | `55,172,425` |
 | Runecrafting XP | `runecraftingxp(lvl, [toLvl])` | `runecrafting_xp`, `runetable` | Runecrafting XP milestones & deltas (1–25) | `runecraftingxp(25)` | `94,450` |
 | Social XP | `socialxp(lvl, [toLvl])` | `social_xp`, `socialtable` | Social XP milestones & deltas (1–25) | `socialxp(25)` | `272,800` |
-| Catacombs XP | `cataxp(lvl, [toLvl])` | `cata_xp`, `catatable`, `catacombsxp` | Catacombs XP milestones & level deltas (1–50+) | `cataxp(50)` | `569,809,640` |
+| Catacombs XP | `cataxp(lvl, [toLvl])` | `cata_xp`, `catatable`, `cxp_table` | Catacombs XP milestones & level deltas (1–50+) | `cataxp(50)` | `569,809,640` |
 | Slayer XP | `slayerxp([boss], lvl, [toLvl])` | `slayer_xp`, `slayertable` | Universal Slayer XP milestones (Zombie, Spider, Wolf, Enderman, Blaze, Vampire) | `slayerxp(spider, 2)` | `25` |
 | Zombie / Wolf Slayer | `zombiexp(lvl, [toLvl])` | `revxp`, `revenantxp`, `wolfxp`, `svenxp` | Zombie (Revenant) & Wolf (Sven) Slayer XP milestones | `zombiexp(4)` | `1,500` |
 | Spider Slayer | `spiderxp(lvl, [toLvl])` | `spider_xp`, `tarantulaxp`, `tarantula_xp`, `spidertable` | Spider / Tarantula Slayer XP | `spiderxp(2)` | `25` |

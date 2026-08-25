@@ -59,10 +59,12 @@ public class SyntaxHighlighterTest {
 
     @Test
     public void testVariableHighlighting() {
-        String highlighted = SyntaxHighlighter.highlight("$buy + ans + $purse");
-        assertTrue(highlighted.contains("§6$§abuy"), "Dollar sign should be Gold (§6) and custom var Green (§a)");
+        String highlighted = SyntaxHighlighter.highlight("$buy + ans + $purse + $coins + $w");
+        assertTrue(highlighted.contains("§6$§3buy"), "Dollar sign should be Gold (§6) and custom var Dark Aqua (§3)");
         assertTrue(highlighted.contains("§bans"), "Builtin variables should be Vibrant Aqua (§b)");
         assertTrue(highlighted.contains("§6$§bpurse"), "Dollar sign Gold (§6) and API variable Vibrant Aqua (§b)");
+        assertTrue(highlighted.contains("§6$§bcoins"), "Dollar sign Gold (§6) and alias coins Vibrant Aqua (§b)");
+        assertTrue(highlighted.contains("§6$§bw"), "Dollar sign Gold (§6) and alias w Vibrant Aqua (§b)");
     }
 
     @Test

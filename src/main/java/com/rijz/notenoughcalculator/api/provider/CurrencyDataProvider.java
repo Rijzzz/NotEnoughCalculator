@@ -27,122 +27,50 @@ import java.math.BigDecimal;
 public class CurrencyDataProvider {
 
     public static BigDecimal getPurse() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            double value = CurrencyAPI.INSTANCE.getPurse();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getPurse()));
     }
 
     public static BigDecimal getBank() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getBank();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getBank()));
     }
 
     public static BigDecimal getPersonalBank() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getPersonalBank();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getPersonalBank()));
     }
 
     public static BigDecimal getCoopBank() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getCoopBank();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getCoopBank()));
     }
 
     public static BigDecimal getMotes() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getMotes();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getMotes()));
     }
 
     public static BigDecimal getBits() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getBits();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getBits()));
     }
 
     public static BigDecimal getCopper() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getCopper();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getCopper()));
     }
 
     public static BigDecimal getSowdust() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getSowdust();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getSowdust()));
     }
 
     public static BigDecimal getKernels() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getKernels();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getKernels()));
     }
 
     public static BigDecimal getNorthStars() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getNorthStars();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getNorthStars()));
     }
 
     public static BigDecimal getGems() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getGems();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getGems()));
     }
 
     public static BigDecimal getSoulflow() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            long value = CurrencyAPI.INSTANCE.getSoulflow();
-            return BigDecimal.valueOf(value);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(CurrencyAPI.INSTANCE.getSoulflow()));
     }
 }

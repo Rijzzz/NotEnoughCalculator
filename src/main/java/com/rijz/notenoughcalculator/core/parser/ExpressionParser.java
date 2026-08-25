@@ -324,14 +324,26 @@ public class ExpressionParser {
                 nextPos++;
             }
 
-            ParseResult res = new ParseResult(val, nextPos, mode);
-            res.isPercentage = isPct;
-            return res;
+            return new ParseResult(val, nextPos, mode, isPct);
         }
 
         if (tok.kind == TokenKind.VAR) {
+            if (!tok.value.startsWith("$")) {
+                throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.undefined_variable", tok.value), tok.pos);
+            }
             String rawName = tok.value.toLowerCase(Locale.ROOT);
-            String cleanName = rawName.startsWith("$") ? rawName.substring(1) : rawName;
+            String cleanName = rawName.substring(1);
+
+            if (cleanName.equals("pi")) {
+                return new ParseResult(new BigDecimal("3.14159265358979323846"), pos + 1);
+            }
+            if (cleanName.equals("e")) {
+                return new ParseResult(new BigDecimal("2.71828182845904523536"), pos + 1);
+            }
+            if (cleanName.equals("ans")) {
+                BigDecimal ansVal = variables.get("ans");
+                return new ParseResult(ansVal != null ? ansVal : BigDecimal.ZERO, pos + 1);
+            }
 
             if (variables.containsKey(cleanName)) {
                 return new ParseResult(variables.get(cleanName), pos + 1);
@@ -615,9 +627,7 @@ public class ExpressionParser {
                 isPct = true;
                 nextPos++;
             }
-            ParseResult res = new ParseResult(val, nextPos, inner.radixMode);
-            res.isPercentage = isPct;
-            return res;
+            return new ParseResult(val, nextPos, inner.radixMode, isPct);
         }
 
         throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_token", tok.value), tok.pos);

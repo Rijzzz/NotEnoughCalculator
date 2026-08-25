@@ -64,7 +64,7 @@ public class CalculatorManager {
             .compile(".*\\d+\\s*" + ExpressionEvaluator.UNITS_REGEX + "(?:\\s|$|[+\\-*/^%xX()])", Pattern.CASE_INSENSITIVE);
     private static final Pattern FUNCTION_PATTERN = Pattern.compile(".*" + ExpressionEvaluator.FUNCTIONS_REGEX + "\\s*\\(",
             Pattern.CASE_INSENSITIVE);
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile(".*(ans|\\$\\w+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("(?i)(?:^|.*\\b)(ans|pi|e|\\$\\w+)(?:\\b.*|$)");
     private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
     private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
@@ -108,6 +108,11 @@ public class CalculatorManager {
 
         String trimmed = input.trim();
 
+        // Standalone mathematical constants
+        if (trimmed.equalsIgnoreCase("e") || trimmed.equalsIgnoreCase("pi") || trimmed.equalsIgnoreCase("ans")) {
+            return true;
+        }
+
         // Single number (e.g. "64") is usually an item count search, not math
         if (NUMBER_ONLY.matcher(trimmed).matches()) {
             return false;
@@ -118,7 +123,6 @@ public class CalculatorManager {
             return false;
         }
 
-        // Check features indicating a calculation
         if (OPERATOR_PATTERN.matcher(trimmed).matches())
             return true;
         if (PAREN_PATTERN.matcher(trimmed).matches())
@@ -136,8 +140,6 @@ public class CalculatorManager {
     }
 
     /**
-     * Verifies if an expression is syntactically complete before triggering live
-     * evaluation.
      * Prevents rendering transient syntax errors while the user is actively typing.
      */
     private boolean isExpressionComplete(String input) {
@@ -147,12 +149,10 @@ public class CalculatorManager {
 
         String trimmed = input.trim();
 
-        // Can't end with operator
         if (TRAILING_OPERATOR.matcher(trimmed).matches()) {
             return false;
         }
 
-        // Check parentheses are balanced
         int parenCount = 0;
         int len = trimmed.length();
         for (int i = 0; i < len; i++) {
@@ -167,20 +167,16 @@ public class CalculatorManager {
         return parenCount == 0;
     }
 
-    // Called on every keystroke in the search bar.
     public String formatSearchBar(String input) {
         String cleanInput = ResultFormatter.cleanInput(input);
 
-        // If user manually types while in history mode, exit history mode
         if (reiHistoryIndex != -1 && !cleanInput.equals(lastSearchInput)) {
             LOGGER.debug("User typed '{}' while navigating history, exiting history mode", cleanInput);
             reiHistoryIndex = -1;
             savedCurrentInput = "";
         }
 
-        // Detect when user clears the search bar (commits equation)
         if (cleanInput.isEmpty() && !lastSearchInput.isEmpty()) {
-            // Save the completed equation to history (not individual keystrokes)
             if (!currentEquation.isEmpty() && looksLikeCalculation(currentEquation)) {
                 addToReiHistory(currentEquation);
                 currentEquation = "";
@@ -188,21 +184,17 @@ public class CalculatorManager {
             commitPendingCalculation();
         }
 
-        // Update current equation being typed
         if (!cleanInput.equals(lastSearchInput)) {
-            // If we're not navigating history, update the current equation
             if (reiHistoryIndex == -1) {
                 currentEquation = cleanInput;
             }
 
             lastSearchInput = cleanInput;
 
-            // Calculate and show result if it looks complete
             if (looksLikeCalculation(cleanInput)) {
                 if (isExpressionComplete(cleanInput)) {
                     calculateForDisplay(cleanInput);
                 } else {
-                    // Still typing, don't show anything
                     lastFormattedResult = null;
                 }
             } else {
@@ -213,18 +205,15 @@ public class CalculatorManager {
         return cleanInput;
     }
 
-    // Add completed equation to REI search history (for Ctrl+Z).
     private void addToReiHistory(String equation) {
         if (equation == null || equation.trim().isEmpty()) {
             return;
         }
 
-        // Don't duplicate the last entry
         if (!reiSearchHistory.isEmpty() && reiSearchHistory.get(reiSearchHistory.size() - 1).equals(equation)) {
             return;
         }
 
-        // Add the completed equation
         reiSearchHistory.add(equation);
 
         while (reiSearchHistory.size() > MAX_EQUATIONS) {
@@ -300,7 +289,6 @@ public class CalculatorManager {
     private void addToCompletedHistory(String expression, BigDecimal result) {
         String historyEntry = expression + " = " + ResultFormatter.formatWithCommas(result);
 
-        // Don't duplicate last entry
         if (completedHistory.isEmpty() || !completedHistory.get(completedHistory.size() - 1).equals(historyEntry)) {
             completedHistory.add(historyEntry);
 
@@ -321,8 +309,7 @@ public class CalculatorManager {
     }
 
     /**
-     * Handle Ctrl+Z (undo) and Ctrl+Y (redo) keyboard shortcuts.
-     * Navigates through completed equations, not individual keystrokes.
+     * Navigates through completed equations using Ctrl+Z and Ctrl+Y.
      */
     public void handleKeyPress(int keyCode, int modifiers) {
         CalculatorConfig config = CalculatorConfig.getInstance();
@@ -333,13 +320,10 @@ public class CalculatorManager {
 
         boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
 
-        // Ctrl+Z: Undo (go back to previous equation)
         if (keyCode == GLFW.GLFW_KEY_Z && isCtrlPressed) {
-            // Save current equation before navigating
             if (reiHistoryIndex == -1 && !reiSearchHistory.isEmpty()) {
                 try {
                     savedCurrentInput = IntegrationManager.getActiveAdapter().getText();
-                    // Also save current equation to history if it's a calculation
                     if (!savedCurrentInput.isEmpty() && looksLikeCalculation(savedCurrentInput)) {
                         currentEquation = savedCurrentInput;
                         addToReiHistory(savedCurrentInput);
@@ -356,15 +340,12 @@ public class CalculatorManager {
             }
 
             if (reiHistoryIndex == -1) {
-                // Start from most recent (skip the one we just added)
                 reiHistoryIndex = reiSearchHistory.size() - 2;
                 if (reiHistoryIndex < 0)
                     reiHistoryIndex = 0;
             } else if (reiHistoryIndex > 0) {
-                // Go back one more
                 reiHistoryIndex--;
             } else {
-                // Already at oldest
                 LOGGER.debug("Already at oldest history entry");
                 return;
             }
@@ -373,7 +354,6 @@ public class CalculatorManager {
             LOGGER.info("Ctrl+Z: Undo to equation: '{}'", reiSearchHistory.get(reiHistoryIndex));
         }
 
-        // Ctrl+Y: Redo (go forward to next equation)
         if (keyCode == GLFW.GLFW_KEY_Y && isCtrlPressed) {
             if (reiHistoryIndex == -1) {
                 LOGGER.debug("Not in history mode, can't redo");
@@ -381,12 +361,10 @@ public class CalculatorManager {
             }
 
             if (reiHistoryIndex < reiSearchHistory.size() - 1) {
-                // Go forward one
                 reiHistoryIndex++;
                 setSearchFieldText(reiHistoryIndex);
                 LOGGER.info("Ctrl+Y: Redo to equation: '{}'", reiSearchHistory.get(reiHistoryIndex));
             } else {
-                // We're at newest, restore what user was typing
                 reiHistoryIndex = -1;
                 restoreSavedInput();
                 LOGGER.info("Ctrl+Y: Restored current input: '{}'", savedCurrentInput);
@@ -394,7 +372,6 @@ public class CalculatorManager {
         }
     }
 
-    // Update search field with a history entry (without triggering history save).
     private void setSearchFieldText(int index) {
         if (index >= 0 && index < reiSearchHistory.size()) {
             try {
@@ -403,7 +380,6 @@ public class CalculatorManager {
                 adapter.setText(historyText);
                 adapter.clamp();
 
-                // Update internal state without triggering history save
                 lastSearchInput = historyText;
                 currentEquation = ""; // Don't save while navigating
 

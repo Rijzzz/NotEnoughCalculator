@@ -143,9 +143,16 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary><strong>Variables & Player Stats</strong></summary>
 
-> **Note:** Many live SkyBlock stuff are extracted from Hypixel's **Tablist/Tab Widget** by **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)**. Ensure you have those relevant widgets turned on in `/tablist`; otherwise, those specific live stats may not be available and the mod might not function as expected.
+<details>
+<summary>Note</summary>
 
-#### Built-in & Custom Variables
+- Many live SkyBlock data are extracted from Hypixel's **Tablist/Tab Widget** by **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)**. Ensure you have those relevant widgets turned on in `/tablist`; otherwise, those specific live stats may not be available and the mod might not function as expected.
+
+</details>
+
+<details>
+<summary>Built-in & Custom Variables</summary>
+
 | Variable | Full Identifier | Type | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Last Result | `ans` | Built-in | Holds the last calculation result | `ans * 2` |
@@ -153,7 +160,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Euler's Number | `e` | Built-in | Constant $e \approx 2.71828182$ (when standalone) | `ln(e)` |
 | Custom Variable | `$name` | User-defined | Persistent variable created via `/calcset` or GUI manager | `$profit * 2` |
 
-#### Currencies
+</details>
+
+<details>
+<summary>Currencies</summary>
+
 | Currency | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Purse Coins | `$purse`, `$coins`, `$money` | `$p`, `$coin` | Purse coin balance | `$purse + $bank`, `$coins / 2` |
@@ -169,7 +180,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Gems | `$gems` | `$gem` | SkyBlock Gems balance | `$gems * 100` |
 | Soulflow | `$soulflow` | `$sf`, `$sflow` | Soulflow count | `$soulflow * 5k` |
 
-#### Player & Dungeon Stats
+</details>
+
+<details>
+<summary>Player & Dungeon Stats</summary>
+
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | SkyBlock Level | `$skyblocklevel`, `$sblevel` | `$sb`, `$sblvl`, `$sblev`, `$level` | Current SkyBlock Level | `$sblevel * 100k` |
@@ -189,7 +204,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Class Level | `$dungeonclass`, `$classlevel` | `$dclass`, `$classlvl` | Active Dungeon Class Level | `$classlevel * 5` |
 | Dungeon Party Size | `$dungeonparty`, `$partysize` | `$party` | Current Dungeon Party Size | `5 - $party` |
 
-#### Mining, HOTM & HOTF
+</details>
+
+<details>
+<summary>Mining, HOTM & HOTF</summary>
+
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Mithril Powder | `$mithrilpowder`, `$mithril` | `$mpowder`, `$mpowd`, `$mith` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
@@ -205,7 +224,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Forest Whispers | `$forestwhispers` | `$whisp`, `$whisper`, `$whispers`, `$fwhisper`, `$fwhispers` | Current Forest Whispers | `$whispers / 100` |
 | Desert Whispers | `$desertwhispers` | `$dwhispers`, `$dwhisper` | Current Desert Whispers | `$dwhispers / 50` |
 
-#### Essences
+</details>
+
+<details>
+<summary>Essences</summary>
+
 | Essence | Full Identifier(s) | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Wither Essence | `$witheressence`, `$wessence` | **`$w`**, `$wither` | Wither Essence count | `$w * 5k` |
@@ -221,7 +244,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Sun Gecko Essence | `$sungeckoessence`, `$geckoessence` | **`$sungeck`**, `$sungecko`, `$gecko` | Sun Gecko Essence count | `$gecko * 100k` |
 | Safari Essence | `$safariessence`, `$safessence` | **`$saf`**, `$safari` | Safari Essence count | `$saf * 25k` |
 
-#### Pets & Bestiary
+</details>
+
+<details>
+<summary>Pets & Bestiary</summary>
+
 | Stat / Category | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Pet Level | `$petlevel` | `$pet`, `$petlvl` | Active Pet Level | `$pet * 100k` |
@@ -234,7 +261,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Bronze Trophy | `$bronzetrophyfish`, `$bronzetrophy` | `$btrophy` | Bronze Trophy Fish count | `$btrophy * 10k` |
 | Accessory Power | `$accessorypower`, `$magicalpower` | `$mp`, `$power` | Maxwell Magical Power | `$mp * 100k` |
 
-#### Skills
+</details>
+
+<details>
+<summary>Skills</summary>
+
 | Skill | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Farming | `$farming`, `$farminglvl`, `$farmlvl` / `$farm` | `$farmingxp` / `$farmxp` | Farming Skill Level & XP | `$farm * 100k` |
@@ -250,7 +281,11 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Social | `$social`, `$sociallvl`, `$soclvl` / `$soc` | `$socialxp` / `$socxp` | Social Skill Level & XP | `$soc * 100k` |
 | Hunting | `$hunting`, `$huntinglvl`, `$huntlvl` / `$hunt` | `$huntingxp` / `$huntxp` | Hunting Skill Level & XP | `$hunt * 100k` |
 
-#### Slayers
+</details>
+
+<details>
+<summary>Slayers</summary>
+
 | Slayer Boss | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
 | Revenant (Zombie) | `$zombieslayer`, `$revslayer`, `$zombie` / `$rev` | `$zombieslayerxp`, `$zombiexp` / `$revxp` | Zombie Slayer Level & XP | `$rev * 50k` |
@@ -261,6 +296,9 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Riftstalker (Vampire) | `$vampireslayer`, `$vampslayer`, `$riftstalker`, `$vamplvl` / `$vamp` | `$vampireslayerxp`, `$riftstalkerxp` / `$vampxp` | Vampire Slayer Level & XP | `$vamp * 50k` |
 
 </details>
+
+</details>
+
 
 <details>
 <summary><strong>Syntax Highlighting & Colors</strong></summary>
@@ -307,7 +345,9 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary><strong>Commands & In-Game Help</strong></summary>
 
-#### Commands
+<details>
+<summary>Commands</summary>
+
 | Category | Command | Syntax | Description | Example |
 | :--- | :--- | :--- | :--- | :--- |
 | Core Calculation | `/calc` | `/calc <expression>` | Calculate directly in chat with click-to-copy result | `/calc 100m - 25m` |
@@ -318,11 +358,15 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Position Editor | `/calcconfig position` / `/calcpos` | `/calcconfig position` (or `/calcpos`) | Open interactive search bar repositioning screen | `/calcpos` |
 | Help System | `/calchelp` | `/calchelp [topic]` | Open interactive in-game guide covering all topics | `/calchelp functions` |
 
-#### Help Menu Pages (`/calchelp <topic>`)
+</details>
+
+<details>
+<summary>Help Menu Pages (/calchelp [topic])</summary>
+
 | Topic | Command | Description |
 | :--- | :--- | :--- |
 | Main Menu | `/calchelp` | Main menu with quick start, commands list, and shortcuts |
-| Operators | `/calchelp operators` | Arithmetic (+, -, *, /, ^, %, !), bitwise (&, |, ~, <<, >>), and radix literals (0b, 0x, 0o) |
+| Operators | `/calchelp operators` | Arithmetic (+, -, *, /, ^, %, !), bitwise (&, \|, ~, <<, >>), and radix literals (0b, 0x, 0o) |
 | Functions | `/calchelp functions` | Math, logarithms, trigonometry, min/max, clamp, avg, pct, gcd, lcm, radix conversions, and XP tables |
 | Units | `/calchelp units` | Coin multipliers (k, m, b, t) and container storage amounts (s, e, h, sc, dc, eb) |
 | Variables | `/calchelp variables` | Built-in constants (ans, pi, e), custom variables ($name), and variable usage guide |
@@ -331,6 +375,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Tax Formulas | `/calchelp tax` | Bazaar payout and Auction House BIN listing/claim tax formulas |
 | Examples | `/calchelp examples` | Practical flipping, crafting, mining, and inventory calculation examples |
 | Config Guide | `/calchelp config` | Mod configuration settings and config file details |
+
+</details>
 
 </details>
 
@@ -363,23 +409,35 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary><strong>Dependencies</strong></summary>
 
-#### Required
+<details>
+<summary>Notes</summary>
+
+- Dependencies and version numbers listed above apply specifically to the **latest release** of the mod. If you are using an older build or playing on a different Minecraft version, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
+- Standalone mode was introduced in v2.7.0. All versions prior to v2.7.0 require REI to be installed.
+
+</details>
+
+<details>
+<summary>Required</summary>
+
 | Name | Version |
 | :--- | :--- |
 | [Fabric Loader](https://fabricmc.net/) | `0.19.3+` |
 | [Fabric API](https://modrinth.com/mod/fabric-api) | `0.152.1+` |
 | [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.13.13+kotlin.2.4.10+` |
 
-> **Note:** Dependencies and version numbers listed above apply specifically to the **latest release** of the mod. If you are using an older build or playing on a different Minecraft version, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
+</details>
 
-> **Note:** Standalone mode was introduced in v2.7.0. All versions prior to v2.7.0 require REI to be installed.
+<details>
+<summary>Optional / Recommended</summary>
 
-#### Optional / Recommended
 | Name | Version |
 | :--- | :--- |
 | [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.2.820+` |
 | [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
 | [ModMenu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
+
+</details>
 
 </details>
 
@@ -403,7 +461,6 @@ Type calculations directly in the search bar and get instant results! Works insi
 ## Support
 
 <details>
-
 <summary>Important Version Notice:</summary>
 
 - Following Hypixel SkyBlock's Modern Update, only the latest two major Minecraft versions are supported. This mod will **not receive updates for older versions**. Please ensure you are using a supported version to avoid issues.
@@ -418,71 +475,142 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 ---
 
 <details>
-
 <summary>Common Issues & Troubleshooting</summary>
 
-- **Calculator search bar not showing up?**
-  - **Standalone Mode (No Search Mods Installed)**: Open any inventory screen (chest, crafting table, player inventory). The standalone search bar renders automatically at the bottom of your screen.
-  - **REI Integration (REI Installed)**: Click inside REI's search bar to start calculating directly.
-  - **Skyblock Item List Integration (Item List Installed)**: Click inside Skyblock Item List's search bar to start calculating.
+<details>
+<summary>Calculator search bar not showing up?</summary>
 
-- **Search bar position is off-screen or misplaced?**
-  - Open `/calcconfig` and click the Reset button (`§f§l⟲`) next to the Edit GUI button.
-  - Alternatively, run `/calcpos` (or `/calcconfig position`) and click **Reset to Default** to snap the search bar back to its default position.
+- **Standalone Mode (No Search Mods Installed)**: Open any inventory screen (chest, crafting table, player inventory). The standalone search bar renders automatically at the bottom of your screen.
+- **REI Integration (REI Installed)**: Click inside REI's search bar to start calculating directly.
+- **Skyblock Item List Integration (Item List Installed)**: Click inside Skyblock Item List's search bar to start calculating.
 
-- **How do I move or drag the search bar anywhere?**
-  - **Quick In-Game Dragging**: While viewing an inventory screen, hold `Shift` and drag the bar with Left-Click, or drag directly using `Right-Click Drag`.
-  - **Interactive Editor**: Run `/calcpos` or click **Edit GUI** in `/calcconfig` to enter the visual positioning screen with alignment guides and drag preview.
+</details>
 
-- **How do I disable REI or SkyBlock Item List search bar hooks?**
-  - If you prefer having a dedicated separate calculator bar rather than typing in REI / Skyblock Item List, open `/calcconfig` and turn ON **Force Standalone Mode**.
-  - To disable Item List integration specifically, toggle **Item List Integration** to OFF in `/calcconfig`.
+<details>
+<summary>Search bar position is off-screen or misplaced?</summary>
 
-- **Calculator is unresponsive or not showing results?**
-  - Make sure the search bar (REI, Skyblock Item List, or Standalone) is actively in focus (clicked into). If you click elsewhere on the screen, focus is lost.
-  - Check that **Inline Results** is enabled in `/calcconfig`.
+- Open `/calcconfig` and click the Reset button (`§f§l⟲`) next to the Edit GUI button.
+- Alternatively, run `/calcpos` (or `/calcconfig position`) and click **Reset to Default** to snap the search bar back to its default position.
 
-- **SkyBlock API stats showing 0 or unavailable?**
-  - API stats (like `$mithrilpowder`, `$skills`, `$slayer`, `$essence`, etc.) might not have loaded yet. Try opening your menus (e.g. running `/hotm`, `/skills`, `/pets`, etc. or make sure you have relevant tab widgets turned on) this may help resolve the issue.
+</details>
 
-- **Item price queries (`bzb`, `bzs`, `lb`, `lba`) return unknown item error?**
-  - Make sure you are using exact Hypixel item IDs (e.g. `SUPERBOOM_TNT`, `HYPERION`, `ENCHANTED_CARROT`).
-  - If the item ID contains spaces, hyphens, or special characters, wrap it in quotes: `bzb("SUPERBOOM_TNT")` or `lb('HYPERION')`.
+<details>
+<summary>How do I move or drag the search bar anywhere?</summary>
 
-- **How does Euler's constant `e` differ from enchanted item stacks (`2e`)?**
-  - Standalone `e` (like `ln(e)`, `e^2`, or `2 * e`) is evaluated as Euler's mathematical constant ($e \approx 2.71828$).
-  - When attached directly to a number without spaces (like `2e`, `10e`), it evaluates as the SkyBlock enchanted item multiplier ($160$). Use `2 * e` if you want two times Euler's number.
+- **Quick In-Game Dragging**: While viewing an inventory screen, hold `Shift` and drag the bar with Left-Click, or drag directly using `Right-Click Drag`.
+- **Interactive Editor**: Run `/calcpos` or click **Edit GUI** in `/calcconfig` to enter the visual positioning screen with alignment guides and drag preview.
 
-- **Bazaar / AH tax calculation rate is inaccurate?**
-  - Open the settings screen (`/calcconfig`). Under **Bazaar Flipper Perk**, select your account's Community Center perk level (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) so `bz()` calculations match your profile's exact tax rate.
+</details>
 
-- **Why is division or math output rounding off decimals?**
-  - Open `/calcconfig` and check your **Decimal Precision** setting (default is 10 decimal places). You can adjust the precision from 1 up to 50 decimal places as needed.
+<details>
+<summary>How do I disable REI or SkyBlock Item List search bar hooks?</summary>
 
-- **Calculations showing up in chat when pressing Enter?**
-  - Running `/calc <expression>` prints the calculation result to your chat window, where you can click the result to instantly copy it. In search bar mode, results show directly inside the search bar.
+- If you prefer having a dedicated separate calculator bar rather than typing in REI / Skyblock Item List, open `/calcconfig` and turn ON **Force Standalone Mode**.
+- To disable Item List integration specifically, toggle **Item List Integration** to OFF in `/calcconfig`.
 
-- **How to copy the result or full equation?**
-  - Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard (or highlighted text if selected).
-  - You can also click any `/calc` result printed in chat to copy the full equation with instant chat confirmation.
+</details>
 
-- **History navigation (`Ctrl+Z` / `Ctrl+Y`) not recalling calculations?**
-  - Make sure `enableHistoryNavigation` is set to `true` in `/calcconfig`. Note that calculation history is **session-based** and resets when joining a new world or server for a fresh start.
+<details>
+<summary>Calculator is unresponsive or not showing results?</summary>
 
-- **How do I clear my calculation history during a session?**
-  - Run `/calcclear` in chat to immediately wipe your active session calculation history, or run `/calchist` to view recent entries.
+- Make sure the search bar (REI, Skyblock Item List, or Standalone) is actively in focus (clicked into). If you click elsewhere on the screen, focus is lost.
+- Check that **Inline Results** is enabled in `/calcconfig`.
 
-- **Custom variables disappeared after restarting the game?**
-  - Custom variables defined via `/calcconfig` GUI or `/calcset var expr` are saved permanently to `config/notenoughcalculator.json`. Make sure you click **Save** when editing variables in `/calcconfig`.
+</details>
 
-- **Can I use custom variables inside complex expressions or other variables?**
-  - Yes! You can reference custom variables anywhere in equations, including inside function calls (e.g. `sqrt($mysize)`), with player stats (e.g. `$purse - $target`), or combined together (e.g. `$profit * $tax`).
+<details>
+<summary>SkyBlock API stats showing 0 or unavailable?</summary>
 
-- **How do I reset my custom variables or config?**
-  - You can manage or delete variables individually in the `/calcconfig` GUI under the **Custom Variables** tab. To reset everything to default, delete `config/notenoughcalculator.json` in your `.minecraft` folder while the game is closed.
+- API stats (like `$mithrilpowder`, `$skills`, `$slayer`, `$essence`, etc.) might not have loaded yet. Try opening your menus (e.g. running `/hotm`, `/skills`, `/pets`, etc., or ensure you have the relevant tab widgets turned on in `/tablist`).
 
-- **Bitwise operations or radix outputs not behaving as expected?**
-  - Hexadecimal (`hex()`), Binary (`bin()`), and Octal (`oct()`) functions operate on integer values. Floating-point numbers are rounded to nearest integers when performing bitwise operations (`&`, `|`, `~`, `<<`, `>>`, `xor`).
+</details>
+
+<details>
+<summary>Item price queries (`bzb`, `bzs`, `lb`, `lba`) return unknown item error?</summary>
+
+- Make sure you are using exact Hypixel item IDs (e.g. `SUPERBOOM_TNT`, `HYPERION`, `ENCHANTED_CARROT`).
+- If the item ID contains spaces, hyphens, or special characters, wrap it in quotes: `bzb("SUPERBOOM_TNT")` or `lb('HYPERION')`.
+
+</details>
+
+<details>
+<summary>How does Euler's constant `e` differ from enchanted item stacks (`2e`)?</summary>
+
+- Standalone `e` (like `ln(e)`, `e^2`, or `2 * e`) is evaluated as Euler's mathematical constant ($e \approx 2.71828$).
+- When attached directly to a number without spaces (like `2e`, `10e`), it evaluates as the SkyBlock enchanted item multiplier ($160$). Use `2 * e` if you want two times Euler's number.
+
+</details>
+
+<details>
+<summary>Bazaar / AH tax calculation rate is inaccurate?</summary>
+
+- Open the settings screen (`/calcconfig`). Under **Bazaar Flipper Perk**, select your account's Community Center perk level (`Lvl 0` = 1.25%, `Lvl 1` = 1.125%, `Lvl 2` = 1.0%) so `bz()` calculations match your profile's exact tax rate.
+
+</details>
+
+<details>
+<summary>Why is division or math output rounding off decimals?</summary>
+
+- Open `/calcconfig` and check your **Decimal Precision** setting (default is 10 decimal places). You can adjust the precision from 1 up to 50 decimal places as needed.
+
+</details>
+
+<details>
+<summary>Calculations showing up in chat when pressing Enter?</summary>
+
+- Running `/calc <expression>` prints the calculation result to your chat window, where you can click the result to instantly copy it. In search bar mode, results show directly inside the search bar.
+
+</details>
+
+<details>
+<summary>How to copy the result or full equation?</summary>
+
+- Press `Ctrl+C` inside the search bar to copy the full equation (`1+1 = 2`) to your system clipboard (or highlighted text if selected).
+- You can also click any `/calc` result printed in chat to copy the full equation with instant chat confirmation.
+
+</details>
+
+<details>
+<summary>History navigation (`Ctrl+Z` / `Ctrl+Y`) not recalling calculations?</summary>
+
+- Make sure `enableHistoryNavigation` is set to `true` in `/calcconfig`. Note that calculation history is **session-based** and resets when joining a new world or server for a fresh start.
+
+</details>
+
+<details>
+<summary>How do I clear my calculation history during a session?</summary>
+
+- Run `/calcclear` in chat to immediately wipe your active session calculation history, or run `/calchist` to view recent entries.
+
+</details>
+
+<details>
+<summary>Custom variables disappeared after restarting the game?</summary>
+
+- Custom variables defined via `/calcconfig` GUI or `/calcset var expr` are saved permanently to `config/notenoughcalculator.json`. Make sure you click **Save** when editing variables in `/calcconfig`.
+
+</details>
+
+<details>
+<summary>Can I use custom variables inside complex expressions or other variables?</summary>
+
+- Yes! You can reference custom variables anywhere in equations, including inside function calls (e.g. `sqrt($mysize)`), with player stats (e.g. `$purse - $target`), or combined together (e.g. `$profit * $tax`).
+
+</details>
+
+<details>
+<summary>How do I reset my custom variables or config?</summary>
+
+- You can manage or delete variables individually in the `/calcconfig` GUI under the **Custom Variables** tab. To reset everything to default, delete `config/notenoughcalculator.json` in your `.minecraft` folder while the game is closed.
+
+</details>
+
+<details>
+<summary>Bitwise operations or radix outputs not behaving as expected?</summary>
+
+- Hexadecimal (`hex()`), Binary (`bin()`), and Octal (`oct()`) functions operate on integer values. Floating-point numbers are rounded to nearest integers when performing bitwise operations (`&`, `|`, `~`, `<<`, `>>`, `xor`).
+
+</details>
 
 </details>
 
@@ -512,24 +640,33 @@ Feel free to include this mod in any modpack without restriction! Adding a link 
 <details>
 <summary><strong>License Update Notice</strong></summary>
 
-### Licensing Notice and Transition Statement
+<details>
+<summary>Licensing Notice and Transition Statement</summary>
 
 This project was previously licensed under **All Rights Reserved**.
 
 As of **February 2nd, 2026**, the project has been relicensed under the  
 **GNU Lesser General Public License v3.0 or later (LGPL-3.0-or-later)**.
 
-### What this means
+</details>
+
+<details>
+<summary>What this means</summary>
 
 - **Open Source:** The project itself is now free and open source.
 - **Modifications:** Any modifications or forks of this project's code must still be released under **LGPL-3.0-or-later**.
 - **Linking and Compatibility:** Other projects (including proprietary mods, closed-source plugins, or modpacks) may link to, depend on, or interoperate with this mod without being required to adopt the LGPL, provided they do not modify this project's source code.
 - **Ecosystem Integration:** This change is intended to improve compatibility with the wider Minecraft modding community, allowing for easier integration into modpacks, servers, and third-party tools.
 
-### Versioning and Legacy
+</details>
+
+<details>
+<summary>Versioning and Legacy</summary>
 
 - **Previous Versions:** All versions released prior to **February 2nd, 2026** (v1.0.11 and earlier) remain under the **All Rights Reserved** license.
 - **Current and Future Versions:** All versions released on or after **February 2nd, 2026** (starting with **v1.0.12**) are licensed under **LGPL-3.0-or-later**.
+
+</details>
 
 </details>
 

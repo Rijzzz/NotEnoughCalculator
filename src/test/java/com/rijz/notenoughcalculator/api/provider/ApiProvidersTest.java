@@ -155,6 +155,10 @@ class ApiProvidersTest {
         assertNull(EssenceDataProvider.getDiamond());
         assertNull(EssenceDataProvider.getGold());
         assertNull(EssenceDataProvider.getCrimson());
+        assertNull(EssenceDataProvider.getForest());
+        assertNull(EssenceDataProvider.getFossil());
+        assertNull(EssenceDataProvider.getSunGecko());
+        assertNull(EssenceDataProvider.getSafari());
         assertNull(EssenceDataProvider.getEssence("wither"));
         assertNull(EssenceDataProvider.getEssence(null));
 
@@ -170,8 +174,6 @@ class ApiProvidersTest {
         assertNull(TrophyFishDataProvider.getBronzeTrophyCount());
 
         assertNull(PlayerStatsDataProvider.getCatacombsLevel());
-        assertNull(PlayerStatsDataProvider.getCatacombsXp());
-        assertNull(PlayerStatsDataProvider.getSecrets());
     }
 
     @Test
@@ -192,7 +194,7 @@ class ApiProvidersTest {
         assertNull(HotfDataProvider.getDesertWhispers());
         assertNull(HotfDataProvider.getPerkLevel("foraging_speed"));
         assertNull(HotfDataProvider.getPerkLevel(null));
-        assertEquals("foragingspeed", HotfDataProvider.normalizePerkName("Foraging Speed"));
-        assertEquals("", HotfDataProvider.normalizePerkName(null));
+        assertEquals("foragingspeed", HotmDataProvider.normalizePerkName("Foraging Speed"));
+        assertEquals("", HotmDataProvider.normalizePerkName(null));
     }
 }

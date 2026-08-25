@@ -1,6 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
     id 'maven-publish'
+    id 'com.diffplug.spotless' version '8.10.0'
 }
 
 version = "${project.mod_version}"
@@ -130,3 +131,15 @@ publishing {
     repositories {
     }
 }
+
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+        importOrder('com.rijz.notenoughcalculator', 'tech.thatgravyboat.skyblockapi', 'net.minecraft', 'com.mojang', 'java', 'javax')
+        removeUnusedImports()
+        eclipse()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+

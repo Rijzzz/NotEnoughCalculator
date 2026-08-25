@@ -26,22 +26,15 @@ import java.math.BigDecimal;
 public class PetDataProvider {
 
     public static BigDecimal getPetLevel() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
+        return SkyblockApiIntegration.safeQuery(() -> {
             int lvl = PetsAPI.INSTANCE.getLevel();
-            return BigDecimal.valueOf(lvl);
-        } catch (Throwable ignored) {
+            if (lvl > 0) return BigDecimal.valueOf(lvl);
+            if (PetsAPI.INSTANCE.isMaxLevel()) return BigDecimal.valueOf(100);
             return null;
-        }
+        });
     }
 
     public static BigDecimal getPetXp() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            double xp = PetsAPI.INSTANCE.getXp();
-            return BigDecimal.valueOf(xp);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PetsAPI.INSTANCE.getXp()));
     }
 }

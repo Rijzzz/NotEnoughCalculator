@@ -30,8 +30,7 @@ class TokenTest {
     @Test
     @DisplayName("Token creation holds correct kind, value, and character position")
     void testTokenFields() {
-        Token tok = new Token(TokenKind.NUM, "100", 0);
-        tok.number = new BigDecimal("100");
+        Token tok = new Token(TokenKind.NUM, "100", 0, new BigDecimal("100"));
 
         assertEquals(TokenKind.NUM, tok.kind);
         assertEquals("100", tok.value);

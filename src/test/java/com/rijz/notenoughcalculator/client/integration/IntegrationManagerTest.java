@@ -18,30 +18,31 @@
 
 package com.rijz.notenoughcalculator.client.integration;
 
-import com.rijz.notenoughcalculator.config.CalculatorConfig;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.rijz.notenoughcalculator.config.CalculatorConfig;
+
+import org.junit.jupiter.api.Test;
 
 class IntegrationManagerTest {
 
-    @Test
-    void testIntegrationManagerFallback() {
-        assertFalse(IntegrationManager.isREILoaded());
-        assertFalse(IntegrationManager.isItemListLoaded());
-        assertTrue(IntegrationManager.isStandaloneActive());
-        assertNotNull(IntegrationManager.getStandaloneField());
-        assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
-    }
+	@Test
+	void testIntegrationManagerFallback() {
+		assertFalse(IntegrationManager.isREILoaded());
+		assertFalse(IntegrationManager.isItemListLoaded());
+		assertTrue(IntegrationManager.isStandaloneActive());
+		assertNotNull(IntegrationManager.getStandaloneField());
+		assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
+	}
 
-    @Test
-    void testForceStandaloneMode() {
-        CalculatorConfig config = CalculatorConfig.getInstance();
-        config.forceStandaloneMode = true;
+	@Test
+	void testForceStandaloneMode() {
+		CalculatorConfig config = CalculatorConfig.getInstance();
+		config.forceStandaloneMode = true;
 
-        assertTrue(IntegrationManager.isStandaloneActive());
-        assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
+		assertTrue(IntegrationManager.isStandaloneActive());
+		assertTrue(IntegrationManager.getActiveAdapter() instanceof StandaloneSearchField);
 
-        config.forceStandaloneMode = false;
-    }
+		config.forceStandaloneMode = false;
+	}
 }

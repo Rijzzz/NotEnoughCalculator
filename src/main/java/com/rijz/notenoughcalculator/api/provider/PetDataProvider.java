@@ -19,22 +19,25 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
+
 import tech.thatgravyboat.skyblockapi.api.profile.PetsAPI;
 
 import java.math.BigDecimal;
 
 public class PetDataProvider {
 
-    public static BigDecimal getPetLevel() {
-        return SkyblockApiIntegration.safeQuery(() -> {
-            int lvl = PetsAPI.INSTANCE.getLevel();
-            if (lvl > 0) return BigDecimal.valueOf(lvl);
-            if (PetsAPI.INSTANCE.isMaxLevel()) return BigDecimal.valueOf(100);
-            return null;
-        });
-    }
+	public static BigDecimal getPetLevel() {
+		return SkyblockApiIntegration.safeQuery(() -> {
+			int lvl = PetsAPI.INSTANCE.getLevel();
+			if (lvl > 0)
+				return BigDecimal.valueOf(lvl);
+			if (PetsAPI.INSTANCE.isMaxLevel())
+				return BigDecimal.valueOf(100);
+			return null;
+		});
+	}
 
-    public static BigDecimal getPetXp() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PetsAPI.INSTANCE.getXp()));
-    }
+	public static BigDecimal getPetXp() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PetsAPI.INSTANCE.getXp()));
+	}
 }

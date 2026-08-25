@@ -17,25 +17,25 @@
  */
 
 package com.rijz.notenoughcalculator.client.integration;
- 
+
 public class CalculatorBounds {
-    public final int x;
-    public final int y;
-    public final int width;
-    public final int height;
+	public final int x;
+	public final int y;
+	public final int width;
+	public final int height;
 
-    public CalculatorBounds(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
+	public CalculatorBounds(int x, int y, int width, int height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	}
 
-    public int getMaxX() {
-        return x + width;
-    }
+	public int getMaxX() {
+		return x + width;
+	}
 
-    public int getMaxY() {
-        return y + height;
-    }
+	public int getMaxY() {
+		return y + height;
+	}
 }

@@ -18,56 +18,56 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class ExpressionTokenizerTest {
 
-    @Test
-    @DisplayName("Tokenize basic numbers and math operators")
-    void testBasicTokenization() throws Exception {
-        List<Token> tokens = ExpressionTokenizer.tokenize("100 + 200 * 3", BigDecimal.ZERO);
-        assertNotNull(tokens);
-        assertTrue(tokens.size() >= 5);
-        assertEquals(TokenKind.NUM, tokens.get(0).kind);
-        assertEquals("100", tokens.get(0).value);
-        assertEquals(TokenKind.OP, tokens.get(1).kind);
-        assertEquals("+", tokens.get(1).value);
-    }
+	@Test
+	@DisplayName("Tokenize basic numbers and math operators")
+	void testBasicTokenization() throws Exception {
+		List<Token> tokens = ExpressionTokenizer.tokenize("100 + 200 * 3", BigDecimal.ZERO);
+		assertNotNull(tokens);
+		assertTrue(tokens.size() >= 5);
+		assertEquals(TokenKind.NUM, tokens.get(0).kind);
+		assertEquals("100", tokens.get(0).value);
+		assertEquals(TokenKind.OP, tokens.get(1).kind);
+		assertEquals("+", tokens.get(1).value);
+	}
 
-    @Test
-    @DisplayName("Tokenize SkyBlock units")
-    void testUnitTokenization() throws Exception {
-        List<Token> tokens = ExpressionTokenizer.tokenize("10k + 5m", BigDecimal.ZERO);
-        assertNotNull(tokens);
-        assertEquals(TokenKind.NUM, tokens.get(0).kind);
-        assertEquals(TokenKind.UNIT, tokens.get(1).kind);
-        assertEquals("k", tokens.get(1).value);
-    }
+	@Test
+	@DisplayName("Tokenize SkyBlock units")
+	void testUnitTokenization() throws Exception {
+		List<Token> tokens = ExpressionTokenizer.tokenize("10k + 5m", BigDecimal.ZERO);
+		assertNotNull(tokens);
+		assertEquals(TokenKind.NUM, tokens.get(0).kind);
+		assertEquals(TokenKind.UNIT, tokens.get(1).kind);
+		assertEquals("k", tokens.get(1).value);
+	}
 
-    @Test
-    @DisplayName("Tokenize radix literals (0b, 0x, 0o)")
-    void testRadixLiteralTokenization() throws Exception {
-        List<Token> hexTokens = ExpressionTokenizer.tokenize("0xFF", BigDecimal.ZERO);
-        assertEquals(TokenKind.NUM, hexTokens.get(0).kind);
-        assertEquals(0, new BigDecimal("255").compareTo(hexTokens.get(0).number));
+	@Test
+	@DisplayName("Tokenize radix literals (0b, 0x, 0o)")
+	void testRadixLiteralTokenization() throws Exception {
+		List<Token> hexTokens = ExpressionTokenizer.tokenize("0xFF", BigDecimal.ZERO);
+		assertEquals(TokenKind.NUM, hexTokens.get(0).kind);
+		assertEquals(0, new BigDecimal("255").compareTo(hexTokens.get(0).number));
 
-        List<Token> binTokens = ExpressionTokenizer.tokenize("0b1010", BigDecimal.ZERO);
-        assertEquals(TokenKind.NUM, binTokens.get(0).kind);
-        assertEquals(0, new BigDecimal("10").compareTo(binTokens.get(0).number));
-    }
+		List<Token> binTokens = ExpressionTokenizer.tokenize("0b1010", BigDecimal.ZERO);
+		assertEquals(TokenKind.NUM, binTokens.get(0).kind);
+		assertEquals(0, new BigDecimal("10").compareTo(binTokens.get(0).number));
+	}
 
-    @Test
-    @DisplayName("Tokenize 'x' as multiplication operator")
-    void testXMultiplicationTokenization() throws Exception {
-        List<Token> tokens = ExpressionTokenizer.tokenize("10x5", BigDecimal.ZERO);
-        assertEquals(TokenKind.NUM, tokens.get(0).kind);
-        assertEquals(TokenKind.OP, tokens.get(1).kind);
-        assertEquals("*", tokens.get(1).value);
-    }
+	@Test
+	@DisplayName("Tokenize 'x' as multiplication operator")
+	void testXMultiplicationTokenization() throws Exception {
+		List<Token> tokens = ExpressionTokenizer.tokenize("10x5", BigDecimal.ZERO);
+		assertEquals(TokenKind.NUM, tokens.get(0).kind);
+		assertEquals(TokenKind.OP, tokens.get(1).kind);
+		assertEquals("*", tokens.get(1).value);
+	}
 }

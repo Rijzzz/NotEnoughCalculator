@@ -21,20 +21,19 @@ package com.rijz.notenoughcalculator.core.parser;
 import java.math.BigDecimal;
 
 public class Token {
-    public final TokenKind kind;
-    public final String value;
-    public final int pos;
-    public final BigDecimal number;
+	public final TokenKind kind;
+	public final String value;
+	public final int pos;
+	public final BigDecimal number;
 
-    public Token(TokenKind kind, String value, int pos) {
-        this(kind, value, pos, null);
-    }
+	public Token(TokenKind kind, String value, int pos) {
+		this(kind, value, pos, null);
+	}
 
-    public Token(TokenKind kind, String value, int pos, BigDecimal number) {
-        this.kind = kind;
-        this.value = value;
-        this.pos = pos;
-        this.number = number;
-    }
+	public Token(TokenKind kind, String value, int pos, BigDecimal number) {
+		this.kind = kind;
+		this.value = value;
+		this.pos = pos;
+		this.number = number;
+	}
 }
-

@@ -20,6 +20,7 @@ package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
+
 import tech.thatgravyboat.skyblockapi.api.events.info.TabWidget;
 
 import java.math.BigDecimal;
@@ -29,23 +30,25 @@ import java.util.regex.Pattern;
 
 public class BestiaryDataProvider {
 
-    private static final Pattern BESTIARY_LEVEL_PATTERN = Pattern.compile("(?i)(?:overall|tier|level|bestiary|milestone)\\s*[:\\-]?\\s*([\\d,]+)");
+	private static final Pattern BESTIARY_LEVEL_PATTERN = Pattern
+			.compile("(?i)(?:overall|tier|level|bestiary|milestone)\\s*[:\\-]?\\s*([\\d,]+)");
 
-    public static BigDecimal getBestiaryLevel() {
-        return SkyblockApiIntegration.safeQuery(() -> {
-            List<String> lines = TabWidget.BESTIARY.getCurrentLines();
-            if (lines != null) {
-                for (String line : lines) {
-                    if (line == null) continue;
-                    String clean = ResultFormatter.stripMinecraftFormatting(line).trim();
-                    Matcher matcher = BESTIARY_LEVEL_PATTERN.matcher(clean);
-                    if (matcher.find()) {
-                        String numStr = matcher.group(1).replace(",", "");
-                        return new BigDecimal(numStr);
-                    }
-                }
-            }
-            return null;
-        });
-    }
+	public static BigDecimal getBestiaryLevel() {
+		return SkyblockApiIntegration.safeQuery(() -> {
+			List<String> lines = TabWidget.BESTIARY.getCurrentLines();
+			if (lines != null) {
+				for (String line : lines) {
+					if (line == null)
+						continue;
+					String clean = ResultFormatter.stripMinecraftFormatting(line).trim();
+					Matcher matcher = BESTIARY_LEVEL_PATTERN.matcher(clean);
+					if (matcher.find()) {
+						String numStr = matcher.group(1).replace(",", "");
+						return new BigDecimal(numStr);
+					}
+				}
+			}
+			return null;
+		});
+	}
 }

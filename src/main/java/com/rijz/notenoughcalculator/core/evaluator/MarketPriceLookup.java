@@ -25,36 +25,36 @@ import java.math.BigDecimal;
 
 public class MarketPriceLookup {
 
-    public static BigDecimal lookupMarketPrice(String func, String itemId) {
-        switch (func) {
-            case "bzb":
-            case "bzbuy":
-                return MarketDataProvider.getBazaarBuyPrice(itemId);
-            case "bzs":
-            case "bzsell":
-                return MarketDataProvider.getBazaarSellPrice(itemId);
-            case "bzm":
-            case "bzmargin":
-                return MarketDataProvider.getBazaarMargin(itemId);
-            case "lb":
-            case "lowestbin":
-                return MarketDataProvider.getLowestBinPrice(itemId);
-            case "lba":
-            case "lowestbinavg":
-                return MarketDataProvider.getLowestBinAvgPrice(itemId);
-            case "npc":
-            case "npcsell":
-                return MarketDataProvider.getNpcSellPrice(itemId);
-            case "motes":
-            case "motessell":
-                return MarketDataProvider.getMotesSellPrice(itemId);
-            case "price":
-                return MarketDataProvider.getUnifiedPrice(itemId);
-            case "sack":
-            case "sackcount":
-                return SackDataProvider.getSackItemCount(itemId);
-            default:
-                return null;
-        }
-    }
+	public static BigDecimal lookupMarketPrice(String func, String itemId) {
+		switch (func) {
+			case "bzb" :
+			case "bzbuy" :
+				return MarketDataProvider.getBazaarBuyPrice(itemId);
+			case "bzs" :
+			case "bzsell" :
+				return MarketDataProvider.getBazaarSellPrice(itemId);
+			case "bzm" :
+			case "bzmargin" :
+				return MarketDataProvider.getBazaarMargin(itemId);
+			case "lb" :
+			case "lowestbin" :
+				return MarketDataProvider.getLowestBinPrice(itemId);
+			case "lba" :
+			case "lowestbinavg" :
+				return MarketDataProvider.getLowestBinAvgPrice(itemId);
+			case "npc" :
+			case "npcsell" :
+				return MarketDataProvider.getNpcSellPrice(itemId);
+			case "motes" :
+			case "motessell" :
+				return MarketDataProvider.getMotesSellPrice(itemId);
+			case "price" :
+				return MarketDataProvider.getUnifiedPrice(itemId);
+			case "sack" :
+			case "sackcount" :
+				return SackDataProvider.getSackItemCount(itemId);
+			default :
+				return null;
+		}
+	}
 }

@@ -18,25 +18,26 @@
 
 package com.rijz.notenoughcalculator.client.gui.overlay;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.rijz.notenoughcalculator.client.CalculatorManager;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CalculatorOverlayRendererTest {
 
-    @Test
-    @DisplayName("renderOverlay handles null inputs safely without exception")
-    void testRenderOverlayNullSafety() {
-        CalculatorManager calcManager = new CalculatorManager();
-        assertDoesNotThrow(() -> CalculatorOverlayRenderer.renderOverlay(null, null, calcManager, false));
-    }
+	@Test
+	@DisplayName("renderOverlay handles null inputs safely without exception")
+	void testRenderOverlayNullSafety() {
+		CalculatorManager calcManager = new CalculatorManager();
+		assertDoesNotThrow(() -> CalculatorOverlayRenderer.renderOverlay(null, null, calcManager, false));
+	}
 
-    @Test
-    @DisplayName("Scissor helper methods handle null context gracefully")
-    void testScissorNullSafety() {
-        assertDoesNotThrow(() -> CalculatorOverlayRenderer.enableScissor(null, 0, 0, 100, 100));
-        assertDoesNotThrow(() -> CalculatorOverlayRenderer.disableScissor(null));
-    }
+	@Test
+	@DisplayName("Scissor helper methods handle null context gracefully")
+	void testScissorNullSafety() {
+		assertDoesNotThrow(() -> CalculatorOverlayRenderer.enableScissor(null, 0, 0, 100, 100));
+		assertDoesNotThrow(() -> CalculatorOverlayRenderer.disableScissor(null));
+	}
 }

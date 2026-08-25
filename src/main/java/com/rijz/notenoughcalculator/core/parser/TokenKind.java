@@ -19,16 +19,5 @@
 package com.rijz.notenoughcalculator.core.parser;
 
 public enum TokenKind {
-    NUM,
-    UNIT,
-    OP,
-    LPAREN,
-    RPAREN,
-    COMMA,
-    FUNC,
-    VAR,
-    ASSIGN,
-    PERCENT,
-    FACTORIAL,
-    EOF
+	NUM, UNIT, OP, LPAREN, RPAREN, COMMA, FUNC, VAR, ASSIGN, PERCENT, FACTORIAL, EOF
 }

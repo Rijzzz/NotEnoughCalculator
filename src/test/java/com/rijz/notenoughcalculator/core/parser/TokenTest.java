@@ -18,23 +18,23 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class TokenTest {
 
-    @Test
-    @DisplayName("Token creation holds correct kind, value, and character position")
-    void testTokenFields() {
-        Token tok = new Token(TokenKind.NUM, "100", 0, new BigDecimal("100"));
+	@Test
+	@DisplayName("Token creation holds correct kind, value, and character position")
+	void testTokenFields() {
+		Token tok = new Token(TokenKind.NUM, "100", 0, new BigDecimal("100"));
 
-        assertEquals(TokenKind.NUM, tok.kind);
-        assertEquals("100", tok.value);
-        assertEquals(0, tok.pos);
-        assertEquals(0, new BigDecimal("100").compareTo(tok.number));
-    }
+		assertEquals(TokenKind.NUM, tok.kind);
+		assertEquals("100", tok.value);
+		assertEquals(0, tok.pos);
+		assertEquals(0, new BigDecimal("100").compareTo(tok.number));
+	}
 }

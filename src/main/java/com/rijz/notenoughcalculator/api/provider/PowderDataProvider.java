@@ -19,33 +19,34 @@
 package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
+
 import tech.thatgravyboat.skyblockapi.api.profile.hotm.PowderAPI;
 
 import java.math.BigDecimal;
 
 public class PowderDataProvider {
 
-    public static BigDecimal getMithril() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getMithril()));
-    }
+	public static BigDecimal getMithril() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getMithril()));
+	}
 
-    public static BigDecimal getGemstone() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstone()));
-    }
+	public static BigDecimal getGemstone() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstone()));
+	}
 
-    public static BigDecimal getGlacite() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGlacite()));
-    }
+	public static BigDecimal getGlacite() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGlacite()));
+	}
 
-    public static BigDecimal getTotalMithril() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getMithrilTotal()));
-    }
+	public static BigDecimal getTotalMithril() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getMithrilTotal()));
+	}
 
-    public static BigDecimal getTotalGemstone() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstoneTotal()));
-    }
+	public static BigDecimal getTotalGemstone() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGemstoneTotal()));
+	}
 
-    public static BigDecimal getTotalGlacite() {
-        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGlaciteTotal()));
-    }
+	public static BigDecimal getTotalGlacite() {
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(PowderAPI.INSTANCE.getGlaciteTotal()));
+	}
 }

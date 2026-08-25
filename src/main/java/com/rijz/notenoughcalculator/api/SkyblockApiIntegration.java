@@ -18,44 +18,45 @@
 
 package com.rijz.notenoughcalculator.api;
 
-import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tech.thatgravyboat.skyblockapi.api.profile.currency.CurrencyAPI;
 
 import java.util.function.Supplier;
 
+import net.fabricmc.loader.api.FabricLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SkyblockApiIntegration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkyblockApiIntegration.class);
-    private static Boolean skyblockApiAvailable = null;
+	private static final Logger LOGGER = LoggerFactory.getLogger(SkyblockApiIntegration.class);
+	private static Boolean skyblockApiAvailable = null;
 
-    public static boolean isAvailable() {
-        if (skyblockApiAvailable == null) {
-            try {
-                boolean modLoaded = FabricLoader.getInstance().isModLoaded("skyblock-api");
-                if (modLoaded) {
-                    Class.forName(CurrencyAPI.class.getName());
-                    skyblockApiAvailable = true;
-                    LOGGER.info("SkyBlock API detected and successfully bound!");
-                } else {
-                    skyblockApiAvailable = false;
-                }
-            } catch (Throwable t) {
-                skyblockApiAvailable = false;
-                LOGGER.debug("SkyBlock API is not available on classpath");
-            }
-        }
-        return skyblockApiAvailable;
-    }
+	public static boolean isAvailable() {
+		if (skyblockApiAvailable == null) {
+			try {
+				boolean modLoaded = FabricLoader.getInstance().isModLoaded("skyblock-api");
+				if (modLoaded) {
+					Class.forName(CurrencyAPI.class.getName());
+					skyblockApiAvailable = true;
+					LOGGER.info("SkyBlock API detected and successfully bound!");
+				} else {
+					skyblockApiAvailable = false;
+				}
+			} catch (Throwable t) {
+				skyblockApiAvailable = false;
+				LOGGER.debug("SkyBlock API is not available on classpath");
+			}
+		}
+		return skyblockApiAvailable;
+	}
 
-    public static <T> T safeQuery(Supplier<T> query) {
-        if (!isAvailable())
-            return null;
-        try {
-            return query.get();
-        } catch (Throwable ignored) {
-            return null;
-        }
-    }
+	public static <T> T safeQuery(Supplier<T> query) {
+		if (!isAvailable())
+			return null;
+		try {
+			return query.get();
+		} catch (Throwable ignored) {
+			return null;
+		}
+	}
 }

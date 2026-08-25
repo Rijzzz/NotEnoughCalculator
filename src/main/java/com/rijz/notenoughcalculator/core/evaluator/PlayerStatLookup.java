@@ -171,15 +171,6 @@ public class PlayerStatLookup {
             case "catacombslevel":
             case "catalvl":
                 return PlayerStatsDataProvider.getCatacombsLevel();
-            case "cataxp":
-            case "cxp":
-            case "catacombsxp":
-                return PlayerStatsDataProvider.getCatacombsXp();
-            case "secrets":
-            case "sec":
-            case "secretcount":
-            case "secret":
-                return PlayerStatsDataProvider.getSecrets();
             case "classlevel":
             case "classlvl":
             case "dclass":
@@ -230,6 +221,27 @@ public class PlayerStatLookup {
             case "cessence":
             case "c":
                 return EssenceDataProvider.getCrimson();
+            case "forestessence":
+            case "forest":
+            case "foressence":
+            case "fe":
+                return EssenceDataProvider.getForest();
+            case "fossilessence":
+            case "fossil":
+            case "fossessence":
+            case "foss":
+                return EssenceDataProvider.getFossil();
+            case "sungeckoessence":
+            case "sungecko":
+            case "geckoessence":
+            case "gecko":
+            case "sungeck":
+                return EssenceDataProvider.getSunGecko();
+            case "safariessence":
+            case "safari":
+            case "safessence":
+            case "saf":
+                return EssenceDataProvider.getSafari();
 
             case "petlvl":
             case "petlevel":

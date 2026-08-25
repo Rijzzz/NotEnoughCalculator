@@ -19,6 +19,7 @@
 package com.rijz.notenoughcalculator.client.gui.tab;
 
 import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -135,9 +136,9 @@ public class VariablesTab {
     }
 
     public void renderContent(GuiGraphicsExtractor graphics, Font font, CalculatorConfigScreen screen, int panelX, int startY) {
-        graphics.text(font, Component.translatable("notenoughcalculator.config.var.section_title"), panelX + 20, startY + 2, 0xFF38BDF8, true);
+        graphics.text(font, Component.translatable("notenoughcalculator.config.var.section_title"), panelX + 20, startY + 2, ColorConstants.TEXT_SKY, true);
         if (varStatusMessage != null && !varStatusMessage.isEmpty()) {
-            graphics.text(font, Component.literal(varStatusMessage), panelX + 20, startY + 37, 0xFFFFFFFF, false);
+            graphics.text(font, Component.literal(varStatusMessage), panelX + 20, startY + 37, ColorConstants.TEXT_WHITE, false);
         }
 
         List<Map.Entry<String, String>> varEntries = new ArrayList<>(screen.workingCustomVariables.entrySet());
@@ -157,19 +158,18 @@ public class VariablesTab {
             if (font.width(valStr) > 138) {
                 valStr = font.plainSubstrByWidth(valStr, 128) + ellipsis;
             }
-
-            graphics.fill(panelX + 20, rowY, panelX + 260, rowY + 16, 0xFF1E293B);
-            graphics.text(font, keyStr, panelX + 25, rowY + 4, 0xFF34D399, true);
-            graphics.text(font, valStr, panelX + 110, rowY + 4, 0xFFFFFFFF, true);
+            graphics.fill(panelX + 20, rowY, panelX + 260, rowY + 16, ColorConstants.BG_VARIABLE_ROW);
+            graphics.text(font, keyStr, panelX + 25, rowY + 4, ColorConstants.TEXT_EMERALD, true);
+            graphics.text(font, valStr, panelX + 110, rowY + 4, ColorConstants.TEXT_WHITE, true);
 
             rowY += 18;
         }
 
         if (screen.workingCustomVariables.isEmpty()) {
-            graphics.text(font, Component.translatable("notenoughcalculator.config.var.empty_notice"), panelX + 20, startY + 52, 0xFF94A3B8, true);
+            graphics.text(font, Component.translatable("notenoughcalculator.config.var.empty_notice"), panelX + 20, startY + 52, ColorConstants.TEXT_MUTED, true);
         } else if (totalPages > 1) {
             Component pageComp = Component.translatable("notenoughcalculator.config.var.page_format", (screen.varPage + 1), totalPages);
-            graphics.text(font, pageComp, panelX + 250, startY + 164, 0xFFCBD5E1, true);
+            graphics.text(font, pageComp, panelX + 250, startY + 164, ColorConstants.TEXT_SLATE, true);
         }
     }
 }

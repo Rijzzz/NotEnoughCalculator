@@ -73,6 +73,8 @@ class CalculatorManagerTest {
         @Test void ceilFunction() { assertTrue(CalculatorManager.looksLikeCalculation("ceil(3.5)")); }
         @Test void roundFunction() { assertTrue(CalculatorManager.looksLikeCalculation("round(3.5)")); }
         @Test void ansVariable() { assertTrue(CalculatorManager.looksLikeCalculation("ans")); }
+        @Test void piConstant() { assertTrue(CalculatorManager.looksLikeCalculation("pi")); }
+        @Test void eConstant() { assertTrue(CalculatorManager.looksLikeCalculation("e")); }
         @Test void customVariable() { assertTrue(CalculatorManager.looksLikeCalculation("$profit")); }
         @Test void unitK() { assertTrue(CalculatorManager.looksLikeCalculation("10k + 5k")); }
         @Test void unitM() { assertTrue(CalculatorManager.looksLikeCalculation("5m + 1m")); }

@@ -22,6 +22,7 @@ import com.rijz.notenoughcalculator.client.CalculatorManager;
 import com.rijz.notenoughcalculator.client.util.REIHelper;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
@@ -81,7 +82,7 @@ public class REIOverlayRenderer {
                     && CalculatorManager.looksLikeCalculation(searchText))
                             ? SyntaxHighlighter.highlight(searchText)
                             : searchText;
-            context.text(font, renderText, textX, textY, 0xFFFFFFFF, true);
+            context.text(font, renderText, textX, textY, ColorConstants.TEXT_WHITE, true);
         }
 
         boolean resultFitsInline = false;
@@ -95,7 +96,7 @@ public class REIOverlayRenderer {
             int resultWidth = font.width(resultDisplay);
 
             if (resultX + resultWidth <= searchBounds.getMaxX() - 4) {
-                context.text(font, resultDisplay, resultX, textY, 0xFFFFFFFF, true);
+                context.text(font, resultDisplay, resultX, textY, ColorConstants.TEXT_WHITE, true);
                 resultFitsInline = true;
             }
         }
@@ -142,11 +143,11 @@ public class REIOverlayRenderer {
             resultScroll = (int) (overflowPixels * normalized);
         }
 
-        context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, 0xEE000000);
+        context.fill(aboveX - 2, aboveY - 2, aboveX + bgWidth, aboveY + bgHeight - 2, ColorConstants.BG_TOOLTIP);
 
         CalculatorOverlayRenderer.enableScissor(context, aboveX - 2, aboveY - 2, aboveX + bgWidth,
                 aboveY + bgHeight - 2);
-        context.text(font, resultDisplay, aboveX - resultScroll, aboveY, 0xFFFFFFFF, true);
+        context.text(font, resultDisplay, aboveX - resultScroll, aboveY, ColorConstants.TEXT_WHITE, true);
         CalculatorOverlayRenderer.disableScissor(context);
     }
 
@@ -171,19 +172,19 @@ public class REIOverlayRenderer {
         int currentX = x;
 
         if (!beforeSelection.isEmpty()) {
-            context.text(font, beforeSelection, currentX, y, 0xFFFFFFFF, true);
+            context.text(font, beforeSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
             currentX += font.width(beforeSelection);
         }
 
         if (!selectedText.isEmpty()) {
             int selectionWidth = font.width(selectedText);
-            context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, 0xFF0066CC);
-            context.text(font, selectedText, currentX, y, 0xFFFFFFFF, true);
+            context.fill(currentX, y - 1, currentX + selectionWidth, y + 9, ColorConstants.SELECTION_HIGHLIGHT);
+            context.text(font, selectedText, currentX, y, ColorConstants.TEXT_WHITE, true);
             currentX += selectionWidth;
         }
 
         if (!afterSelection.isEmpty()) {
-            context.text(font, afterSelection, currentX, y, 0xFFFFFFFF, true);
+            context.text(font, afterSelection, currentX, y, ColorConstants.TEXT_WHITE, true);
         }
     }
 
@@ -204,9 +205,9 @@ public class REIOverlayRenderer {
 
     private static void drawSearchBoxBackground(GuiGraphicsExtractor context, int minX, int minY, int maxX, int maxY,
             boolean isFocused) {
-        int borderColor = isFocused ? 0xFFFFFFFF : 0xFF8B8B8B;
+        int borderColor = isFocused ? ColorConstants.BORDER_FOCUSED : ColorConstants.BORDER_UNFOCUSED;
         context.fill(minX, minY, maxX, maxY, borderColor);
-        context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, 0xFF000000);
+        context.fill(minX + 1, minY + 1, maxX - 1, maxY - 1, ColorConstants.BG_BLACK);
     }
 
     private static void drawCursor(GuiGraphicsExtractor context, String text, Font font, int textX, int textY,
@@ -224,7 +225,7 @@ public class REIOverlayRenderer {
                 int cursorY = textY - 1;
 
                 if (cursorX >= minX && cursorX <= maxX) {
-                    context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, 0xFFFFFFFF);
+                    context.fill(cursorX, cursorY, cursorX + 1, cursorY + 9, ColorConstants.TEXT_WHITE);
                 }
             }
         } catch (Exception ignored) {

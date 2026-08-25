@@ -28,13 +28,13 @@ import java.util.Map;
 public class SackDataProvider {
 
     public static BigDecimal getSackItemCount(String itemId) {
-        if (!SkyblockApiIntegration.isAvailable() || itemId == null || itemId.isEmpty()) return null;
-        try {
+        if (itemId == null || itemId.isEmpty()) return null;
+        return SkyblockApiIntegration.safeQuery(() -> {
             Map<String, Integer> counts = SacksAPI.INSTANCE.getSackItems();
             if (counts != null && counts.containsKey(itemId.toUpperCase())) {
                 return BigDecimal.valueOf(counts.get(itemId.toUpperCase()));
             }
-        } catch (Throwable ignored) {}
-        return null;
+            return null;
+        });
     }
 }

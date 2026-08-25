@@ -17,8 +17,7 @@
  */
 
 package com.rijz.notenoughcalculator.client.integration;
-
-// Rectangle bounds structure for positioning calculator search overlays
+ 
 public class CalculatorBounds {
     public final int x;
     public final int y;

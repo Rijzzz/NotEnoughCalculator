@@ -21,6 +21,7 @@ package com.rijz.notenoughcalculator.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rijz.notenoughcalculator.client.util.SyntaxHighlighter;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-// User configuration class. Supports live reloading on file changes without game restarts.
 public class CalculatorConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculatorConfig.class);
@@ -43,7 +43,8 @@ public class CalculatorConfig {
             if (FabricLoader.getInstance() != null && FabricLoader.getInstance().getConfigDir() != null) {
                 return FabricLoader.getInstance().getConfigDir().resolve("notenoughcalculator.json");
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return Path.of("build", "tmp", "notenoughcalculator.json");
     }
 
@@ -52,13 +53,12 @@ public class CalculatorConfig {
     private static long lastChecked = 0;
     private static final long CHECK_INTERVAL_MS = 2000;
 
-    // Config options
     public int decimalPrecision = 10;
     public boolean showUnitSuggestions = true;
     public boolean enableHistoryNavigation = true;
     public boolean showInlineResults = true;
     public boolean enableCommaFormatting = true;
-    public int bazaarFlipperLevel = 0;    // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
+    public int bazaarFlipperLevel = 0; // 0 = 1.25%, 1 = 1.125%, 2 = 1.0%
     public boolean enableShorthandResults = false;
     public boolean enableSyntaxHighlighting = true;
     public boolean enableFullEquationCopy = true;
@@ -83,7 +83,6 @@ public class CalculatorConfig {
     }
 
     public static CalculatorConfig getInstance() {
-        // Poll for external config file edits every 2 seconds
         long now = System.currentTimeMillis();
         if (INSTANCE != null && (now - lastChecked) >= CHECK_INTERVAL_MS) {
             lastChecked = now;
@@ -94,7 +93,8 @@ public class CalculatorConfig {
                         LOGGER.info("Config file changed, reloading...");
                         INSTANCE = load();
                     }
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
         }
 
@@ -114,10 +114,10 @@ public class CalculatorConfig {
                 return config;
             }
         } catch (IOException e) {
-            LOGGER.warn("Failed to load configuration file from '{}' (falling back to default settings): {}", CONFIG_PATH, e.getMessage());
+            LOGGER.warn("Failed to load configuration file from '{}' (falling back to default settings): {}",
+                    CONFIG_PATH, e.getMessage());
         }
 
-        // File doesn't exist, create it with defaults
         CalculatorConfig config = new CalculatorConfig();
         config.save();
         return config;
@@ -136,11 +136,11 @@ public class CalculatorConfig {
     }
 
     public String getResultColorCode() {
-        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : "§f";
+        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
     }
 
     public String getChatResultColorCode() {
-        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : "§f";
+        return enableSyntaxHighlighting ? SyntaxHighlighter.getColorResult() : ColorConstants.PLAIN_WHITE;
     }
 
     public String getErrorColorCode() {

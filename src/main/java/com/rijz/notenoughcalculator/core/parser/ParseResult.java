@@ -26,16 +26,25 @@ public class ParseResult {
     public final BigDecimal value;
     public final int nextPos;
     public final RadixMode radixMode;
-    public boolean isPercentage;
+    public final boolean isPercentage;
 
     public ParseResult(BigDecimal value, int nextPos) {
-        this(value, nextPos, RadixMode.DEFAULT);
+        this(value, nextPos, RadixMode.DEFAULT, false);
     }
 
     public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode) {
+        this(value, nextPos, radixMode, false);
+    }
+
+    public ParseResult(BigDecimal value, int nextPos, RadixMode radixMode, boolean isPercentage) {
         this.value = value;
         this.nextPos = nextPos;
         this.radixMode = radixMode != null ? radixMode : RadixMode.DEFAULT;
-        this.isPercentage = false;
+        this.isPercentage = isPercentage;
+    }
+
+    public ParseResult withPercentage(boolean isPercentage) {
+        return new ParseResult(this.value, this.nextPos, this.radixMode, isPercentage);
     }
 }
+

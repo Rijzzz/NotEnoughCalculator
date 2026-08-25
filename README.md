@@ -116,7 +116,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Spider Slayer | `spiderxp(lvl, [toLvl])` | `spider_xp`, `tarantulaxp`, `tarantula_xp`, `spidertable` | Spider / Tarantula Slayer XP | `spiderxp(2)` | `25` |
 | Enderman / Blaze | `emanxp(lvl, [toLvl])` | `voidgloomxp`, `endermanxp`, `blazexp`, `infernoxp` | Enderman (Voidgloom) & Blaze (Inferno) Slayer XP | `emanxp(4)` | `1,500` |
 | Vampire Slayer | `vampirexp(lvl, [toLvl])` | `vampire_xp`, `vampiretable`, `vampslayerxp`, `riftstalkerxp` | Vampire Slayer XP milestones & deltas (1–5) | `vampirexp(5)` | `2,400` |
-| Active Perks | `perk("name")` | `hotmperk`, `hperk` | Live active HotM / HotF perk level from SkyBlock API | `perk(mining_speed)` | `50` |
+| Active Perks | `perk("name")` | `hotmperk`, `hperk` | Live active HotM / HotF perk level | `perk(mining_speed)` | `50` |
 
 </details>
 
@@ -143,6 +143,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary><strong>Variables & Player Stats</strong></summary>
 
+> **Note:** Many live SkyBlock stuff are extracted from Hypixel's **Tablist/Tab Widget** by **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)**. Ensure you have those relevant widgets turned on in `/tablist`; otherwise, those specific live stats may not be available and the mod might not function as expected.
+
 #### Built-in & Custom Variables
 | Variable | Full Identifier | Type | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
@@ -154,81 +156,83 @@ Type calculations directly in the search bar and get instant results! Works insi
 #### Currencies
 | Currency | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Purse Coins | `$purse`, `$coins`, `$coin`, `$money` | `$p` | Purse coin balance | `$purse + $bank`, `$coins / 2` |
-| Bank Coins | `$bank`, `$bankcoins` | `$b` | Bank coin balance | `$bank / 2` |
+| Purse Coins | `$purse`, `$coins`, `$money` | `$p`, `$coin` | Purse coin balance | `$purse + $bank`, `$coins / 2` |
+| Bank Coins | `$bankcoins`, `$bank` | `$b` | Bank coin balance | `$bank / 2` |
 | Personal Bank | `$personalbank` | `$pbank` | Personal bank coins | `$pbank + 10m` |
 | Coop Bank | `$coopbank` | `$cbank` | Coop bank coins | `$cbank / 4` |
-| Bits | `$bits`, `$bit` | `$bt` | Hypixel Bits balance | `$bits * 1000` |
-| Motes | `$motes`, `$mote` | `$mt` | Rift Motes balance | `$motes / 50` |
+| Bits | `$bits` | `$bt`, `$bit` | Hypixel Bits balance | `$bits * 1000` |
+| Motes | `$motes` | `$mt`, `$mote` | Rift Motes balance | `$motes / 50` |
 | Copper | `$copper` | `$cop` | Garden Copper balance | `$copper * 500` |
 | Sowdust | `$sowdust` | `$sdust` | Garden Sowdust count | `$sowdust / 10` |
-| Kernels | `$kernels`, `$kernel` | `$kern` | Garden Kernels count | `$kernels * 100` |
-| North Stars | `$northstars`, `$nstars`, `$northstar`, `$star`, `$stars` | `$ns` | Winter Island North Stars | `$ns * 50k` |
+| Kernels | `$kernels` | `$kern`, `$kernel` | Garden Kernels count | `$kernels * 100` |
+| North Stars | `$northstars`, `$northstar` | `$ns`, `$nstars`, `$star`, `$stars` | Winter Island North Stars | `$ns * 50k` |
 | Gems | `$gems` | `$gem` | SkyBlock Gems balance | `$gems * 100` |
-| Soulflow | `$soulflow`, `$sflow` | `$sf` | Soulflow count | `$soulflow * 5k` |
+| Soulflow | `$soulflow` | `$sf`, `$sflow` | Soulflow count | `$soulflow * 5k` |
 
 #### Player & Dungeon Stats
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| SkyBlock Level | `$skyblocklevel`, `$sblevel`, `$sblvl`, `$sblev`, `$level` | `$sb` | Current SkyBlock Level | `$sblevel * 100k` |
-| Level Progress | `$sblevelprogress`, `$sblevelprog`, `$levelprogress`, `$levelprog` | `$sbprog` | Progress to next SB Level | `100 - $sbprog` |
+| SkyBlock Level | `$skyblocklevel`, `$sblevel` | `$sb`, `$sblvl`, `$sblev`, `$level` | Current SkyBlock Level | `$sblevel * 100k` |
+| Level Progress | `$sblevelprogress`, `$levelprogress` | `$sbprog`, `$sblevelprog`, `$levelprog` | Progress to next SB Level | `100 - $sbprog` |
 | Faction Reputation | `$reputation` | `$rep` | Nether Faction Reputation | `$rep / 1000` |
 | Health | `$health` | `$hp` | Current Health points | `$hp / $maxhp` |
-| Max Health | `$maxhealth`, `$mhp` | `$maxhp` | Maximum Health points | `$maxhp + 500` |
+| Max Health | `$maxhealth` | `$mhp`, `$maxhp` | Maximum Health points | `$maxhp + 500` |
 | Defense | `$defense`, `$defence` | `$def` | Current Defense stat | `$def / ($def + 100)` |
-| Intelligence / Mana | `$intelligence`, `$intel` | `$mana` | Current Mana points | `$mana * 2` |
-| Max Mana | `$maxintel`, `$maxintelligence` | `$maxmana`, `$mmana` | Maximum Mana points | `$maxmana - 500` |
+| Intelligence / Mana | `$intelligence` | `$mana`, `$intel` | Current Mana points | `$mana * 2` |
+| Max Mana | `$maxmana`, `$maxintelligence` | `$mmana`, `$maxintel` | Maximum Mana points | `$maxmana - 500` |
 | Overflow Mana | `$overflowmana` | `$ofmana` | Current Overflow Mana | `$ofmana * 10` |
 | Vitality | `$vitality` | `$vit` | Current Vitality stat | `$vit + 50` |
 | Max Vitality | `$maxvitality` | `$mvit` | Maximum Vitality stat | `$mvit` |
 | Speed | `$speed` | `$spd` | Current Speed stat | `$spd / 400` |
-| Vanilla XP Level | `$xplevel`, `$xplvl` | `$xp` | Vanilla Minecraft XP Level | `$xp * 100` |
-| Catacombs Level | `$catacombslevel`, `$catacombs`, `$catalvl` | `$cata` | Dungeons Catacombs Level | `$cata * 10` |
-| Catacombs XP | `$catacombsxp`, `$cataxp` | `$cxp` | Dungeons Catacombs XP | `$cxp / 1m` |
-| Dungeon Secrets | `$secretcount`, `$secrets`, `$secret` | `$sec` | Total Dungeon Secrets found | `$secrets / $cata` |
-| Class Level | `$dungeonclass`, `$classlvl` | `$classlevel`, `$dclass` | Active Dungeon Class Level | `$classlevel * 5` |
-| Dungeon Party Size | `$dungeonparty`, `$party` | `$partysize` | Current Dungeon Party Size | `5 - $partysize` |
+| Vanilla XP Level | `$xplevel` | `$xp`, `$xplvl` | Vanilla Minecraft XP Level | `$xp * 100` |
+| Catacombs Level | `$catacombslevel`, `$catacombs` | `$cata`, `$catalvl` | Dungeons Catacombs Level | `$cata * 10` |
+| Class Level | `$dungeonclass`, `$classlevel` | `$dclass`, `$classlvl` | Active Dungeon Class Level | `$classlevel * 5` |
+| Dungeon Party Size | `$dungeonparty`, `$partysize` | `$party` | Current Dungeon Party Size | `5 - $party` |
 
 #### Mining, HOTM & HOTF
 | Stat | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Mithril Powder | `$mithrilpowder`, `$mithril`, `$mith`, `$mpowd` | `$mpowder` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
-| Gemstone Powder | `$gemstonepowder`, `$gemstone`, `$gpowd` | `$gpowder` | Current Gemstone Powder | `1m - $gpowder` |
-| Glacite Powder | `$glacitepowder`, `$glacite`, `$glac`, `$glpowd` | `$glpowder` | Current Glacite Powder | `500k - $glpowder` |
-| Total Mithril | `$totalmithrilpowder`, `$totmithril`, `$totmith` | `$totmpowder` | Lifetime Total Mithril | `$totmpowder / 1m` |
-| Total Gemstone | `$totalgemstonepowder`, `$totgemstone`, `$totgem` | `$totgpowder` | Lifetime Total Gemstone | `$totgpowder / 1m` |
-| Total Glacite | `$totalglacitepowder`, `$totglacite`, `$totglac` | `$totglpowder` | Lifetime Total Glacite | `$totglpowder / 1m` |
+| Mithril Powder | `$mithrilpowder`, `$mithril` | `$mpowder`, `$mpowd`, `$mith` | Current Mithril Powder | `(1m - $mithrilpowder) / 50k` |
+| Gemstone Powder | `$gemstonepowder`, `$gemstone` | `$gpowder`, `$gpowd` | Current Gemstone Powder | `1m - $gpowder` |
+| Glacite Powder | `$glacitepowder`, `$glacite` | `$glpowder`, `$glpowd`, `$glac` | Current Glacite Powder | `500k - $glpowder` |
+| Total Mithril | `$totalmithrilpowder`, `$totalmithril` | `$totmpowder`, `$totmithril`, `$totmith` | Lifetime Total Mithril | `$totmpowder / 1m` |
+| Total Gemstone | `$totalgemstonepowder`, `$totalgemstone` | `$totgpowder`, `$totgemstone`, `$totgem` | Lifetime Total Gemstone | `$totgpowder / 1m` |
+| Total Glacite | `$totalglacitepowder`, `$totalglacite` | `$totglpowder`, `$totglacite`, `$totglac` | Lifetime Total Glacite | `$totglpowder / 1m` |
 | HOTM Tier | `$hotmtier` | `$hotm` | Heart of the Mountain Tier | `10 - $hotm` |
-| HOTM Tokens | `$hotmtokens`, `$token` | `$tokens` | Available HOTM Tokens | `$tokens * 2` |
-| HOTF Tier | `$hotftier`, `$hotf` | `$htier` | Heart of the Forest Tier | `$hotf + 1` |
-| HOTF Tokens | `$hotftokens`, `$htoken` | `$htokens` | Available HOTF Tokens | `$htokens * 10` |
-| Forest Whispers | `$forestwhispers`, `$whispers`, `$whisper`, `$fwhispers`, `$fwhisper` | `$whisp` | Current Forest Whispers | `$whispers / 100` |
-| Desert Whispers | `$desertwhispers`, `$dwhisper` | `$dwhispers` | Current Desert Whispers | `$dwhispers / 50` |
+| HOTM Tokens | `$hotmtokens`, `$tokens` | `$token` | Available HOTM Tokens | `$tokens * 2` |
+| HOTF Tier | `$hotftier` | `$hotf`, `$htier` | Heart of the Forest Tier | `$hotf + 1` |
+| HOTF Tokens | `$hotftokens`, `$htokens` | `$htoken` | Available HOTF Tokens | `$htokens * 10` |
+| Forest Whispers | `$forestwhispers` | `$whisp`, `$whisper`, `$whispers`, `$fwhisper`, `$fwhispers` | Current Forest Whispers | `$whispers / 100` |
+| Desert Whispers | `$desertwhispers` | `$dwhispers`, `$dwhisper` | Current Desert Whispers | `$dwhispers / 50` |
 
 #### Essences
-| Essence | Full Identifier(s) | Short Alias | Description | Example Input |
+| Essence | Full Identifier(s) | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Wither Essence | `$witheressence`, `$wither`, `$wessence` | **`$w`** | Wither Essence count | `$w * 5k` |
-| Undead Essence | `$undeadessence`, `$undead`, `$uessence` | **`$u`** | Undead Essence count | `$u * 1k` |
-| Dragon Essence | `$dragonessence`, `$dragon`, `$dessence` | **`$d`** | Dragon Essence count | `$d * 2k` |
-| Spider Essence | `$spideressence`, `$spider`, `$spessence` | **`$sp`** | Spider Essence count | `$sp * 1.5k` |
-| Ice Essence | `$iceessence`, `$ice`, `$iessence` | **`$i`** | Ice Essence count | `$i * 3k` |
-| Diamond Essence | `$diamondessence`, `$diamond`, `$diessence` | **`$di`** | Diamond Essence count | `$di * 10k` |
-| Gold Essence | `$goldessence`, `$gold`, `$gessence` | **`$g`** | Gold Essence count | `$g * 8k` |
-| Crimson Essence | `$crimsonessence`, `$crimson`, `$cessence` | **`$c`** | Crimson Essence count | `$c * 6k` |
+| Wither Essence | `$witheressence`, `$wessence` | **`$w`**, `$wither` | Wither Essence count | `$w * 5k` |
+| Undead Essence | `$undeadessence`, `$uessence` | **`$u`**, `$undead` | Undead Essence count | `$u * 1k` |
+| Dragon Essence | `$dragonessence`, `$dessence` | **`$d`**, `$dragon` | Dragon Essence count | `$d * 2k` |
+| Spider Essence | `$spideressence`, `$spessence` | **`$sp`**, `$spider` | Spider Essence count | `$sp * 1.5k` |
+| Ice Essence | `$iceessence`, `$iessence` | **`$i`**, `$ice` | Ice Essence count | `$i * 3k` |
+| Diamond Essence | `$diamondessence`, `$diessence` | **`$di`**, `$diamond` | Diamond Essence count | `$di * 10k` |
+| Gold Essence | `$goldessence`, `$gessence` | **`$g`**, `$gold` | Gold Essence count | `$g * 8k` |
+| Crimson Essence | `$crimsonessence`, `$cessence` | **`$c`**, `$crimson` | Crimson Essence count | `$c * 6k` |
+| Forest Essence | `$forestessence`, `$foressence` | **`$fe`**, `$forest` | Forest Essence count | `$fe * 10k` |
+| Fossil Essence | `$fossilessence`, `$fossessence` | **`$foss`**, `$fossil` | Fossil Essence count | `$foss * 50k` |
+| Sun Gecko Essence | `$sungeckoessence`, `$geckoessence` | **`$sungeck`**, `$sungecko`, `$gecko` | Sun Gecko Essence count | `$gecko * 100k` |
+| Safari Essence | `$safariessence`, `$safessence` | **`$saf`**, `$safari` | Safari Essence count | `$saf * 25k` |
 
 #### Pets & Bestiary
 | Stat / Category | Full Identifier | Short Alias(es) | Description | Example Input |
 | :--- | :--- | :--- | :--- | :--- |
-| Pet Level | `$petlevel`, `$petlvl` | `$pet` | Active Pet Level | `$pet * 100k` |
+| Pet Level | `$petlevel` | `$pet`, `$petlvl` | Active Pet Level | `$pet * 100k` |
 | Pet XP | `$petexperience`, `$petxp` | `$pxp` | Active Pet Experience | `25m - $pxp` |
-| Bestiary Level | `$bestiarylevel`, `$bestiarylvl` | `$bestiary`, `$best` | Current Bestiary Level | `$best * 50k` |
+| Bestiary Level | `$bestiarylevel` | `$best`, `$bestiary`, `$bestiarylvl` | Current Bestiary Level | `$best * 50k` |
 | Total Trophy Fish | `$trophyfishcount`, `$trophyfish` | `$tfish` | Total Trophy Fish caught | `$tfish * 10k` |
 | Diamond Trophy | `$diamondtrophyfish`, `$diamondtrophy` | `$dtrophy` | Diamond Trophy Fish count | `$dtrophy * 100k` |
 | Gold Trophy | `$goldtrophyfish`, `$goldtrophy` | `$gtrophy` | Gold Trophy Fish count | `$gtrophy * 50k` |
 | Silver Trophy | `$silvertrophyfish`, `$silvertrophy` | `$strophy` | Silver Trophy Fish count | `$strophy * 20k` |
 | Bronze Trophy | `$bronzetrophyfish`, `$bronzetrophy` | `$btrophy` | Bronze Trophy Fish count | `$btrophy * 10k` |
-| Accessory Power | `$magicalpower`, `$accessorypower`, `$power` | `$mp` | Maxwell Magical Power | `$mp * 100k` |
+| Accessory Power | `$accessorypower`, `$magicalpower` | `$mp`, `$power` | Maxwell Magical Power | `$mp * 100k` |
 
 #### Skills
 | Skill | Level Full / Short Identifier | XP Full / Short Identifier | Description | Example Input |
@@ -270,7 +274,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | **Market, Auctions & Taxes** | `§9` (Royal Blue) | `bzb()`, `bzsell()`, `lowestbin()`, `npc()`, `price()`, `sack()`, `ah()`, `ahbin()` |
 | **Radix Literals & Functions** | `§d` (Light Purple / Magenta) | `0xFF`, `0b1010`, `0o77`, `hex()`, `bin()`, `oct()`, `pct()` |
 | **Built-in Variables & Constants** | `§b` (Vibrant Aqua) | `ans`, `pi`, `e`, `$purse`, `$mana`, `$hp`, `$mithril`, `$hunting`, `$cata` |
-| **Custom Variables** | `§a` (Bright Lime Green) | `$myset`, `$tax`, `$profit`, `$goal` |
+| **Custom Variables** | `§3` (Cyan / Dark Aqua) | `$myset`, `$tax`, `$profit`, `$goal` |
 | **Variable Prefix ($)** | `§6` (Vibrant Gold) | `$` prefix preceding any variable |
 | **Item IDs & Quoted Strings** | `§d` (Light Purple / Pink) | `"HYPERION"`, `'SUPERBOOM_TNT'`, `COBBLESTONE` |
 | **Mathematical Operators** | `§c` (Light Red) | `+`, `-`, `*`, `/`, `^`, `%`, `x`, `!`, `&`, `\|`, `~`, `<<`, `>>` |
@@ -439,7 +443,7 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
   - Check that **Inline Results** is enabled in `/calcconfig`.
 
 - **SkyBlock API stats showing 0 or unavailable?**
-  - API stats (like `$mithrilpowder`, `$skills`, `$slayer`, `$essence`, etc.) might not have loaded yet. Try opening your menus (e.g. running `/hotm`, `/skills`, `/pets`, etc.) this may help resolve the issue.
+  - API stats (like `$mithrilpowder`, `$skills`, `$slayer`, `$essence`, etc.) might not have loaded yet. Try opening your menus (e.g. running `/hotm`, `/skills`, `/pets`, etc. or make sure you have relevant tab widgets turned on) this may help resolve the issue.
 
 - **Item price queries (`bzb`, `bzs`, `lb`, `lba`) return unknown item error?**
   - Make sure you are using exact Hypixel item IDs (e.g. `SUPERBOOM_TNT`, `HYPERION`, `ENCHANTED_CARROT`).
@@ -553,4 +557,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 21-08-2026*
+*Last updated: 25-08-2026*

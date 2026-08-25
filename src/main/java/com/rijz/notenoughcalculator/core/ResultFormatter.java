@@ -21,7 +21,6 @@ package com.rijz.notenoughcalculator.core;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
-import net.minecraft.client.resources.language.I18n;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,35 +31,26 @@ public class ResultFormatter {
 
 
     private static String tr(String key, Object... args) {
-        try {
-            String translated = I18n.get(key, args);
-            if (translated != null && !translated.equals(key)) {
-                return translated;
-            }
-        } catch (Exception | NoClassDefFoundError ignored) {}
         if ("notenoughcalculator.unit.suggestion_suffix".equals(key) && args.length > 0) {
-            return " (" + args[0] + ")";
+            String translated = ExpressionEvaluator.tr(key, args);
+            if (translated.equals(key)) {
+                return " (" + args[0] + ")";
+            }
+            return translated;
         }
-        if (args.length > 0) {
-            try {
-                return String.format(key, args);
-            } catch (Exception ignored) {}
-        }
-        return key;
+        return ExpressionEvaluator.tr(key, args);
     }
 
     public static String getEqualsSign() {
         CalculatorConfig config = CalculatorConfig.getInstance();
         if (!config.enableSyntaxHighlighting) {
-            return " §f= ";
+            return ColorConstants.EQUALS_PLAIN;
         }
-        try {
-            String val = I18n.get("notenoughcalculator.result.equals");
-            if (val != null && !val.equals("notenoughcalculator.result.equals")) {
-                return val;
-            }
-        } catch (Throwable ignored) {}
-        return " §6= ";
+        String val = ExpressionEvaluator.tr("notenoughcalculator.result.equals");
+        if (val != null && !val.equals("notenoughcalculator.result.equals")) {
+            return val;
+        }
+        return ColorConstants.EQUALS_HIGHLIGHTED;
     }
 
     // Format full equation for copying to clipboard (e.g. "1+1 = 2")
@@ -93,7 +83,6 @@ public class ResultFormatter {
         String intPart = dotIdx >= 0 ? numberStr.substring(0, dotIdx) : numberStr;
         String fracPart = dotIdx >= 0 ? numberStr.substring(dotIdx) : "";
 
-        // Handle leading sign (- or +)
         String sign = "";
         if (intPart.startsWith("-") || intPart.startsWith("+")) {
             sign = intPart.substring(0, 1);
@@ -113,7 +102,6 @@ public class ResultFormatter {
         return sign + sb.toString() + fracPart;
     }
 
-    // Format result considering radix mode (hex, bin, oct) or decimal commas
     public static String formatResult(EvalResult evalResult) {
         if (evalResult == null) return "0";
         if (evalResult.radixMode != null && evalResult.radixMode != RadixMode.DEFAULT && evalResult.radixMode != RadixMode.NONE) {
@@ -126,7 +114,6 @@ public class ResultFormatter {
         return formatWithCommas(evalResult.value);
     }
 
-    // Convert value to base 16 (0xFF), base 2 (0b1010), or base 8 (0o77)
     public static String formatWithRadix(BigDecimal value, RadixMode radixMode) {
         if (value == null) return "0";
         if (radixMode == null || radixMode == RadixMode.DEFAULT || radixMode == RadixMode.NONE) {
@@ -152,7 +139,6 @@ public class ResultFormatter {
         }
     }
 
-    // Format with units OR radix representation
     public static String formatResultWithUnits(EvalResult evalResult) {
         if (evalResult == null) return "0";
         if (evalResult.radixMode != null && evalResult.radixMode != RadixMode.DEFAULT && evalResult.radixMode != RadixMode.NONE) {
@@ -161,8 +147,6 @@ public class ResultFormatter {
         return formatWithUnits(evalResult.value);
     }
 
-    // Format with commas AND unit suggestions (used for chat commands)
-    // Example: "50,000,000 (50m)"
     public static String formatWithUnits(BigDecimal value) {
         CalculatorConfig config = CalculatorConfig.getInstance();
 
@@ -173,7 +157,6 @@ public class ResultFormatter {
             result.append(formatWithCommas(value));
         }
 
-        // Add helpful unit suggestions if enabled
         if (config.showUnitSuggestions && !config.enableShorthandResults) {
             String unitSuggestion = suggestUnit(value);
             if (unitSuggestion != null) {
@@ -292,7 +275,6 @@ public class ResultFormatter {
         return input == null ? "" : MINECRAFT_COLOR_PATTERN.matcher(input).replaceAll("");
     }
 
-    // Remove any weird formatting characters from user input
     public static String cleanInput(String input) {
         return input == null ? "" : input.replaceAll("\\p{Cf}", "").trim();
     }

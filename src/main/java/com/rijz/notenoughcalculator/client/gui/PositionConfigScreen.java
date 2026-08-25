@@ -22,6 +22,7 @@ import com.rijz.notenoughcalculator.client.integration.CalculatorBounds;
 import com.rijz.notenoughcalculator.client.integration.StandaloneSearchField;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -135,38 +136,34 @@ public class PositionConfigScreen extends Screen {
             this.wasMouseDown = isMouseDown;
         }
 
-        graphics.fill(0, 0, this.width, this.height, 0xB0000000);
+        graphics.fill(0, 0, this.width, this.height, ColorConstants.BG_POSITION_OVERLAY);
 
         Component title = Component.translatable("notenoughcalculator.position.screen.title");
-        graphics.text(this.font, title, (this.width - this.font.width(title)) / 2, 12, 0xFFFFFFFF, true);
+        graphics.text(this.font, title, (this.width - this.font.width(title)) / 2, 12, ColorConstants.TEXT_WHITE, true);
 
         Component instructions = Component.translatable("notenoughcalculator.position.screen.instructions");
-        graphics.text(this.font, instructions, (this.width - this.font.width(instructions)) / 2, 26, 0x88AAAAAA, true);
+        graphics.text(this.font, instructions, (this.width - this.font.width(instructions)) / 2, 26, ColorConstants.TEXT_PLACEHOLDER, true);
 
         CalculatorBounds bounds = getEffectiveBounds();
         String coordText = (currentX >= 0 && currentY >= 0)
                 ? I18n.get("notenoughcalculator.position.screen.coord_custom", bounds.x, bounds.y)
                 : I18n.get("notenoughcalculator.position.screen.coord_default", bounds.x, bounds.y);
-        graphics.text(this.font, coordText, (this.width - this.font.width(coordText)) / 2, 40, 0xFF55FFFF, true);
+        graphics.text(this.font, coordText, (this.width - this.font.width(coordText)) / 2, 40, ColorConstants.TEXT_CYAN, true);
 
-        // Draw preview of search bar
         int bx = bounds.x;
         int by = bounds.y;
         int bMaxX = bounds.getMaxX();
         int bMaxY = bounds.getMaxY();
 
-        // Border & background
-        graphics.fill(bx - 2, by - 2, bMaxX + 2, bMaxY + 2, isDragging ? 0xFFFFD700 : 0xFF55FFFF);
-        graphics.fill(bx - 1, by - 1, bMaxX + 1, bMaxY + 1, 0xFF000000);
-        graphics.fill(bx, by, bMaxX, bMaxY, 0xEE1E293B);
+        graphics.fill(bx - 2, by - 2, bMaxX + 2, bMaxY + 2, isDragging ? ColorConstants.BORDER_DRAG_ACTIVE : ColorConstants.BORDER_DRAG_IDLE);
+        graphics.fill(bx - 1, by - 1, bMaxX + 1, bMaxY + 1, ColorConstants.BG_BLACK);
+        graphics.fill(bx, by, bMaxX, bMaxY, ColorConstants.BG_POSITION_BAR);
 
-        // Text & placeholder inside
         String placeholder = I18n.get("notenoughcalculator.standalone.placeholder");
-        graphics.text(this.font, placeholder, bx + 4, by + (bounds.height - 8) / 2, 0xFFE0E0E0, true);
+        graphics.text(this.font, placeholder, bx + 4, by + (bounds.height - 8) / 2, ColorConstants.TEXT_LIGHT_GRAY, true);
 
-        // Drag icon / indicator on right
         String dragIcon = I18n.get("notenoughcalculator.position.screen.drag_icon");
-        graphics.text(this.font, dragIcon, bMaxX - this.font.width(dragIcon) - 4, by + (bounds.height - 8) / 2, isDragging ? 0xFFFFD700 : 0xFF88AAAA, true);
+        graphics.text(this.font, dragIcon, bMaxX - this.font.width(dragIcon) - 4, by + (bounds.height - 8) / 2, isDragging ? ColorConstants.DRAG_ICON_ACTIVE : ColorConstants.DRAG_ICON_IDLE, true);
 
         super.extractRenderState(graphics, mouseX, mouseY, delta);
     }

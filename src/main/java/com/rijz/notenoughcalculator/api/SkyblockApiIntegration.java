@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.thatgravyboat.skyblockapi.api.profile.currency.CurrencyAPI;
 
+import java.util.function.Supplier;
+
 public class SkyblockApiIntegration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SkyblockApiIntegration.class);
@@ -45,5 +47,15 @@ public class SkyblockApiIntegration {
             }
         }
         return skyblockApiAvailable;
+    }
+
+    public static <T> T safeQuery(Supplier<T> query) {
+        if (!isAvailable())
+            return null;
+        try {
+            return query.get();
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 }

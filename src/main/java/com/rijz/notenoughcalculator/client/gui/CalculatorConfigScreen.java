@@ -26,6 +26,7 @@ import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.integration.SearchFieldAdapter;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -68,7 +69,7 @@ public class CalculatorConfigScreen extends Screen {
     private final SettingsTab settingsTab = new SettingsTab();
     private final VariablesTab variablesTab = new VariablesTab();
 
-    private final int[] PRECISION_OPTIONS = {1, 2, 5, 10, 15, 20, 30, 50};
+    private final int[] PRECISION_OPTIONS = { 1, 2, 5, 10, 15, 20, 30, 50 };
 
     public CalculatorConfigScreen(Screen parent) {
         super(Component.translatable("notenoughcalculator.config.screen.title"));
@@ -149,19 +150,23 @@ public class CalculatorConfigScreen extends Screen {
         int tabY = panelY + 26;
 
         int tabWidth = (buttonWidth - 10) / 2;
-        settingsTabBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.tab.settings"), btn -> {
-            activeTab = 0;
-            init();
-        }).bounds(panelX + 20, tabY, tabWidth, 18)
-                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.tab_settings")))
-                .build());
+        settingsTabBtn = addRenderableWidget(
+                Button.builder(Component.translatable("notenoughcalculator.config.tab.settings"), btn -> {
+                    activeTab = 0;
+                    init();
+                }).bounds(panelX + 20, tabY, tabWidth, 18)
+                        .tooltip(Tooltip
+                                .create(Component.translatable("notenoughcalculator.config.tooltip.tab_settings")))
+                        .build());
 
-        variablesTabBtn = addRenderableWidget(Button.builder(Component.translatable("notenoughcalculator.config.tab.variables"), btn -> {
-            activeTab = 1;
-            init();
-        }).bounds(panelX + 20 + tabWidth + 10, tabY, tabWidth, 18)
-                .tooltip(Tooltip.create(Component.translatable("notenoughcalculator.config.tooltip.tab_variables")))
-                .build());
+        variablesTabBtn = addRenderableWidget(
+                Button.builder(Component.translatable("notenoughcalculator.config.tab.variables"), btn -> {
+                    activeTab = 1;
+                    init();
+                }).bounds(panelX + 20 + tabWidth + 10, tabY, tabWidth, 18)
+                        .tooltip(Tooltip
+                                .create(Component.translatable("notenoughcalculator.config.tooltip.tab_variables")))
+                        .build());
 
         int startY = tabY + 22;
 
@@ -208,14 +213,14 @@ public class CalculatorConfigScreen extends Screen {
 
     private void updateButtonLabels() {
         if (settingsTabBtn != null) {
-            settingsTabBtn.setMessage(activeTab == 0 ?
-                    Component.translatable("notenoughcalculator.config.tab.settings_selected") :
-                    Component.translatable("notenoughcalculator.config.tab.settings"));
+            settingsTabBtn.setMessage(
+                    activeTab == 0 ? Component.translatable("notenoughcalculator.config.tab.settings_selected")
+                            : Component.translatable("notenoughcalculator.config.tab.settings"));
         }
         if (variablesTabBtn != null) {
-            variablesTabBtn.setMessage(activeTab == 1 ?
-                    Component.translatable("notenoughcalculator.config.tab.variables_selected") :
-                    Component.translatable("notenoughcalculator.config.tab.variables"));
+            variablesTabBtn.setMessage(
+                    activeTab == 1 ? Component.translatable("notenoughcalculator.config.tab.variables_selected")
+                            : Component.translatable("notenoughcalculator.config.tab.variables"));
         }
 
         if (activeTab == 0) {
@@ -242,14 +247,16 @@ public class CalculatorConfigScreen extends Screen {
         int panelX = getPanelX();
         int panelY = getPanelY();
 
-        graphics.fill(0, 0, this.width, this.height, 0xD0040711);
-        graphics.fill(panelX - 1, panelY - 1, panelX + panelWidth + 1, panelY + panelHeight + 1, 0xFF1E293B);
-        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, 0xF50F172A);
+        graphics.fill(0, 0, this.width, this.height, ColorConstants.BG_SCREEN_OVERLAY);
+        graphics.fill(panelX - 1, panelY - 1, panelX + panelWidth + 1, panelY + panelHeight + 1,
+                ColorConstants.BG_PANEL_HEADER);
+        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, ColorConstants.BG_PANEL);
 
-        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + 22, 0xFF1E293B);
+        graphics.fill(panelX, panelY, panelX + panelWidth, panelY + 22, ColorConstants.BG_PANEL_HEADER);
         String modVersion = NotEnoughCalculator.getVersion();
         Component titleComp = Component.translatable("notenoughcalculator.config.screen.header_title", modVersion);
-        graphics.text(this.font, titleComp, panelX + (panelWidth - this.font.width(titleComp)) / 2, panelY + 7, 0xFFFFFFFF, true);
+        graphics.text(this.font, titleComp, panelX + (panelWidth - this.font.width(titleComp)) / 2, panelY + 7,
+                ColorConstants.TEXT_WHITE, true);
 
         int startY = panelY + 48;
 
@@ -267,16 +274,18 @@ public class CalculatorConfigScreen extends Screen {
             int bannerWidth = 280;
             int bannerHeight = 13;
 
-            // Sleek ruby translucent banner with border
-            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + bannerHeight, 0xD02A0808);
-            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + 1, 0xFFDC2626);
-            graphics.fill(bannerX, bannerY + bannerHeight - 1, bannerX + bannerWidth, bannerY + bannerHeight, 0xFFDC2626);
-            graphics.fill(bannerX, bannerY, bannerX + 1, bannerY + bannerHeight, 0xFFDC2626);
-            graphics.fill(bannerX + bannerWidth - 1, bannerY, bannerX + bannerWidth, bannerY + bannerHeight, 0xFFDC2626);
+            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + bannerHeight,
+                    ColorConstants.BG_WARNING_BANNER);
+            graphics.fill(bannerX, bannerY, bannerX + bannerWidth, bannerY + 1, ColorConstants.BORDER_WARNING);
+            graphics.fill(bannerX, bannerY + bannerHeight - 1, bannerX + bannerWidth, bannerY + bannerHeight,
+                    ColorConstants.BORDER_WARNING);
+            graphics.fill(bannerX, bannerY, bannerX + 1, bannerY + bannerHeight, ColorConstants.BORDER_WARNING);
+            graphics.fill(bannerX + bannerWidth - 1, bannerY, bannerX + bannerWidth, bannerY + bannerHeight,
+                    ColorConstants.BORDER_WARNING);
 
             int textX = bannerX + (bannerWidth - this.font.width(warn)) / 2;
             int textY = bannerY + 3;
-            graphics.text(this.font, warn, textX, textY, 0xFFFFFFFF, true);
+            graphics.text(this.font, warn, textX, textY, ColorConstants.TEXT_WHITE, true);
         }
 
         super.extractRenderState(graphics, mouseX, mouseY, delta);
@@ -284,19 +293,32 @@ public class CalculatorConfigScreen extends Screen {
 
     public boolean hasUnsavedChanges() {
         CalculatorConfig config = CalculatorConfig.getInstance();
-        if (this.showInlineResults != config.showInlineResults) return true;
-        if (this.showUnitSuggestions != config.showUnitSuggestions) return true;
-        if (this.enableCommaFormatting != config.enableCommaFormatting) return true;
-        if (this.enableHistoryNavigation != config.enableHistoryNavigation) return true;
-        if (this.enableShorthandResults != config.enableShorthandResults) return true;
-        if (this.enableSyntaxHighlighting != config.enableSyntaxHighlighting) return true;
-        if (this.enableFullEquationCopy != config.enableFullEquationCopy) return true;
-        if (this.enableItemListIntegration != config.enableItemListIntegration) return true;
-        if (this.forceStandaloneMode != config.forceStandaloneMode) return true;
-        if (this.standaloneX != config.standaloneX) return true;
-        if (this.standaloneY != config.standaloneY) return true;
-        if (this.decimalPrecision != config.decimalPrecision) return true;
-        if (this.bazaarFlipperLevel != config.bazaarFlipperLevel) return true;
+        if (this.showInlineResults != config.showInlineResults)
+            return true;
+        if (this.showUnitSuggestions != config.showUnitSuggestions)
+            return true;
+        if (this.enableCommaFormatting != config.enableCommaFormatting)
+            return true;
+        if (this.enableHistoryNavigation != config.enableHistoryNavigation)
+            return true;
+        if (this.enableShorthandResults != config.enableShorthandResults)
+            return true;
+        if (this.enableSyntaxHighlighting != config.enableSyntaxHighlighting)
+            return true;
+        if (this.enableFullEquationCopy != config.enableFullEquationCopy)
+            return true;
+        if (this.enableItemListIntegration != config.enableItemListIntegration)
+            return true;
+        if (this.forceStandaloneMode != config.forceStandaloneMode)
+            return true;
+        if (this.standaloneX != config.standaloneX)
+            return true;
+        if (this.standaloneY != config.standaloneY)
+            return true;
+        if (this.decimalPrecision != config.decimalPrecision)
+            return true;
+        if (this.bazaarFlipperLevel != config.bazaarFlipperLevel)
+            return true;
         Map<String, String> savedVars = config.customVariables != null ? config.customVariables : Map.of();
         return !this.workingCustomVariables.equals(savedVars);
     }

@@ -29,57 +29,42 @@ import java.util.Map;
 public class HotmDataProvider {
 
     public static BigDecimal getHotmTier() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(HotmAPI.INSTANCE.getTier());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotmAPI.INSTANCE.getTier()));
     }
 
     public static BigDecimal getHotmTokens() {
-        if (!SkyblockApiIntegration.isAvailable()) {
-            return null;
-        }
-        try {
-            return BigDecimal.valueOf(HotmAPI.INSTANCE.getTokens());
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(HotmAPI.INSTANCE.getTokens()));
     }
 
     public static BigDecimal getPerkLevel(String perkName) {
         if (!SkyblockApiIntegration.isAvailable() || perkName == null || perkName.isEmpty()) {
             return null;
         }
+        return lookupPerkLevel(HotmAPI.INSTANCE.getPerks(), perkName);
+    }
 
-        String normalizedQuery = normalizePerkName(perkName);
-
+    static BigDecimal lookupPerkLevel(Map<String, ? extends SkillTreePerk> perks, String perkName) {
+        if (perks == null)
+            return null;
+        String query = normalizePerkName(perkName);
         try {
-            Map<String, ? extends SkillTreePerk> hotmPerks = HotmAPI.INSTANCE.getPerks();
-            if (hotmPerks != null) {
-                for (Map.Entry<String, ? extends SkillTreePerk> entry : hotmPerks.entrySet()) {
-                    if (normalizePerkName(entry.getKey()).equals(normalizedQuery)) {
-                        SkillTreePerk perk = entry.getValue();
-                        if (perk != null && perk.getUnlocked()) {
-                            return BigDecimal.valueOf(perk.getLevel());
-                        }
-                        return BigDecimal.ZERO;
+            for (Map.Entry<String, ? extends SkillTreePerk> entry : perks.entrySet()) {
+                if (normalizePerkName(entry.getKey()).equals(query)) {
+                    SkillTreePerk perk = entry.getValue();
+                    if (perk != null && perk.getUnlocked()) {
+                        return BigDecimal.valueOf(perk.getLevel());
                     }
+                    return BigDecimal.ZERO;
                 }
             }
         } catch (Throwable ignored) {
         }
-
         return null;
     }
 
-    public static String normalizePerkName(String name) {
-        if (name == null) {
+    static String normalizePerkName(String name) {
+        if (name == null)
             return "";
-        }
         return name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
     }
 }

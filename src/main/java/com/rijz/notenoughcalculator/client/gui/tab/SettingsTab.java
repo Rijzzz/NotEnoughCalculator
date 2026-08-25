@@ -23,6 +23,7 @@ import com.rijz.notenoughcalculator.client.gui.CalculatorConfigScreen;
 import com.rijz.notenoughcalculator.client.integration.IntegrationManager;
 import com.rijz.notenoughcalculator.client.util.ReflectionUtils;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
+import com.rijz.notenoughcalculator.core.ColorConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -262,9 +263,9 @@ public class SettingsTab {
     }
 
     public void renderSectionHeaders(GuiGraphicsExtractor graphics, Font font, int panelX, int startY) {
-        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.display_header"), panelX + 20, startY + 2, 0xFF34D399, true);
-        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.calculation_header"), panelX + 20, startY + 106, 0xFF38BDF8, true);
-        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_level_label"), panelX + 20, startY + 138, 0xFFCBD5E1, true);
-        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.features_header"), panelX + 20, startY + 170, 0xFFFBBF24, true);
+        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.display_header"), panelX + 20, startY + 2, ColorConstants.TEXT_EMERALD, true);
+        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.calculation_header"), panelX + 20, startY + 106, ColorConstants.TEXT_SKY, true);
+        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.bazaar_flipper_level_label"), panelX + 20, startY + 138, ColorConstants.TEXT_SLATE, true);
+        graphics.text(font, Component.translatable("notenoughcalculator.config.screen.features_header"), panelX + 20, startY + 170, ColorConstants.TEXT_AMBER, true);
     }
 }

@@ -97,9 +97,7 @@ public class ExpressionTokenizer {
                         }
                     }
 
-                    Token tok = new Token(TokenKind.NUM, "0" + nextChar + rawVal, start);
-                    tok.number = parsedVal;
-                    tokens.add(tok);
+                    tokens.add(new Token(TokenKind.NUM, "0" + nextChar + rawVal, start, parsedVal));
                     continue;
                 }
             }
@@ -129,9 +127,9 @@ public class ExpressionTokenizer {
                     throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
                 }
 
-                Token tok = new Token(TokenKind.NUM, numStr, start);
+                Token tok;
                 try {
-                    tok.number = new BigDecimal(numStr);
+                    tok = new Token(TokenKind.NUM, numStr, start, new BigDecimal(numStr));
                 } catch (NumberFormatException e) {
                     throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.invalid_number"), start);
                 }
@@ -260,17 +258,13 @@ public class ExpressionTokenizer {
 
                 if (ExpressionEvaluator.FUNCTIONS.contains(nameStr)) {
                     tokens.add(new Token(TokenKind.FUNC, nameStr, start));
-                } else if (nameStr.equals("pi")) {
-                    Token tok = new Token(TokenKind.NUM, "pi", start);
-                    tok.number = new BigDecimal("3.14159265358979323846");
-                    tokens.add(tok);
-                } else if (nameStr.equals("e")) {
-                    if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
+                } else if (nameStr.equals("pi") || nameStr.equals("$pi")) {
+                    tokens.add(new Token(TokenKind.NUM, nameStr, start, new BigDecimal("3.14159265358979323846")));
+                } else if (nameStr.equals("e") || nameStr.equals("$e")) {
+                    if (!nameStr.startsWith("$") && !tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
                         tokens.add(new Token(TokenKind.UNIT, nameStr, start));
                     } else {
-                        Token tok = new Token(TokenKind.NUM, "e", start);
-                        tok.number = new BigDecimal("2.71828182845904523536");
-                        tokens.add(tok);
+                        tokens.add(new Token(TokenKind.NUM, nameStr, start, new BigDecimal("2.71828182845904523536")));
                     }
                 } else if (ExpressionEvaluator.UNITS.containsKey(nameStr)) {
                     if (!tokens.isEmpty() && tokens.get(tokens.size() - 1).kind == TokenKind.NUM) {
@@ -278,10 +272,8 @@ public class ExpressionTokenizer {
                     } else {
                         tokens.add(new Token(TokenKind.VAR, nameStr, start));
                     }
-                } else if (nameStr.equals("ans")) {
-                    Token tok = new Token(TokenKind.NUM, "ans", start);
-                    tok.number = lastAnswer != null ? lastAnswer : BigDecimal.ZERO;
-                    tokens.add(tok);
+                } else if (nameStr.equals("ans") || nameStr.equals("$ans")) {
+                    tokens.add(new Token(TokenKind.NUM, nameStr, start, lastAnswer != null ? lastAnswer : BigDecimal.ZERO));
                 } else {
                     tokens.add(new Token(TokenKind.VAR, nameStr, start));
                 }

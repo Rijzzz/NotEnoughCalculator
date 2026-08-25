@@ -27,12 +27,6 @@ import java.math.BigDecimal;
 public class MaxwellDataProvider {
 
     public static BigDecimal getAccessoryPower() {
-        if (!SkyblockApiIntegration.isAvailable()) return null;
-        try {
-            int power = MaxwellAPI.INSTANCE.getAccessoryPower();
-            return BigDecimal.valueOf(power);
-        } catch (Throwable ignored) {
-            return null;
-        }
+        return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(MaxwellAPI.INSTANCE.getAccessoryPower()));
     }
 }

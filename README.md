@@ -299,7 +299,6 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 </details>
 
-
 <details>
 <summary><strong>Syntax Highlighting & Colors</strong></summary>
 
@@ -675,14 +674,14 @@ This mod is licensed under the **GNU Lesser General Public License v3.0 or later
 
 You are free to:
 
-* Use, modify, and redistribute this mod
-* Include it in modpacks (commercial or non-commercial)
+- Use, modify, and redistribute this mod
+- Include it in modpacks (commercial or non-commercial)
 
 Under the following conditions:
 
-* Any modifications to this mod itself must be released under the same license
-* You must provide appropriate credit and include a copy of the license
-* You must state any changes you make
+- Any modifications to this mod itself must be released under the same license
+- You must provide appropriate credit and include a copy of the license
+- You must state any changes you make
 
 See the full license text here:
 [View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
@@ -695,4 +694,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 25-08-2026*
+*Last updated: 26-08-2026*

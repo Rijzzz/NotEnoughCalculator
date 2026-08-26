@@ -144,7 +144,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 <summary><strong>Variables & Player Stats</strong></summary>
 
 <details>
-<summary>Note</summary>
+<summary>Important Note</summary>
 
 - Many live SkyBlock data are extracted from Hypixel's **Tablist/Tab Widget** by **[SkyblockAPI](https://github.com/SkyblockAPI/SkyblockAPI)**. Ensure you have those relevant widgets turned on in `/tablist`; otherwise, those specific live stats may not be available and the mod might not function as expected.
 
@@ -410,9 +410,10 @@ Type calculations directly in the search bar and get instant results! Works insi
 <summary><strong>Dependencies</strong></summary>
 
 <details>
-<summary>Notes</summary>
+<summary>Important Note</summary>
 
 - Dependencies and version numbers listed above apply specifically to the **latest release** of the mod. If you are using an older build or playing on a different Minecraft version, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
+
 - Standalone mode was introduced in v2.7.0. All versions prior to v2.7.0 require REI to be installed.
 
 </details>

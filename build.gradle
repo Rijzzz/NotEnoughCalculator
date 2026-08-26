@@ -1,7 +1,7 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
-    id 'com.diffplug.spotless' version '8.10.0'
+    id 'com.diffplug.spotless' version "${spotless_version}"
 }
 
 version = "${project.mod_version}"
@@ -44,14 +44,14 @@ dependencies {
     runtimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
     runtimeOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project.rei_version}"
-    compileOnly "me.shedaniel.cloth:basic-math:0.6.1"
+    compileOnly "me.shedaniel.cloth:basic-math:${project.cloth_basic_math_version}"
 
     // Mod Menu
     compileOnly  "maven.modrinth:modmenu:${project.modmenu_version}"
     localRuntime "maven.modrinth:modmenu:${project.modmenu_version}"
 
     // Dev Auth
-    localRuntime "me.djtheredstoner:DevAuth-fabric:1.2.2"
+    localRuntime "me.djtheredstoner:DevAuth-fabric:${project.devauth_version}"
 
     // SkyBlock Api
     api("tech.thatgravyboat:skyblock-api:${project.skyblockapi_version}") {
@@ -66,7 +66,7 @@ dependencies {
     }
 
     // Unit tests
-    testImplementation "org.junit.jupiter:junit-jupiter:6.1.3"
+    testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
@@ -74,13 +74,10 @@ processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "loader_version", project.loader_version
-    inputs.property "fabric_version", project.fabric_version
     inputs.property "min_fabric_api_version", project.min_fabric_api_version
     inputs.property "fabric_language_kotlin_version", project.fabric_language_kotlin_version
     inputs.property "rei_version", project.rei_version
-    inputs.property "modmenu_version", project.modmenu_version
     inputs.property "min_modmenu_version", project.min_modmenu_version
-    inputs.property "skyblockapi_version", project.skyblockapi_version
     inputs.property "skyblockitemlist_version", project.skyblockitemlist_version
     filteringCharset "UTF-8"
 
@@ -88,13 +85,10 @@ processResources {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
                 "loader_version": project.loader_version,
-                "fabric_version": project.fabric_version,
                 "min_fabric_api_version": project.min_fabric_api_version,
                 "fabric_language_kotlin_version": project.fabric_language_kotlin_version,
                 "rei_version": project.rei_version,
-                "modmenu_version": project.modmenu_version,
                 "min_modmenu_version": project.min_modmenu_version,
-                "skyblockapi_version": project.skyblockapi_version,
                 "skyblockitemlist_version": project.skyblockitemlist_version
     }
 }

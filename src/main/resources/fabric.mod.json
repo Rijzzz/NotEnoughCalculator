@@ -41,7 +41,7 @@
     }
   ],
   "depends": {
-    "fabricloader": ">=${loader_version}",
+    "fabricloader": ">=${min_loader_version}",
     "fabric-api": ">=${min_fabric_api_version}",
     "fabric-language-kotlin": ">=${fabric_language_kotlin_version}",
     "minecraft": ">=${minecraft_version}"

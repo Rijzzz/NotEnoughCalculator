@@ -73,7 +73,7 @@ dependencies {
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "loader_version", project.loader_version
+    inputs.property "min_loader_version", project.min_loader_version
     inputs.property "min_fabric_api_version", project.min_fabric_api_version
     inputs.property "fabric_language_kotlin_version", project.fabric_language_kotlin_version
     inputs.property "rei_version", project.rei_version
@@ -84,7 +84,7 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version,
+                "min_loader_version": project.min_loader_version,
                 "min_fabric_api_version": project.min_fabric_api_version,
                 "fabric_language_kotlin_version": project.fabric_language_kotlin_version,
                 "rei_version": project.rei_version,

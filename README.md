@@ -635,6 +635,12 @@ Feel free to include this mod in any modpack without restriction! Adding a link 
 
 ---
 
+## Contributing
+
+Want to help improve Not Enough Calculator? Check out our [Contributing Guide](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/CONTRIBUTING.md).
+
+---
+
 ## License
 
 <details>
@@ -694,4 +700,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 26-08-2026*
+*Last updated: 27-08-2026*

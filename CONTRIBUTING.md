@@ -19,7 +19,7 @@ Thanks for wanting to help out with Not Enough Calculator 🧮
 ### Setup
 1. Fork the repo
 2. Clone it: `git clone https://github.com/Rijzzz/NotEnoughCalculator.git`
-3. Open in IntelliJ IDEA
+3. Open it in your preferred IDE
 4. Run `./gradlew build` to make sure it works
 
 ### Making a PR
@@ -34,6 +34,7 @@ Thanks for wanting to help out with Not Enough Calculator 🧮
 * 4 spaces, no tabs
 * Clear naming (`calculateResult` not `cr`)
 * Comment anything that isn't obvious
+* Run `./gradlew spotlessApply` before committing to format your code automatically
 * All `.java` files need the LGPL header at the top, don't remove or modify it:
 
 ```java

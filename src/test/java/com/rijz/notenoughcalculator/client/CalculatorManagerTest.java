@@ -514,6 +514,18 @@ class CalculatorManagerTest {
 			assertEquals("fmt(1500000)", manager.formatSearchBar("fmt(1500000)"));
 			assertTrue(manager.hasResult());
 			assertEquals("1.5m", manager.getLastFormattedResult());
+
+			assertEquals("100 + 10%", manager.formatSearchBar("100 + 10%"));
+			assertTrue(manager.hasResult());
+			assertEquals("110", manager.getLastFormattedResult());
+
+			assertEquals("200 - 15%", manager.formatSearchBar("200 - 15%"));
+			assertTrue(manager.hasResult());
+			assertEquals("170", manager.getLastFormattedResult());
+
+			assertEquals("500 * 20%", manager.formatSearchBar("500 * 20%"));
+			assertTrue(manager.hasResult());
+			assertEquals("100", manager.getLastFormattedResult());
 		}
 	}
 }

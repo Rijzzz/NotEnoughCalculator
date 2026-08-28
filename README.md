@@ -40,14 +40,14 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Factorial | `!` | Integer Factorial ($n!$) | `5!` | `120` |
 | Percentage | `%` | Percentage scaling (`100 + 10%` = `110`) | `100 + 10%` | `110` |
 | Parentheses | `( )` | Grouping & implicit multiplication | `2(3+4)`, `(3)(4)` | `14`, `12` |
-| Bitwise AND | `&` | Bitwise AND operation | `0b1010 & 0b1100` | `8` |
-| Bitwise OR | `\|` | Bitwise OR operation | `0b1010 \| 0b0101` | `15` |
+| Bitwise AND | `&` | Bitwise AND operation | `0b1010 & 0b1100` | `0b1000` |
+| Bitwise OR | `\|` | Bitwise OR operation | `0b1010 \| 0b0101` | `0b1111` |
 | Bitwise NOT | `~` | Bitwise NOT operation | `~0`, `~5` | `-1`, `-6` |
 | Left Shift | `<<` | Bitwise left shift | `1 << 4` | `16` |
 | Right Shift | `>>` | Bitwise right shift | `16 >> 2` | `4` |
-| Binary Literal | `0b` | Binary number literal | `0b1010` | `10` |
-| Hex Literal | `0x` | Hexadecimal number literal | `0xFF` | `255` |
-| Octal Literal | `0o` | Octal number literal | `0o77` | `63` |
+| Binary Literal | `0b` | Binary number literal | `0b1010` | `0b1010` |
+| Hex Literal | `0x` | Hexadecimal number literal | `0xFF` | `0xFF` |
+| Octal Literal | `0o` | Octal number literal | `0o77` | `0o77` |
 
 </details>
 
@@ -125,8 +125,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Category | Function Syntax | Alternative Alias | Description | Example Input | Result Output |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| Bazaar Buy | `bzb("ITEM")` | `bzbuy("ITEM")` | Live Bazaar Buy order price | `bzb(SUPERBOOM_TNT)` | `3,200` |
-| Bazaar Sell | `bzs("ITEM")` | `bzsell("ITEM")` | Live Bazaar Sell offer price | `bzs("COBBLESTONE")` | `3.5` |
+| Bazaar Buy | `bzb("ITEM")` | `bzbuy("ITEM")` | Live Bazaar Instant Buy price (lowest sell offer) | `bzb(SUPERBOOM_TNT)` | `3,200` |
+| Bazaar Sell | `bzs("ITEM")` | `bzsell("ITEM")` | Live Bazaar Instant Sell price (highest buy order) | `bzs("COBBLESTONE")` | `3.5` |
 | Bazaar Margin | `bzm("ITEM")` | `bzmargin("ITEM")` | Live Bazaar spread / margin (`bzb - bzs`) | `bzm(SUPERBOOM_TNT)` | `450` |
 | Lowest BIN | `lb("ITEM")` | `lowestbin("ITEM")` | Live Lowest BIN auction price | `lb(HYPERION)` | `1,850,000,000` |
 | Lowest BIN Avg | `lba("ITEM")` | `lowestbinavg("ITEM")` | 3-Day Lowest BIN average price | `lba("HYPERION")` | `1,900,000,000` |
@@ -391,7 +391,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Unit Suggestions | `showUnitSuggestions` | `true` | **ON:** Displays unit conversions and item equivalents (e.g. `(1 double chest)`) below the search bar.<br>**OFF:** Hides unit conversion tooltips. |
 | Comma Formatting | `enableCommaFormatting` | `true` | **ON:** Formats large numbers with thousand separator commas (e.g. `1,000,000`).<br>**OFF:** Outputs plain numbers without commas (e.g. `1000000`). |
 | Shorthand Results | `enableShorthandResults` | `false` | **ON:** Formats results in compact SkyBlock notation (e.g. `1.5m`, `2.5b`).<br>**OFF:** Displays the full numeric value with comma formatting. |
-| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Color-codes numbers (white), units (aqua), math functions (yellow), progression (gold), market (blue), and variables (lime).<br>**OFF:** Renders search bar text in plain standard white. |
+| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Color-codes numbers (cyan), units (aqua), math functions (yellow), progression (gold), market (royal blue), variables (aqua/cyan), operators (red), and results (green).<br>**OFF:** Renders search bar text in plain standard white. |
 | Decimal Precision | `decimalPrecision` | `10` | Configures maximum decimal places for outputs (`1` to `50`). Numbers exceeding this scale are rounded using `HALF_UP`. |
 | Bazaar Flipper Perk | `bazaarFlipperLevel` | `0` | Selects your account's Community Center perk: `Lvl 0` (1.25% tax), `Lvl 1` (1.125% tax), or `Lvl 2` (1.0% tax). |
 | History Shortcuts | `enableHistoryNavigation` | `true` | **ON:** Traverses calculation history in search bars using `Ctrl+Z` (Undo) and `Ctrl+Y` (Redo).<br>**OFF:** Disables `Ctrl+Z`/`Ctrl+Y` history recall. |
@@ -609,6 +609,28 @@ Or join our Discord for support: [Discord](https://discord.gg/asPJ4qgs8q)
 <summary>Bitwise operations or radix outputs not behaving as expected?</summary>
 
 - Hexadecimal (`hex()`), Binary (`bin()`), and Octal (`oct()`) functions operate on integer values. Floating-point numbers are rounded to nearest integers when performing bitwise operations (`&`, `|`, `~`, `<<`, `>>`, `xor`).
+
+</details>
+
+<details>
+<summary>Why does typing a single number like 64 or 6912 not show calculator results in the search bar?</summary>
+
+- Standalone plain numbers without operators or units are treated as item count or item ID searches in REI and SkyBlock Item List so normal item searching is not interrupted. To calculate or view unit equivalents for raw numbers, type an expression (e.g. `6912+0`, `2dc`, `1sc`) or run `/calc 6912` in chat.
+
+</details>
+
+<details>
+<summary>How does radix literal formatting work (0xFF, 0b1010, 0o77)?</summary>
+
+- When calculating purely with radix literals, the calculator preserves the original base format on output (`0xFF = 0xFF`, `0b1010 = 0b1010`, `0o77 = 0o77`). To convert to decimal, use standard math (e.g. `0xFF + 0 = 255`, `0b1010 + 0 = 10`). To convert any decimal into a radix format, use `hex(255)`, `bin(10)`, or `oct(63)`.
+
+</details>
+
+<details>
+<summary>What is the difference between bzb() and bzs()?</summary>
+
+- **`bzb(ITEM)` (Bazaar Buy Price)**: Returns the price to *Instant Buy* an item. In Hypixel's Bazaar system, instant buyers purchase directly from the lowest active **Sell Offer** (e.g. `106.6` coins for Superboom TNT).
+- **`bzs(ITEM)` (Bazaar Sell Price)**: Returns the coins received to *Instant Sell* an item. In Hypixel's Bazaar system, instant sellers sell directly into the highest active **Buy Order** (e.g. `55.9` coins for Superboom TNT).
 
 </details>
 

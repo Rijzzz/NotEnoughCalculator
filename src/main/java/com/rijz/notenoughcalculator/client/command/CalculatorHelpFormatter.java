@@ -157,18 +157,20 @@ public class CalculatorHelpFormatter {
 				"notenoughcalculator.help.functions.round", "notenoughcalculator.help.functions.log",
 				"notenoughcalculator.help.functions.ln", "notenoughcalculator.help.functions.sin",
 				"notenoughcalculator.help.functions.cos", "notenoughcalculator.help.functions.tan",
+				"notenoughcalculator.help.functions.rad", "notenoughcalculator.help.functions.deg",
 				"notenoughcalculator.help.functions.min", "notenoughcalculator.help.functions.max", null,
 				"notenoughcalculator.help.functions.radix", "notenoughcalculator.help.functions.hex",
 				"notenoughcalculator.help.functions.bin", "notenoughcalculator.help.functions.oct", null,
-				"notenoughcalculator.help.functions.math_helpers", "notenoughcalculator.help.functions.pct",
-				"notenoughcalculator.help.functions.gcd", "notenoughcalculator.help.functions.lcm",
-				"notenoughcalculator.help.functions.clamp", "notenoughcalculator.help.functions.avg",
-				"notenoughcalculator.help.functions.xor", null, "notenoughcalculator.help.functions.xp_tables",
-				"notenoughcalculator.help.functions.skillxp", "notenoughcalculator.help.functions.huntingxp",
-				"notenoughcalculator.help.functions.runecraftingxp", "notenoughcalculator.help.functions.socialxp",
-				"notenoughcalculator.help.functions.cataxp", "notenoughcalculator.help.functions.slayerxp",
-				"notenoughcalculator.help.functions.emanxp", "notenoughcalculator.help.functions.vampirexp",
-				"notenoughcalculator.help.functions.perk", null, "@main:notenoughcalculator.help.back");
+				"notenoughcalculator.help.functions.math_helpers", "notenoughcalculator.help.functions.fmt",
+				"notenoughcalculator.help.functions.pct", "notenoughcalculator.help.functions.gcd",
+				"notenoughcalculator.help.functions.lcm", "notenoughcalculator.help.functions.clamp",
+				"notenoughcalculator.help.functions.avg", "notenoughcalculator.help.functions.xor", null,
+				"notenoughcalculator.help.functions.xp_tables", "notenoughcalculator.help.functions.skillxp",
+				"notenoughcalculator.help.functions.huntingxp", "notenoughcalculator.help.functions.runecraftingxp",
+				"notenoughcalculator.help.functions.socialxp", "notenoughcalculator.help.functions.cataxp",
+				"notenoughcalculator.help.functions.slayerxp", "notenoughcalculator.help.functions.emanxp",
+				"notenoughcalculator.help.functions.vampirexp", "notenoughcalculator.help.functions.perk", null,
+				"@main:notenoughcalculator.help.back");
 	}
 
 	public static void showStatsHelp(CommandContext<FabricClientCommandSource> ctx) {

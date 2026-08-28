@@ -3,7 +3,7 @@
   "id": "notenoughcalculator",
   "version": "${version}",
   "name": "Not Enough Calculator",
-  "description": "A NEU-style calculator that works standalone or inside Roughly Enough Items & Skyblock Item List search bars!",
+  "description": "A NEU-style calculator that works standalone or inside Roughly Enough Items (REI) & Skyblock Item List search bars!",
   "authors": [
     "Rijz",
     "Laze"

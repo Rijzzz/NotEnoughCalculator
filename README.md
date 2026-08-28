@@ -384,7 +384,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Setting Name | Config Key | Default | Behavior (ON vs OFF) |
 | :--- | :--- | :--- | :--- |
-| Open Settings Screen | Command `/calcconfig` | N/A | Opens interactive GUI settings & custom variables manager screen (or via ModMenu) |
+| Open Settings Screen | Command `/calcconfig` | N/A | Opens interactive GUI settings & custom variables manager screen (or via Mod Menu) |
 | Custom Variables | `customVariables` | `{}` | Persistent key-value variables created via `/calcset` or GUI manager |
 | Custom Variables Manager | GUI Tab `Custom Variables` | N/A | Interactive GUI tab to add, edit, delete, and paginate (`<` / `>`) custom variables |
 | Inline Results | `showInlineResults` | `true` | **ON:** Renders live calculation results (`= 50m`) directly inside the search bar as you type.<br>**OFF:** Hides live result overlays in search bars. |
@@ -435,7 +435,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | :--- | :--- |
 | [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.2.820+` |
 | [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
-| [ModMenu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
+| [Mod Menu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
 
 </details>
 
@@ -450,7 +450,7 @@ Type calculations directly in the search bar and get instant results! Works insi
     - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
     - [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) *(Optional)*
     - [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) *(Optional)*
-    - [ModMenu](https://modrinth.com/mod/modmenu) *(Optional)*
+    - [Mod Menu](https://modrinth.com/mod/modmenu) *(Optional)*
     - **Not Enough Calculator** (this mod)
 2. Launch Minecraft using the Fabric loader
 3. Open any inventory screen (chest, crafting table, etc.)
@@ -700,4 +700,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 27-08-2026*
+*Last updated: 28-08-2026*

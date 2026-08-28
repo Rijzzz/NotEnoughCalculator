@@ -665,51 +665,7 @@ Want to help improve Not Enough Calculator? Check out our [Contributing Guide](h
 
 ## License
 
-<details>
-<summary><strong>License Update Notice</strong></summary>
-
-<details>
-<summary>Licensing Notice and Transition Statement</summary>
-
-This project was previously licensed under **All Rights Reserved**.
-
-As of **February 2nd, 2026**, the project has been relicensed under the  
-**GNU Lesser General Public License v3.0 or later (LGPL-3.0-or-later)**.
-
-</details>
-
-<details>
-<summary>What this means</summary>
-
-- **Open Source:** The project itself is now free and open source.
-- **Modifications:** Any modifications or forks of this project's code must still be released under **LGPL-3.0-or-later**.
-- **Linking and Compatibility:** Other projects (including proprietary mods, closed-source plugins, or modpacks) may link to, depend on, or interoperate with this mod without being required to adopt the LGPL, provided they do not modify this project's source code.
-- **Ecosystem Integration:** This change is intended to improve compatibility with the wider Minecraft modding community, allowing for easier integration into modpacks, servers, and third-party tools.
-
-</details>
-
-<details>
-<summary>Versioning and Legacy</summary>
-
-- **Previous Versions:** All versions released prior to **February 2nd, 2026** (v1.0.11 and earlier) remain under the **All Rights Reserved** license.
-- **Current and Future Versions:** All versions released on or after **February 2nd, 2026** (starting with **v1.0.12**) are licensed under **LGPL-3.0-or-later**.
-
-</details>
-
-</details>
-
-This mod is licensed under the **GNU Lesser General Public License v3.0 or later (LGPL-3.0-or-later)**.
-
-You are free to:
-
-- Use, modify, and redistribute this mod
-- Include it in modpacks (commercial or non-commercial)
-
-Under the following conditions:
-
-- Any modifications to this mod itself must be released under the same license
-- You must provide appropriate credit and include a copy of the license
-- You must state any changes you make
+Read [Licensing Notice and Transition Statement](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/NOTICE.md).
 
 See the full license text here:
 [View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)

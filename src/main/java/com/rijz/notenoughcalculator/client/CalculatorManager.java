@@ -69,7 +69,8 @@ public class CalculatorManager {
 	private static final Pattern PAREN_PATTERN = Pattern.compile(".*[()].*");
 	private static final Pattern LOOSE_LITERAL_PATTERN = Pattern.compile("^\\s*0[bxo].*", Pattern.CASE_INSENSITIVE);
 	private static final Pattern NUMBER_ONLY = Pattern.compile("^\\s*\\d+\\.?\\d*\\s*$");
-	private static final Pattern TRAILING_OPERATOR = Pattern.compile(".*(?:[+\\-*/^%xX&|~]|<<|>>)\\s*$");
+	private static final Pattern TRAILING_OPERATOR = Pattern
+			.compile(".*(?:[+\\-*/^xX&|~]|<<|>>|(?<![0-9a-zA-Z\\)$])%)\\s*$");
 	private static final Pattern MINECRAFT_ITEM = Pattern.compile(
 			"(?i).*(sword|pickaxe|axe|shovel|hoe|helmet|chestplate|leggings|boots|diamond|iron|gold|stone|wood|bow|arrow|block|ore|ingot|coal|redstone|lapis|emerald|netherite|pearl|eye|blaze|slime|magma|prismarine|quartz|obsidian|glowstone|hopper|chest|furnace|crafting|enchant|potion|book|bed)");
 

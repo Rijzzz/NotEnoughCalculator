@@ -433,7 +433,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Name | Version |
 | :--- | :--- |
-| [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.2.820+` |
+| [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.1.819+` |
 | [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
 | [Mod Menu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
 
@@ -678,4 +678,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 28-08-2026*
+*Last updated: 02-09-2026*

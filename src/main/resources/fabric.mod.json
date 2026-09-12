@@ -41,14 +41,14 @@
     }
   ],
   "depends": {
-    "fabricloader": ">=${min_loader_version}",
-    "fabric-api": ">=${min_fabric_api_version}",
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": ">=${fabric_version}",
     "fabric-language-kotlin": ">=${fabric_language_kotlin_version}",
     "minecraft": ">=${minecraft_version}"
   },
   "suggests": {
     "roughlyenoughitems": ">=${rei_version}",
-    "modmenu": ">=${min_modmenu_version}",
+    "modmenu": ">=${modmenu_version}",
     "skyblock-item-list": ">=${skyblockitemlist_version}"
   },
   "custom": {

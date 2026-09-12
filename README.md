@@ -5,7 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/asPJ4qgs8q)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x/LICENSE.txt)
 
 **A NEU-style calculator that works standalone or inside Roughly Enough Items (REI) & Skyblock Item List search bars. Type calculations directly in the search bar and get instant results.**
 
@@ -422,9 +422,9 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Name | Version |
 | :--- | :--- |
-| [Fabric Loader](https://fabricmc.net/) | `0.19.3+` |
-| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.152.1+` |
-| [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.13.13+kotlin.2.4.10+` |
+| [Fabric Loader](https://fabricmc.net/) | `0.19.5+` |
+| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.155.3+` |
+| [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.14.1+kotlin.2.4.20+` |
 
 </details>
 
@@ -434,8 +434,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Name | Version |
 | :--- | :--- |
 | [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.1.819+` |
-| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
-| [Mod Menu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
+| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.21+` |
+| [Mod Menu](https://modrinth.com/mod/modmenu) | `18.0.1+` |
 
 </details>
 
@@ -659,16 +659,16 @@ Feel free to include this mod in any modpack without restriction! Adding a link 
 
 ## Contributing
 
-Want to help improve Not Enough Calculator? Check out our [Contributing Guide](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/CONTRIBUTING.md).
+Want to help improve Not Enough Calculator? Check out our [Contributing Guide](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x/CONTRIBUTING.md).
 
 ---
 
 ## License
 
-Read [Licensing Notice and Transition Statement](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/NOTICE.md).
+Read [Licensing Notice and Transition Statement](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x/NOTICE.md).
 
 See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
+[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.1.x/LICENSE.txt)
 
 ---
 
@@ -678,4 +678,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 02-09-2026*
+*Last updated: 12-09-2026*

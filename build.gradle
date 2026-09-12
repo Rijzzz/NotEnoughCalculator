@@ -74,11 +74,11 @@ processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "skyblockapi_mc_version", project.skyblockapi_mc_version
-    inputs.property "min_loader_version", project.min_loader_version
-    inputs.property "min_fabric_api_version", project.min_fabric_api_version
+    inputs.property "loader_version", project.loader_version
+    inputs.property "fabric_version", project.fabric_version
     inputs.property "fabric_language_kotlin_version", project.fabric_language_kotlin_version
     inputs.property "rei_version", project.rei_version
-    inputs.property "min_modmenu_version", project.min_modmenu_version
+    inputs.property "modmenu_version", project.modmenu_version
     inputs.property "skyblockitemlist_version", project.skyblockitemlist_version
     filteringCharset "UTF-8"
 
@@ -86,11 +86,11 @@ processResources {
         expand "version": project.version,
                 "minecraft_version": project.minecraft_version,
                 "skyblockapi_mc_version": project.skyblockapi_mc_version,
-                "min_loader_version": project.min_loader_version,
-                "min_fabric_api_version": project.min_fabric_api_version,
+                "loader_version": project.loader_version,
+                "fabric_version": project.fabric_version,
                 "fabric_language_kotlin_version": project.fabric_language_kotlin_version,
                 "rei_version": project.rei_version,
-                "min_modmenu_version": project.min_modmenu_version,
+                "modmenu_version": project.modmenu_version,
                 "skyblockitemlist_version": project.skyblockitemlist_version
     }
 }
@@ -138,4 +138,3 @@ spotless {
         endWithNewline()
     }
 }
-

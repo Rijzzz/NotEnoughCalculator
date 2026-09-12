@@ -173,85 +173,15 @@ public class ReflectionUtils {
 		return null;
 	}
 
-	private static Field mcGuiField = null;
-	private static Field guiScreenField = null;
-	private static Method guiScreenMethod = null;
-	private static Method setScreenMethod = null;
-	private static boolean screenInitialized = false;
-
-	private static void initScreenAccessors(Minecraft mc) {
-		if (screenInitialized || mc == null)
-			return;
-		screenInitialized = true;
-		try {
-			mcGuiField = Minecraft.class.getDeclaredField("gui");
-			mcGuiField.setAccessible(true);
-			Object gui = mcGuiField.get(mc);
-			if (gui != null) {
-				Class<?> guiClass = gui.getClass();
-				try {
-					guiScreenField = guiClass.getDeclaredField("screen");
-					guiScreenField.setAccessible(true);
-				} catch (NoSuchFieldException e) {
-					try {
-						guiScreenMethod = guiClass.getDeclaredMethod("screen");
-						guiScreenMethod.setAccessible(true);
-					} catch (NoSuchMethodException ignored) {
-					}
-				}
-				try {
-					setScreenMethod = guiClass.getMethod("setScreen", Screen.class);
-				} catch (NoSuchMethodException ignored) {
-				}
-			}
-		} catch (Throwable ignored) {
-		}
-
-		if (setScreenMethod == null) {
-			try {
-				setScreenMethod = Minecraft.class.getMethod("setScreen", Screen.class);
-			} catch (Throwable ignored) {
-			}
-		}
-	}
-
 	public static Screen getCurrentScreen(Minecraft mc) {
 		if (mc == null)
 			return null;
-		initScreenAccessors(mc);
-		try {
-			if (mcGuiField != null) {
-				Object gui = mcGuiField.get(mc);
-				if (gui != null) {
-					if (guiScreenField != null)
-						return (Screen) guiScreenField.get(gui);
-					if (guiScreenMethod != null)
-						return (Screen) guiScreenMethod.invoke(gui);
-				}
-			}
-		} catch (Throwable ignored) {
-		}
-		return null;
+		return mc.screen;
 	}
 
 	public static void openScreen(Minecraft mc, Screen screen) {
 		if (mc == null)
 			return;
-		mc.execute(() -> {
-			initScreenAccessors(mc);
-			try {
-				if (setScreenMethod != null) {
-					if (setScreenMethod.getDeclaringClass().equals(Minecraft.class)) {
-						setScreenMethod.invoke(mc, screen);
-					} else if (mcGuiField != null) {
-						Object gui = mcGuiField.get(mc);
-						if (gui != null) {
-							setScreenMethod.invoke(gui, screen);
-						}
-					}
-				}
-			} catch (Throwable ignored) {
-			}
-		});
+		mc.execute(() -> mc.setScreen(screen));
 	}
 }

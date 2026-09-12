@@ -422,9 +422,9 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Name | Version |
 | :--- | :--- |
-| [Fabric Loader](https://fabricmc.net/) | `0.19.3+` |
-| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.152.1+` |
-| [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.13.13+kotlin.2.4.10+` |
+| [Fabric Loader](https://fabricmc.net/) | `0.19.5+` |
+| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.155.3+` |
+| [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin) | `1.14.1+kotlin.2.4.20+` |
 
 </details>
 
@@ -434,8 +434,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Name | Version |
 | :--- | :--- |
 | [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.1.819+` |
-| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.20+` |
-| [Mod Menu](https://modrinth.com/mod/modmenu) | `20.0.0+` |
+| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.21+` |
+| [Mod Menu](https://modrinth.com/mod/modmenu) | `18.0.1+` |
 
 </details>
 
@@ -678,4 +678,4 @@ See the full license text here:
 
 ---
 
-*Last updated: 02-09-2026*
+*Last updated: 12-09-2026*

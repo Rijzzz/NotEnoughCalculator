@@ -26,13 +26,14 @@ import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ResultFormatter;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -320,9 +321,10 @@ public class CalculatorManager {
 			return;
 		}
 
-		boolean isCtrlPressed = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
+		boolean isCtrlPressed = (modifiers & InputConstants.MOD_CONTROL) != 0
+				|| (modifiers & InputConstants.MOD_SUPER) != 0;
 
-		if (keyCode == GLFW.GLFW_KEY_Z && isCtrlPressed) {
+		if (keyCode == InputConstants.KEY_Z && isCtrlPressed) {
 			if (reiHistoryIndex == -1 && !reiSearchHistory.isEmpty()) {
 				try {
 					savedCurrentInput = IntegrationManager.getActiveAdapter().getText();
@@ -356,7 +358,7 @@ public class CalculatorManager {
 			LOGGER.info("Ctrl+Z: Undo to equation: '{}'", reiSearchHistory.get(reiHistoryIndex));
 		}
 
-		if (keyCode == GLFW.GLFW_KEY_Y && isCtrlPressed) {
+		if (keyCode == InputConstants.KEY_Y && isCtrlPressed) {
 			if (reiHistoryIndex == -1) {
 				LOGGER.debug("Not in history mode, can't redo");
 				return;

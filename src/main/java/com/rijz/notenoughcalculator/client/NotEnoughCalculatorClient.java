@@ -32,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.commands.SharedSuggestionProvider;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.arguments.StringArgumentType;
 
 import me.shedaniel.rei.api.client.REIRuntime;
@@ -43,7 +44,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,9 +116,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 					if (click.x() >= bounds.x && click.x() <= bounds.getMaxX() && click.y() >= bounds.y
 							&& click.y() <= bounds.getMaxY()) {
 						sf.mouseClicked(click.x(), click.y(), click.button());
-						long window = Minecraft.getInstance().getWindow().handle();
-						boolean shiftDown = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS
-								|| GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS;
+						boolean shiftDown = InputConstants.isKeyDown(InputConstants.KEY_LSHIFT)
+								|| InputConstants.isKeyDown(InputConstants.KEY_RSHIFT);
 						if (shiftDown || click.button() == 1) {
 							sf.startDragging(click.x(), click.y());
 						}
@@ -139,8 +138,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 
 			// Intercept Enter to commit, Ctrl+Z/Y for history undo/redo
 			ScreenKeyboardEvents.allowKeyPress(screen).register((scr, keyInput) -> {
-				return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.scancode(),
-						keyInput.modifiers());
+				return handleKeyboardShortcutsWithCancel(scr, keyInput.key(), keyInput.keycode(), keyInput.modifiers());
 			});
 
 			// Intercept character typing when standalone field is focused so it doesn't
@@ -159,7 +157,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 		});
 	}
 
-	private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int scancode, int modifiers) {
+	private boolean handleKeyboardShortcutsWithCancel(Screen screen, int key, int keycode, int modifiers) {
 		Minecraft mc = Minecraft.getInstance();
 
 		if (ReflectionUtils.getCurrentScreen(mc) != screen || mc.level == null || mc.player == null) {
@@ -181,7 +179,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 						boolean isCalculation = CalculatorManager.looksLikeCalculation(searchText);
 						boolean hasResult = calcManager.hasResult();
 
-						if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && isCalculation
+						if ((key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) && isCalculation
 								&& hasResult) {
 							calcManager.commitPendingCalculationPublic();
 
@@ -196,11 +194,11 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 							return false;
 						}
 
-						boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0
-								|| (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
+						boolean isCtrlOrCmd = (modifiers & InputConstants.MOD_CONTROL) != 0
+								|| (modifiers & InputConstants.MOD_SUPER) != 0;
 						boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
 
-						if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult
+						if (key == InputConstants.KEY_C && isCtrlOrCmd && isCalculation && hasResult
 								&& REIHelper.isNoSelection(searchField)) {
 							String result = calcManager.getLastFormattedResult();
 							if (result != null && !result.isEmpty()) {
@@ -213,7 +211,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 							}
 						}
 
-						if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult
+						if (key == InputConstants.KEY_X && isCtrlOrCmd && isCalculation && hasResult
 								&& REIHelper.isNoSelection(searchField)) {
 							String result = calcManager.getLastFormattedResult();
 							if (result != null && !result.isEmpty()) {
@@ -229,7 +227,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 							}
 						}
 
-						if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlOrCmd) {
+						if ((key == InputConstants.KEY_Z || key == InputConstants.KEY_Y) && isCtrlOrCmd) {
 							calcManager.handleKeyPress(key, modifiers);
 						}
 					}
@@ -243,7 +241,8 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 					boolean isCalculation = CalculatorManager.looksLikeCalculation(searchText);
 					boolean hasResult = calcManager.hasResult();
 
-					if ((key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) && isCalculation && hasResult) {
+					if ((key == InputConstants.KEY_RETURN || key == InputConstants.KEY_NUMPADENTER) && isCalculation
+							&& hasResult) {
 						calcManager.commitPendingCalculationPublic();
 
 						String result = calcManager.getLastFormattedResult();
@@ -257,11 +256,11 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 						return false;
 					}
 
-					boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0
-							|| (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
+					boolean isCtrlOrCmd = (modifiers & InputConstants.MOD_CONTROL) != 0
+							|| (modifiers & InputConstants.MOD_SUPER) != 0;
 					boolean enableFullCopy = CalculatorConfig.getInstance().enableFullEquationCopy;
 
-					if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd && isCalculation && hasResult
+					if (key == InputConstants.KEY_C && isCtrlOrCmd && isCalculation && hasResult
 							&& ReflectionUtils.isNoSelection(adapter)) {
 						String result = calcManager.getLastFormattedResult();
 						if (result != null && !result.isEmpty()) {
@@ -274,7 +273,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 						}
 					}
 
-					if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd && isCalculation && hasResult
+					if (key == InputConstants.KEY_X && isCtrlOrCmd && isCalculation && hasResult
 							&& ReflectionUtils.isNoSelection(adapter)) {
 						String result = calcManager.getLastFormattedResult();
 						if (result != null && !result.isEmpty()) {
@@ -290,17 +289,17 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 						}
 					}
 
-					if ((key == GLFW.GLFW_KEY_Z || key == GLFW.GLFW_KEY_Y) && isCtrlOrCmd) {
+					if ((key == InputConstants.KEY_Z || key == InputConstants.KEY_Y) && isCtrlOrCmd) {
 						calcManager.handleKeyPress(key, modifiers);
 					}
 
 					if (IntegrationManager.isStandaloneActive()
 							&& IntegrationManager.getStandaloneField().isFocused()) {
-						if (key == GLFW.GLFW_KEY_ESCAPE) {
+						if (key == InputConstants.KEY_ESCAPE) {
 							IntegrationManager.getStandaloneField().setFocused(false);
 							return true;
 						}
-						IntegrationManager.getStandaloneField().keyPressed(key, scancode, modifiers);
+						IntegrationManager.getStandaloneField().keyPressed(key, keycode, modifiers);
 						String text = IntegrationManager.getStandaloneField().getText();
 						calcManager.formatSearchBar(text);
 						return false;

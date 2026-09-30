@@ -24,11 +24,12 @@ import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
-import org.lwjgl.glfw.GLFW;
 
 public class StandaloneSearchField implements SearchFieldAdapter {
 
@@ -148,6 +149,13 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 	@Override
 	public void setFocused(boolean focused) {
 		this.focused = focused;
+		try {
+			Minecraft mc = Minecraft.getInstance();
+			if (mc != null && mc.textInputManager() != null) {
+				mc.textInputManager().onTextInputFocusChange(this, focused);
+			}
+		} catch (Exception ignored) {
+		}
 	}
 
 	@Override
@@ -353,20 +361,21 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 		if (!focused)
 			return false;
 
-		boolean isCtrlOrCmd = (modifiers & GLFW.GLFW_MOD_CONTROL) != 0 || (modifiers & GLFW.GLFW_MOD_SUPER) != 0;
-		boolean isShift = (modifiers & GLFW.GLFW_MOD_SHIFT) != 0;
+		boolean isCtrlOrCmd = (modifiers & InputConstants.MOD_CONTROL) != 0
+				|| (modifiers & InputConstants.MOD_SUPER) != 0;
+		boolean isShift = (modifiers & InputConstants.MOD_SHIFT) != 0;
 
 		String currentStr = getText();
 		int len = currentStr.length();
 		int pos = getCursorPosition();
 
-		if (key == GLFW.GLFW_KEY_A && isCtrlOrCmd) {
+		if (key == InputConstants.KEY_A && isCtrlOrCmd) {
 			cursorPosition = 0;
 			selectionEnd = len;
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_C && isCtrlOrCmd) {
+		if (key == InputConstants.KEY_C && isCtrlOrCmd) {
 			if (hasSelection()) {
 				String selected = getSelectedText();
 				setClipboardText(selected);
@@ -374,7 +383,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			}
 		}
 
-		if (key == GLFW.GLFW_KEY_X && isCtrlOrCmd) {
+		if (key == InputConstants.KEY_X && isCtrlOrCmd) {
 			if (hasSelection()) {
 				String selected = getSelectedText();
 				setClipboardText(selected);
@@ -383,7 +392,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			}
 		}
 
-		if (key == GLFW.GLFW_KEY_V && isCtrlOrCmd) {
+		if (key == InputConstants.KEY_V && isCtrlOrCmd) {
 			String clipboard = getClipboardText();
 			if (clipboard != null && !clipboard.isEmpty()) {
 				deleteSelection();
@@ -397,7 +406,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			}
 		}
 
-		if (key == GLFW.GLFW_KEY_BACKSPACE) {
+		if (key == InputConstants.KEY_BACKSPACE) {
 			if (hasSelection()) {
 				deleteSelection();
 			} else if (isCtrlOrCmd) {
@@ -415,7 +424,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_DELETE) {
+		if (key == InputConstants.KEY_DELETE) {
 			if (hasSelection()) {
 				deleteSelection();
 			} else if (isCtrlOrCmd) {
@@ -429,7 +438,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_LEFT) {
+		if (key == InputConstants.KEY_LEFT) {
 			int newPos = isCtrlOrCmd ? findWordStart(currentStr, pos) : Math.max(0, pos - 1);
 			cursorPosition = newPos;
 			if (!isShift) {
@@ -438,7 +447,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_RIGHT) {
+		if (key == InputConstants.KEY_RIGHT) {
 			int newPos = isCtrlOrCmd ? findWordEnd(currentStr, pos) : Math.min(len, pos + 1);
 			cursorPosition = newPos;
 			if (!isShift) {
@@ -447,7 +456,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_HOME) {
+		if (key == InputConstants.KEY_HOME) {
 			cursorPosition = 0;
 			if (!isShift) {
 				selectionEnd = 0;
@@ -455,7 +464,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			return true;
 		}
 
-		if (key == GLFW.GLFW_KEY_END) {
+		if (key == InputConstants.KEY_END) {
 			cursorPosition = len;
 			if (!isShift) {
 				selectionEnd = len;
@@ -524,7 +533,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 			}
 			return true;
 		} else {
-			focused = false;
+			setFocused(false);
 			return false;
 		}
 	}

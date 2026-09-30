@@ -42,8 +42,6 @@ import net.minecraft.network.chat.Component;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.lwjgl.glfw.GLFW;
-
 public class CalculatorConfigScreen extends Screen {
 
 	private final Screen parent;
@@ -233,8 +231,7 @@ public class CalculatorConfigScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 		if (this.minecraft != null) {
-			long window = this.minecraft.getWindow().handle();
-			boolean isMouseDown = GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+			boolean isMouseDown = this.minecraft.mouseHandler.isLeftPressed();
 			if (isMouseDown && !wasMouseDown) {
 				if (activeTab == 1) {
 					variablesTab.handleMouseClickOutsideInputs(mouseX, mouseY);

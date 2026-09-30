@@ -20,9 +20,10 @@ package com.rijz.notenoughcalculator.client.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.lwjgl.glfw.GLFW;
 
 public class StandaloneSearchFieldTest {
 
@@ -66,30 +67,30 @@ public class StandaloneSearchFieldTest {
 	@Test
 	public void testKeyPressedNavigation() {
 		field.setText("hello");
-		field.keyPressed(GLFW.GLFW_KEY_END, 0, 0);
+		field.keyPressed(InputConstants.KEY_END, 0, 0);
 		assertEquals(5, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_LEFT, 0, 0);
+		field.keyPressed(InputConstants.KEY_LEFT, 0, 0);
 		assertEquals(4, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_HOME, 0, 0);
+		field.keyPressed(InputConstants.KEY_HOME, 0, 0);
 		assertEquals(0, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_RIGHT, 0, 0);
+		field.keyPressed(InputConstants.KEY_RIGHT, 0, 0);
 		assertEquals(1, field.getCursorPosition());
 	}
 
 	@Test
 	public void testBackspaceAndDelete() {
 		field.setText("123");
-		field.keyPressed(GLFW.GLFW_KEY_END, 0, 0);
+		field.keyPressed(InputConstants.KEY_END, 0, 0);
 
-		field.keyPressed(GLFW.GLFW_KEY_BACKSPACE, 0, 0);
+		field.keyPressed(InputConstants.KEY_BACKSPACE, 0, 0);
 		assertEquals("12", field.getText());
 		assertEquals(2, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_HOME, 0, 0);
-		field.keyPressed(GLFW.GLFW_KEY_DELETE, 0, 0);
+		field.keyPressed(InputConstants.KEY_HOME, 0, 0);
+		field.keyPressed(InputConstants.KEY_DELETE, 0, 0);
 		assertEquals("2", field.getText());
 		assertEquals(0, field.getCursorPosition());
 	}
@@ -97,7 +98,7 @@ public class StandaloneSearchFieldTest {
 	@Test
 	public void testSelectAllAndReplace() {
 		field.setText("100+500");
-		field.keyPressed(GLFW.GLFW_KEY_A, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_A, 0, InputConstants.MOD_CONTROL);
 		assertTrue(field.hasSelection());
 		assertEquals("100+500", field.getSelectedText());
 
@@ -115,24 +116,24 @@ public class StandaloneSearchFieldTest {
 		assertFalse(field.isFullSelection());
 		assertEquals("cd", field.getSelectedText());
 
-		field.keyPressed(GLFW.GLFW_KEY_C, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_C, 0, InputConstants.MOD_CONTROL);
 
 		field.setText("");
 		field.setCursorPosition(0);
 		field.setSelectionEnd(0);
 
-		field.keyPressed(GLFW.GLFW_KEY_V, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_V, 0, InputConstants.MOD_CONTROL);
 		assertEquals("cd", field.getText());
 	}
 
 	@Test
 	public void testCopyFullSelectionAfterCtrlA() {
 		field.setText("126.855m");
-		field.keyPressed(GLFW.GLFW_KEY_A, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_A, 0, InputConstants.MOD_CONTROL);
 		assertTrue(field.hasSelection());
 		assertTrue(field.isFullSelection());
 
-		boolean handled = field.keyPressed(GLFW.GLFW_KEY_C, 0, GLFW.GLFW_MOD_CONTROL);
+		boolean handled = field.keyPressed(InputConstants.KEY_C, 0, InputConstants.MOD_CONTROL);
 		assertTrue(handled);
 		assertEquals("126.855m", field.getClipboardText());
 	}
@@ -140,15 +141,15 @@ public class StandaloneSearchFieldTest {
 	@Test
 	public void testWordNavigation() {
 		field.setText("100 + 200");
-		field.keyPressed(GLFW.GLFW_KEY_END, 0, 0);
+		field.keyPressed(InputConstants.KEY_END, 0, 0);
 
-		field.keyPressed(GLFW.GLFW_KEY_LEFT, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_LEFT, 0, InputConstants.MOD_CONTROL);
 		assertEquals(6, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_LEFT, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_LEFT, 0, InputConstants.MOD_CONTROL);
 		assertEquals(4, field.getCursorPosition());
 
-		field.keyPressed(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL);
+		field.keyPressed(InputConstants.KEY_RIGHT, 0, InputConstants.MOD_CONTROL);
 		assertEquals(6, field.getCursorPosition());
 	}
 
@@ -204,10 +205,10 @@ public class StandaloneSearchFieldTest {
 	@Test
 	public void testKeyPressedFocusHandling() {
 		field.setFocused(true);
-		assertTrue(field.keyPressed(GLFW.GLFW_KEY_1, 0, 0));
+		assertTrue(field.keyPressed(InputConstants.KEY_1, 0, 0));
 
 		field.setFocused(false);
-		assertFalse(field.keyPressed(GLFW.GLFW_KEY_1, 0, 0));
+		assertFalse(field.keyPressed(InputConstants.KEY_1, 0, 0));
 	}
 
 	@Test

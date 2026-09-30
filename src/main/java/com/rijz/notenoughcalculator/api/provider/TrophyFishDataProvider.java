@@ -20,19 +20,19 @@ package com.rijz.notenoughcalculator.api.provider;
 
 import com.rijz.notenoughcalculator.api.SkyblockApiIntegration;
 
-import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishTier;
 import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishType;
 import tech.thatgravyboat.skyblockapi.api.area.isle.trophyfish.TrophyFishingAPI;
+import tech.thatgravyboat.skyblockapi.api.datatype.defaults.trophy.TrophyTier;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 public class TrophyFishDataProvider {
 
-	private static long countByTier(TrophyFishTier targetTier) {
+	private static long countByTier(TrophyTier targetTier) {
 		long total = 0;
 		for (TrophyFishType type : TrophyFishType.values()) {
-			Map<TrophyFishTier, Integer> caught = TrophyFishingAPI.INSTANCE.getCaught(type);
+			Map<TrophyTier, Integer> caught = TrophyFishingAPI.INSTANCE.getCaughtTiers(type);
 			if (caught == null)
 				continue;
 			if (targetTier == null) {
@@ -54,18 +54,18 @@ public class TrophyFishDataProvider {
 	}
 
 	public static BigDecimal getDiamondTrophyCount() {
-		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.DIAMOND)));
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyTier.DIAMOND)));
 	}
 
 	public static BigDecimal getGoldTrophyCount() {
-		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.GOLD)));
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyTier.GOLD)));
 	}
 
 	public static BigDecimal getSilverTrophyCount() {
-		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.SILVER)));
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyTier.SILVER)));
 	}
 
 	public static BigDecimal getBronzeTrophyCount() {
-		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyFishTier.BRONZE)));
+		return SkyblockApiIntegration.safeQuery(() -> BigDecimal.valueOf(countByTier(TrophyTier.BRONZE)));
 	}
 }

@@ -43,7 +43,6 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${fabric_version}",
-    "fabric-language-kotlin": ">=${fabric_language_kotlin_version}",
     "minecraft": ">=${minecraft_version}"
   },
   "suggests": {

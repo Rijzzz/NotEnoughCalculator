@@ -44,14 +44,12 @@ public class SyntaxHighlighterTest {
 		assertTrue(highlighted.contains("§350"), "Numbers should be Dark Aqua / Cyan (§3)");
 		assertTrue(highlighted.contains("§bm"), "Units should be Vibrant Cyan (§b)");
 
-		String marketHighlighted = SyntaxHighlighter.highlight("bzb(SUPERBOOM_TNT)");
-		assertTrue(marketHighlighted.contains("§9bzb"), "Market functions should be Royal Blue (§9)");
-		assertTrue(marketHighlighted.contains("§dSUPERBOOM_TNT"), "Item IDs should be Light Purple (§d)");
+		String marketHighlighted = SyntaxHighlighter.highlight("bz(100m)");
+		assertTrue(marketHighlighted.contains("§9bz"), "Market functions should be Royal Blue (§9)");
 
-		String progHighlighted = SyntaxHighlighter.highlight("vampirexp(5) + skillxp(50) + perk(mining_speed)");
+		String progHighlighted = SyntaxHighlighter.highlight("vampirexp(5) + skillxp(50)");
 		assertTrue(progHighlighted.contains("§6vampirexp"), "Progression functions should be Vibrant Gold (§6)");
 		assertTrue(progHighlighted.contains("§6skillxp"), "Progression functions should be Vibrant Gold (§6)");
-		assertTrue(progHighlighted.contains("§6perk"), "Perk functions should be Vibrant Gold (§6)");
 
 		String radixHighlighted = SyntaxHighlighter.highlight("hex(255) + 0xFF");
 		assertTrue(radixHighlighted.contains("§dhex"), "Radix functions should be Light Purple (§d)");
@@ -60,12 +58,11 @@ public class SyntaxHighlighterTest {
 
 	@Test
 	public void testVariableHighlighting() {
-		String highlighted = SyntaxHighlighter.highlight("$buy + ans + $purse + $coins + $w");
+		String highlighted = SyntaxHighlighter.highlight("$buy + ans + pi + e");
 		assertTrue(highlighted.contains("§6$§3buy"), "Dollar sign should be Gold (§6) and custom var Dark Aqua (§3)");
 		assertTrue(highlighted.contains("§bans"), "Builtin variables should be Vibrant Aqua (§b)");
-		assertTrue(highlighted.contains("§6$§bpurse"), "Dollar sign Gold (§6) and API variable Vibrant Aqua (§b)");
-		assertTrue(highlighted.contains("§6$§bcoins"), "Dollar sign Gold (§6) and alias coins Vibrant Aqua (§b)");
-		assertTrue(highlighted.contains("§6$§bw"), "Dollar sign Gold (§6) and alias w Vibrant Aqua (§b)");
+		assertTrue(highlighted.contains("§bpi"), "Builtin variable pi should be Vibrant Aqua (§b)");
+		assertTrue(highlighted.contains("§be"), "Builtin variable e should be Vibrant Aqua (§b)");
 	}
 
 	@Test
@@ -83,7 +80,7 @@ public class SyntaxHighlighterTest {
 		assertTrue(unitHighlighted.contains("§beb"), "Ender chest unit should be Vibrant Aqua (§b)");
 		assertTrue(unitHighlighted.contains("§bsc"), "Small chest unit should be Vibrant Aqua (§b)");
 
-		String quoteHighlighted = SyntaxHighlighter.highlight("bzb(\"HYPERION\")");
+		String quoteHighlighted = SyntaxHighlighter.highlight("\"HYPERION\"");
 		assertTrue(quoteHighlighted.contains("§d\"HYPERION\""), "Quoted string should be Light Purple (§d)");
 	}
 

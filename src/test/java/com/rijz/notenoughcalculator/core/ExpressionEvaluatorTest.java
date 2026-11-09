@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalResult;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
-import com.rijz.notenoughcalculator.core.evaluator.PlayerStatLookup;
 
 import java.math.BigDecimal;
 
@@ -697,9 +696,11 @@ class ExpressionEvaluatorTest {
 
 		@Test
 		void reservedVariables() {
-			assertTrue(ExpressionEvaluator.isReservedVariable("purse"));
+			assertTrue(ExpressionEvaluator.isReservedVariable("ans"));
+			assertTrue(ExpressionEvaluator.isReservedVariable("pi"));
+			assertTrue(ExpressionEvaluator.isReservedVariable("e"));
 			assertTrue(ExpressionEvaluator.isReservedVariable("bz"));
-			assertTrue(ExpressionEvaluator.isReservedVariable("bzb"));
+			assertTrue(ExpressionEvaluator.isReservedVariable("ah"));
 			assertTrue(ExpressionEvaluator.isReservedVariable("sqrt"));
 			assertTrue(ExpressionEvaluator.isReservedVariable("k"));
 			assertTrue(ExpressionEvaluator.isReservedVariable("m"));
@@ -1317,8 +1318,7 @@ class ExpressionEvaluatorTest {
 	class ReservedVariables {
 		@Test
 		void settingReservedVariableThrowsException() {
-			String[] reserved = {"purse", "bank", "hp", "maxhealth", "def", "mana", "vitality", "speed", "mp",
-					"farming", "mining", "zombieslayer", "hotf", "htier", "hotftokens", "whispers"};
+			String[] reserved = {"ans", "pi", "e", "bz", "ah", "ahbin", "sqrt", "sin", "k", "m", "b"};
 			for (String var : reserved) {
 				assertThrows(EvalException.class, () -> eval.setVariable(var, new BigDecimal("100")));
 				assertThrows(EvalException.class, () -> eval.setVariable("$" + var, "100"));
@@ -1327,7 +1327,7 @@ class ExpressionEvaluatorTest {
 	}
 
 	@Nested
-	@DisplayName("SkyBlock XP Tables and Perk Functions")
+	@DisplayName("SkyBlock XP Tables")
 	class XpAndPerkFunctions {
 		@Test
 		void testSkillXpEvaluations() throws Exception {
@@ -1402,13 +1402,6 @@ class ExpressionEvaluatorTest {
 		}
 
 		@Test
-		void testPerkEvaluationsFallback() throws Exception {
-			assertCalc("perk(mining_speed)", "0");
-			assertCalc("hotmperk(mining_speed)", "0");
-			assertCalc("hperk(mining_fortune)", "0");
-		}
-
-		@Test
 		void testAllStorageUnits() throws Exception {
 			assertCalc("2s", "128");
 			assertCalc("2st", "128");
@@ -1418,37 +1411,6 @@ class ExpressionEvaluatorTest {
 			assertCalc("2sc", "3456");
 			assertCalc("3dc", "10368");
 			assertCalc("2eb", "5760");
-		}
-
-		@Test
-		void testAllStatVariableLookupsSafelyResolveNullWhenDisconnected() {
-			assertNull(PlayerStatLookup.lookupPlayerStat("hunting"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hunt"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("huntlvl"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("huntingxp"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("huntxp"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("whispers"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("forestwhispers"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("fwhispers"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("desertwhispers"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("dwhisper"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hotm"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hotmtier"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hotmtokens"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hotf"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("htier"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("hotftokens"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("vitality"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("maxvitality"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("coins"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("coin"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("money"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("defence"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("power"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("farmlvl"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("minelvl"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("cmbtlvl"));
-			assertNull(PlayerStatLookup.lookupPlayerStat("voidgloomxp"));
 		}
 	}
 }

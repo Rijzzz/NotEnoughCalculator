@@ -11,21 +11,9 @@ base {
     archivesName = project.archives_base_name
 }
 
-loom {
-    runs {
-        client {
-            property "devauth.enabled", "true"
-            property "devauth.account", "main"
-        }
-    }
-}
-
 repositories {
     maven { url = "https://maven.fabricmc.net/" }
     maven { url = "https://maven.shedaniel.me" }
-    maven { url = "https://maven.teamresourceful.com/repository/maven-public/" }
-    maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
-    maven { url = "https://repo.hypixel.net/repository/Hypixel/" }
     maven { url = "https://maven.terraformersmc.com/releases" }
     maven { url = "https://api.modrinth.com/maven" }
     gradlePluginPortal()
@@ -37,7 +25,6 @@ dependencies {
 
     // Fabric
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}+${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}"
 
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
@@ -50,20 +37,8 @@ dependencies {
     compileOnly  "maven.modrinth:modmenu:${project.modmenu_version}"
     localRuntime "maven.modrinth:modmenu:${project.modmenu_version}"
 
-    // Dev Auth
-    localRuntime "me.djtheredstoner:DevAuth-fabric:${project.devauth_version}"
-
-    // SkyBlock Api
-    api("tech.thatgravyboat:skyblock-api:${project.skyblockapi_version}") {
-        capabilities {
-            requireCapability("tech.thatgravyboat:skyblock-api-${project.minecraft_version}")
-        }
-    }
-    include("tech.thatgravyboat:skyblock-api:${project.skyblockapi_version}") {
-        capabilities {
-            requireCapability("tech.thatgravyboat:skyblock-api-${project.minecraft_version}")
-        }
-    }
+    // Kotlin stdlib (compile-only for optional Skyblock Item List mixin)
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:2.1.20"
 
     // Unit tests
     testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
@@ -75,7 +50,6 @@ processResources {
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "loader_version", project.loader_version
     inputs.property "fabric_version", project.fabric_version
-    inputs.property "fabric_language_kotlin_version", project.fabric_language_kotlin_version
     inputs.property "rei_version", project.rei_version
     inputs.property "modmenu_version", project.modmenu_version
     inputs.property "skyblockitemlist_version", project.skyblockitemlist_version
@@ -86,7 +60,6 @@ processResources {
                 "minecraft_version": project.minecraft_version,
                 "loader_version": project.loader_version,
                 "fabric_version": project.fabric_version,
-                "fabric_language_kotlin_version": project.fabric_language_kotlin_version,
                 "rei_version": project.rei_version,
                 "modmenu_version": project.modmenu_version,
                 "skyblockitemlist_version": project.skyblockitemlist_version
@@ -129,7 +102,7 @@ publishing {
 spotless {
     java {
         target 'src/*/java/**/*.java'
-        importOrder('com.rijz.notenoughcalculator', 'tech.thatgravyboat.skyblockapi', 'net.minecraft', 'com.mojang', 'java', 'javax')
+        importOrder('com.rijz.notenoughcalculator', 'net.minecraft', 'com.mojang', 'java', 'javax')
         removeUnusedImports()
         eclipse()
         trimTrailingWhitespace()

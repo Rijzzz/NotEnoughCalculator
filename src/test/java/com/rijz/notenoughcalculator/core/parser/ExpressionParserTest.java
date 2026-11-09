@@ -83,13 +83,4 @@ class ExpressionParserTest {
 		assertNotNull(result);
 		assertEquals(0, new BigDecimal("175").compareTo(result.value));
 	}
-
-	@Test
-	@DisplayName("Parse perk fallback function")
-	void testParsePerkFallback() throws Exception {
-		List<Token> tokens = ExpressionTokenizer.tokenize("perk(mining_speed)", BigDecimal.ZERO);
-		ParseResult result = parser.parse(tokens);
-		assertNotNull(result);
-		assertEquals(0, BigDecimal.ZERO.compareTo(result.value));
-	}
 }

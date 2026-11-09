@@ -492,4 +492,4 @@ See the full license text in [LICENSE.txt](LICENSE.txt).
 
 ---
 
-*Last updated: 12-09-2026*
+*Last updated: 09-11-2026*

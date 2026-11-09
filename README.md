@@ -148,19 +148,19 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Syntax Category | Minecraft Color Code | Example Elements |
 | :--- | :--- | :--- |
 | **Numbers & Decimals** | `§3` (Cyan / Dark Aqua) | `42`, `100.5`, `3.14159` |
-| **Quantities & Suffix Units** | `§b` (Vibrant Aqua) | `k`, `m`, `b`, `t`, `st`, `stack`, `dc`, `eb` |
-| **Mathematical Functions** | `§e` (Bright Yellow) | `sqrt()`, `abs()`, `floor()`, `sin()`, `min()`, `max()`, `avg()`, `clamp()`, `gcd()`, `lcm()` |
-| **Progression & Slayers** | `§6` (Vibrant Gold) | `skillxp()`, `huntingxp()`, `cataxp()`, `slayerxp()`, `emanxp()`, `vampirexp()` |
+| **Quantities & Suffix Units** | `§b` (Aqua) | `k`, `m`, `b`, `t`, `st`, `stack`, `dc`, `eb` |
+| **Mathematical Functions** | `§e` (Yellow) | `sqrt()`, `abs()`, `floor()`, `sin()`, `min()`, `max()`, `avg()`, `clamp()`, `gcd()`, `lcm()` |
+| **Progression & Slayers** | `§6` (Gold) | `skillxp()`, `huntingxp()`, `cataxp()`, `slayerxp()`, `emanxp()`, `vampirexp()` |
 | **Taxes** | `§9` (Royal Blue) | `bz()`, `ah()`, `ahbin()` |
 | **Radix Literals & Functions** | `§d` (Light Purple / Magenta) | `0xFF`, `0b1010`, `0o77`, `hex()`, `bin()`, `oct()`, `pct()` |
-| **Built-in Variables & Constants** | `§b` (Vibrant Aqua) | `ans`, `pi`, `e` |
+| **Built-in Variables & Constants** | `§b` (Aqua) | `ans`, `pi`, `e` |
 | **Custom Variables** | `§3` (Cyan / Dark Aqua) | `$myset`, `$tax`, `$profit`, `$goal` |
-| **Variable Prefix ($)** | `§6` (Vibrant Gold) | `$` prefix preceding any variable |
+| **Variable Prefix ($)** | `§6` (Gold) | `$` prefix preceding any variable |
 | **Quoted Strings** | `§d` (Light Purple / Pink) | `"ITEM"`, `'TEXT'` |
 | **Mathematical Operators** | `§c` (Light Red) | `+`, `-`, `*`, `/`, `^`, `%`, `x`, `!`, `&`, `\|`, `~`, `<<`, `>>` |
-| **Delimiters & Parentheses** | `§7` (Neutral Light Gray) | `(`, `)`, `,` |
-| **Result Equals Sign (=)** | `§6` (Vibrant Gold) | `=` separator preceding calculated output |
-| **Calculated Result Value** | `§a` (Bright Lime Green) | `50,000,000` |
+| **Delimiters & Parentheses** | `§7` (Gray) | `(`, `)`, `,` |
+| **Result Equals Sign (=)** | `§6` (Gold) | `=` separator preceding calculated output |
+| **Calculated Result Value** | `§a` (Green) | `50,000,000` |
 
 </details>
 
@@ -225,22 +225,22 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Setting Name | Config Key | Default | Behavior (ON vs OFF) |
 | :--- | :--- | :--- | :--- |
-| Open Settings Screen | Command `/calcconfig` | N/A | Opens interactive GUI settings & custom variables manager screen (or via Mod Menu) |
-| Custom Variables | `customVariables` | `{}` | Persistent key-value variables created via `/calcset` or GUI manager |
-| Custom Variables Manager | GUI Tab `Custom Variables` | N/A | Interactive GUI tab to add, edit, delete, and paginate (`<` / `>`) custom variables |
-| Inline Results | `showInlineResults` | `true` | **ON:** Renders live calculation results (`= 50m`) directly inside the search bar as you type.<br>**OFF:** Hides live result overlays in search bars. |
-| Unit Suggestions | `showUnitSuggestions` | `true` | **ON:** Displays unit conversions and item equivalents (e.g. `(1 double chest)`) below the search bar.<br>**OFF:** Hides unit conversion tooltips. |
-| Comma Formatting | `enableCommaFormatting` | `true` | **ON:** Formats large numbers with thousand separator commas (e.g. `1,000,000`).<br>**OFF:** Outputs plain numbers without commas (e.g. `1000000`). |
-| Shorthand Results | `enableShorthandResults` | `false` | **ON:** Formats results in compact SkyBlock notation (e.g. `1.5m`, `2.5b`).<br>**OFF:** Displays the full numeric value with comma formatting. |
-| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Color-codes numbers (cyan), units (aqua), math functions (yellow), progression (gold), taxes (royal blue), variables (aqua/cyan), operators (red), and results (green).<br>**OFF:** Renders search bar text in plain standard white. |
-| Decimal Precision | `decimalPrecision` | `10` | Configures maximum decimal places for outputs (`1` to `50`). Numbers exceeding this scale are rounded using `HALF_UP`. |
-| Bazaar Flipper Perk | `bazaarFlipperLevel` | `0` | Selects your account's Community Center perk: `Lvl 0` (1.25% tax), `Lvl 1` (1.125% tax), or `Lvl 2` (1.0% tax). |
-| History Shortcuts | `enableHistoryNavigation` | `true` | **ON:** Traverses calculation history in search bars using `Ctrl+Z` (Undo) and `Ctrl+Y` (Redo).<br>**OFF:** Disables `Ctrl+Z`/`Ctrl+Y` history recall. |
-| Full Equation Copy | `enableFullEquationCopy` | `true` | **ON:** Pressing `Ctrl+C` with no text selected copies the entire equation and answer (e.g. `100m - 25m = 75m`).<br>**OFF:** Copies only the formatted result value (`75m`). |
-| Force Standalone Mode | `forceStandaloneMode` | `false` | **ON:** Unhooks calculator from REI & Item List search bars, using our dedicated standalone bar (dynamically sized and moveable).<br>**OFF:** Integrates directly inside the active REI or Item List search bar. |
-| Edit GUI | GUI Button `Edit GUI` | N/A | Opens interactive GUI positioning editor to drag and place search bar anywhere on screen. |
-| Reset Position | GUI Button `§f§l⟲` / Edit GUI | N/A | Resets search bar position back to default (beside active search bar or centered at bottom). |
-| Item List Integration | `enableItemListIntegration` | `true` | **ON:** Enables calculator within SkyBlock Item List search bar (when installed).<br>**OFF:** Disables calculator hooks in SkyBlock Item List. |
+| Open Settings Screen | Command `/calcconfig` | N/A | Opens settings and custom variables manager screen (also available in Mod Menu) |
+| Custom Variables | `customVariables` | `{}` | Saved variables created via `/calcset` or the GUI manager |
+| Custom Variables Manager | GUI Tab `Custom Variables` | N/A | Menu tab to add, edit, delete, and browse custom variables |
+| Inline Results | `showInlineResults` | `true` | **ON:** Shows live results (`= 50m`) directly in the search bar as you type.<br>**OFF:** Hides live results. |
+| Unit Suggestions | `showUnitSuggestions` | `true` | **ON:** Shows item conversions like `(1 double chest)` below the search bar.<br>**OFF:** Hides unit suggestions. |
+| Comma Formatting | `enableCommaFormatting` | `true` | **ON:** Formats large numbers with commas (`1,000,000`).<br>**OFF:** Shows plain numbers without commas (`1000000`). |
+| Shorthand Results | `enableShorthandResults` | `false` | **ON:** Shortens answers using SkyBlock notation (`1.5m`, `2.5b`).<br>**OFF:** Shows the full number with commas. |
+| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Colors numbers, units, functions, progression, taxes, variables, operators, and results.<br>**OFF:** Shows plain white text. |
+| Decimal Precision | `decimalPrecision` | `10` | Maximum decimal places for outputs (`1` to `50`). Rounds using `HALF_UP`. |
+| Bazaar Flipper Perk | `bazaarFlipperLevel` | `0` | Your Community Center perk level: `Lvl 0` (1.25% tax), `Lvl 1` (1.125% tax), or `Lvl 2` (1.0% tax). |
+| History Shortcuts | `enableHistoryNavigation` | `true` | **ON:** Step through recent calculations in the search bar with `Ctrl+Z` and `Ctrl+Y`.<br>**OFF:** Disables `Ctrl+Z`/`Ctrl+Y` history shortcuts. |
+| Full Equation Copy | `enableFullEquationCopy` | `true` | **ON:** Pressing `Ctrl+C` with nothing selected copies the full equation (`100m - 25m = 75m`).<br>**OFF:** Copies only the result (`75m`). |
+| Force Standalone Mode | `forceStandaloneMode` | `false` | **ON:** Uses our standalone bar even if REI or Skyblock Item List is installed.<br>**OFF:** Uses the REI or Skyblock Item List search bar when present. |
+| Edit GUI | GUI Button `Edit GUI` | N/A | Opens the screen to drag and position the search bar anywhere. |
+| Reset Position | GUI Button `§f§l⟲` / Edit GUI | N/A | Resets search bar position back to default. |
+| Item List Integration | `enableItemListIntegration` | `true` | **ON:** Enables the calculator inside SkyBlock Item List search bar.<br>**OFF:** Disables hooks into SkyBlock Item List. |
 
 </details>
 
@@ -252,9 +252,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary>Important Note</summary>
 
-- Dependencies and version numbers listed above apply specifically to the **latest release** of the mod. If you are using an older build or playing on a different Minecraft version, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
-
-- Standalone mode was introduced in v2.7.0. All versions prior to v2.7.0 require REI to be installed.
+- These dependency versions are for the latest release (v3.0.3). If you are using an older build, check its release notes.
+- Standalone mode was added in v2.7.0. Versions before v2.7.0 need REI installed.
 
 </details>
 
@@ -480,9 +479,9 @@ Want to help improve Not Enough Calculator? Check out [CONTRIBUTING.md](CONTRIBU
 
 ## License
 
-Read [NOTICE.md](NOTICE.md).
+Read [Licensing Notice and Transition Statement](NOTICE.md).
 
-See the full license text in [LICENSE.txt](LICENSE.txt).
+See the full license text in [View LICENSE](LICENSE.txt).
 
 ---
 

@@ -273,7 +273,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Name | Version |
 | :--- | :--- |
 | [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.2.820+` |
-| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.23+` |
+| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.24+` |
 | [Mod Menu](https://modrinth.com/mod/modmenu) | `20.0.3+` |
 
 </details>

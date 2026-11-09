@@ -212,6 +212,20 @@ public class StandaloneSearchFieldTest {
 	}
 
 	@Test
+	public void testGuiEventListenerMethods() {
+		field.setFocused(true);
+		assertTrue(field.capturesInput());
+
+		CalculatorBounds bounds = field.getBounds();
+		assertNotNull(bounds);
+		assertTrue(field.isMouseOver(bounds.x + 5, bounds.y + 5));
+		assertFalse(field.isMouseOver(bounds.x - 50, bounds.y - 50));
+
+		field.setFocused(false);
+		assertFalse(field.capturesInput());
+	}
+
+	@Test
 	public void testGetDefaultBounds() {
 		CalculatorBounds def = StandaloneSearchField.getDefaultBounds(800, 600);
 		assertNotNull(def);

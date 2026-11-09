@@ -23,6 +23,7 @@ import com.rijz.notenoughcalculator.config.CalculatorConfig;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -31,7 +32,7 @@ import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.overlay.ScreenOverlay;
 
-public class StandaloneSearchField implements SearchFieldAdapter {
+public class StandaloneSearchField implements SearchFieldAdapter, GuiEventListener {
 
 	public static final int DEFAULT_WIDTH = 160;
 	public static final int DEFAULT_HEIGHT = 18;
@@ -151,11 +152,29 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 		this.focused = focused;
 		try {
 			Minecraft mc = Minecraft.getInstance();
-			if (mc != null && mc.textInputManager() != null) {
-				mc.textInputManager().onTextInputFocusChange(this, focused);
+			if (mc != null) {
+				if (focused && mc.textInputManager() != null) {
+					CalculatorBounds bounds = getBounds();
+					if (bounds != null) {
+						mc.textInputManager().setTextInputArea(bounds.x, bounds.y, bounds.getMaxX(), bounds.getMaxY());
+					}
+				}
+				mc.onTextInputFocusChange(this, focused);
 			}
-		} catch (Exception ignored) {
+		} catch (Throwable ignored) {
 		}
+	}
+
+	@Override
+	public boolean isMouseOver(double mouseX, double mouseY) {
+		CalculatorBounds bounds = getBounds();
+		return bounds != null && mouseX >= bounds.x && mouseX <= bounds.getMaxX() && mouseY >= bounds.y
+				&& mouseY <= bounds.getMaxY();
+	}
+
+	@Override
+	public boolean capturesInput() {
+		return focused;
 	}
 
 	@Override
@@ -505,7 +524,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		CalculatorBounds bounds = getBounds();
 		if (mouseX >= bounds.x && mouseX <= bounds.getMaxX() && mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
-			focused = true;
+			setFocused(true);
 
 			Minecraft mc = Minecraft.getInstance();
 			if (mc != null && mc.font != null) {

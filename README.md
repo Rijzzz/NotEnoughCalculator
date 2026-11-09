@@ -5,7 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/Rijzzz/NotEnoughCalculator?logo=github&label=Latest%20Release&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/Rijzzz/NotEnoughCalculator/total?logo=github&label=GitHub&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/releases)
 [![Discord Server](https://img.shields.io/discord/1389631948359598220?logo=discord&label=Discord&color=5865F2&style=for-the-badge)](https://discord.com/invite/asPJ4qgs8q)
-[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.3/LICENSE.txt)
+[![License](https://img.shields.io/badge/License-LGPL--3.0--or--later-blue?logo=gnu&style=for-the-badge)](LICENSE.txt)
 
 **A NEU-style calculator that works standalone or inside Roughly Enough Items (REI) & Skyblock Item List search bars. Type calculations directly in the search bar and get instant results.**
 
@@ -232,7 +232,7 @@ Type calculations directly in the search bar and get instant results! Works insi
 | Unit Suggestions | `showUnitSuggestions` | `true` | **ON:** Displays unit conversions and item equivalents (e.g. `(1 double chest)`) below the search bar.<br>**OFF:** Hides unit conversion tooltips. |
 | Comma Formatting | `enableCommaFormatting` | `true` | **ON:** Formats large numbers with thousand separator commas (e.g. `1,000,000`).<br>**OFF:** Outputs plain numbers without commas (e.g. `1000000`). |
 | Shorthand Results | `enableShorthandResults` | `false` | **ON:** Formats results in compact SkyBlock notation (e.g. `1.5m`, `2.5b`).<br>**OFF:** Displays the full numeric value with comma formatting. |
-| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Color-codes numbers (cyan), units (aqua), math functions (yellow), progression (gold), market (royal blue), variables (aqua/cyan), operators (red), and results (green).<br>**OFF:** Renders search bar text in plain standard white. |
+| Syntax Highlighting | `enableSyntaxHighlighting` | `true` | **ON:** Color-codes numbers (cyan), units (aqua), math functions (yellow), progression (gold), taxes (royal blue), variables (aqua/cyan), operators (red), and results (green).<br>**OFF:** Renders search bar text in plain standard white. |
 | Decimal Precision | `decimalPrecision` | `10` | Configures maximum decimal places for outputs (`1` to `50`). Numbers exceeding this scale are rounded using `HALF_UP`. |
 | Bazaar Flipper Perk | `bazaarFlipperLevel` | `0` | Selects your account's Community Center perk: `Lvl 0` (1.25% tax), `Lvl 1` (1.125% tax), or `Lvl 2` (1.0% tax). |
 | History Shortcuts | `enableHistoryNavigation` | `true` | **ON:** Traverses calculation history in search bars using `Ctrl+Z` (Undo) and `Ctrl+Y` (Redo).<br>**OFF:** Disables `Ctrl+Z`/`Ctrl+Y` history recall. |
@@ -474,16 +474,15 @@ Feel free to include this mod in any modpack without restriction! Adding a link 
 
 ## Contributing
 
-Want to help improve Not Enough Calculator? Check out our [Contributing Guide](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/CONTRIBUTING.md).
+Want to help improve Not Enough Calculator? Check out [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## License
 
-Read [Licensing Notice and Transition Statement](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/NOTICE.md).
+Read [NOTICE.md](NOTICE.md).
 
-See the full license text here:
-[View License](https://github.com/Rijzzz/NotEnoughCalculator/blob/26.2/LICENSE.txt)
+See the full license text in [LICENSE.txt](LICENSE.txt).
 
 ---
 

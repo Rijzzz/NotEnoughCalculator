@@ -121,6 +121,7 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 						if (shiftDown || click.button() == 1) {
 							sf.startDragging(click.x(), click.y());
 						}
+						scr.clearFocus();
 						return false;
 					} else {
 						sf.setFocused(false);
@@ -154,6 +155,24 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 				}
 				return true;
 			});
+
+			ScreenEvents.remove(screen).register(scr -> {
+				if (IntegrationManager.isStandaloneActive()) {
+					var sf = IntegrationManager.getStandaloneField();
+					if (sf != null) {
+						sf.setFocused(false);
+					}
+				}
+			});
+		});
+
+		ScreenEvents.AFTER_INIT.register((client, screen, sw, sh) -> {
+			if (IntegrationManager.isStandaloneActive() && !CalculatorOverlayRenderer.isNonGameplayScreen(screen)) {
+				var sf = IntegrationManager.getStandaloneField();
+				if (sf != null && sf.isFocused()) {
+					sf.setFocused(true);
+				}
+			}
 		});
 	}
 

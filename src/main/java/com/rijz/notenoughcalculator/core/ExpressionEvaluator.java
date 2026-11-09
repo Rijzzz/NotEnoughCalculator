@@ -86,25 +86,16 @@ public class ExpressionEvaluator {
 
 	public static final Set<String> RADIX_FUNCTIONS = Set.of("hex", "bin", "oct", "pct");
 
-	public static final Set<String> MARKET_QUERY_FUNCTIONS = Set.of("bzb", "bzbuy", "bzs", "bzsell", "bzm", "bzmargin",
-			"lb", "lowestbin", "lba", "lowestbinavg", "npc", "npcsell", "motes", "motessell", "price", "sack",
-			"sackcount");
-
 	public static final Set<String> TAX_FUNCTIONS = Set.of("bz", "ah", "ahbin");
 
-	public static final Set<String> MARKET_FUNCTIONS;
-	static {
-		Set<String> allMarket = new HashSet<>(MARKET_QUERY_FUNCTIONS);
-		allMarket.addAll(TAX_FUNCTIONS);
-		MARKET_FUNCTIONS = Set.copyOf(allMarket);
-	}
+	public static final Set<String> MARKET_FUNCTIONS = TAX_FUNCTIONS;
 
 	public static final Set<String> PROGRESSION_FUNCTIONS = Set.of("skillxp", "skill_xp", "skilltable", "huntingxp",
 			"hunting_xp", "huntingtable", "runecraftingxp", "runecrafting_xp", "runetable", "socialxp", "social_xp",
 			"socialtable", "cataxp", "cata_xp", "catatable", "cxp_table", "slayerxp", "slayer_xp", "slayertable",
 			"zombiexp", "wolfxp", "svenxp", "revxp", "revenantxp", "spiderxp", "spider_xp", "tarantulaxp",
 			"tarantula_xp", "spidertable", "emanxp", "voidgloomxp", "blazexp", "infernoxp", "endermanxp", "vampirexp",
-			"vampire_xp", "vampiretable", "vampslayerxp", "riftstalkerxp", "perk", "hotmperk", "hperk");
+			"vampire_xp", "vampiretable", "vampslayerxp", "riftstalkerxp");
 
 	public static final Set<String> FUNCTIONS;
 	static {
@@ -145,45 +136,7 @@ public class ExpressionEvaluator {
 		return sb.toString();
 	}
 
-	public static final Set<String> BUILTIN_VARIABLES = Set.of("ans", "pi", "e", "purse", "p", "coins", "coin", "money",
-			"bank", "b", "bankcoins", "personalbank", "pbank", "coopbank", "cbank", "bits", "bt", "bit", "motes", "mt",
-			"mote", "copper", "cop", "sowdust", "sdust", "kernels", "kern", "kernel", "northstars", "nstars", "ns",
-			"northstar", "star", "stars", "gems", "gem", "soulflow", "sflow", "sf", "sblevel", "sblvl", "sb",
-			"skyblocklevel", "sblev", "level", "sblevelprogress", "sbprog", "sblevelprog", "levelprogress", "levelprog",
-			"rep", "reputation", "mithrilpowder", "mithril", "mpowder", "mith", "mpowd", "gemstonepowder", "gemstone",
-			"gpowder", "gpowd", "glacitepowder", "glacite", "glpowder", "glac", "glpowd", "totalmithrilpowder",
-			"totalmithril", "totmithril", "totmpowder", "totmith", "totalgemstonepowder", "totalgemstone",
-			"totgemstone", "totgpowder", "totgem", "totalglacitepowder", "totalglacite", "totglacite", "totglpowder",
-			"totglac", "hotm", "hotmtier", "hotmtokens", "tokens", "token", "hotf", "hotftier", "htier", "hotftokens",
-			"htokens", "htoken", "whispers", "whisper", "whisp", "forestwhispers", "fwhispers", "fwhisper",
-			"desertwhispers", "dwhispers", "dwhisper", "cata", "catacombs", "catacombslevel", "catalvl", "classlevel",
-			"classlvl", "dclass", "dungeonclass", "partysize", "party", "dungeonparty", "witheressence", "wither",
-			"wessence", "w", "undeadessence", "undead", "uessence", "u", "dragonessence", "dragon", "dessence", "d",
-			"spideressence", "spider", "spessence", "sp", "iceessence", "ice", "iessence", "i", "diamondessence",
-			"diamond", "diessence", "di", "goldessence", "gold", "gessence", "g", "crimsonessence", "crimson",
-			"cessence", "c", "forestessence", "forest", "foressence", "fe", "fossilessence", "fossil", "fossessence",
-			"foss", "sungeckoessence", "sungecko", "geckoessence", "gecko", "sungeck", "safariessence", "safari",
-			"safessence", "saf", "petlvl", "petlevel", "pet", "petxp", "pxp", "petexperience", "bestiary",
-			"bestiarylvl", "bestiarylevel", "best", "trophyfish", "trophyfishcount", "tfish", "diamondtrophy",
-			"diamondtrophyfish", "dtrophy", "goldtrophy", "goldtrophyfish", "gtrophy", "silvertrophy",
-			"silvertrophyfish", "strophy", "bronzetrophy", "bronzetrophyfish", "btrophy", "mp", "magicalpower",
-			"accessorypower", "power", "hp", "health", "maxhp", "maxhealth", "mhp", "def", "defense", "defence", "mana",
-			"intel", "intelligence", "maxmana", "mmana", "maxintel", "maxintelligence", "overflowmana", "ofmana", "vit",
-			"vitality", "maxvitality", "mvit", "spd", "speed", "xplevel", "xplvl", "xp", "farming", "farminglvl",
-			"farmlvl", "farm", "farmingxp", "farmxp", "mining", "mininglvl", "minelvl", "mine", "miningxp", "minexp",
-			"combat", "combatlvl", "cmbtlvl", "cmbt", "combatxp", "cmbtxp", "foraging", "foraginglvl", "foraglvl",
-			"forag", "foragingxp", "foragxp", "fishing", "fishinglvl", "fishlvl", "fish", "fishingxp", "fishxp",
-			"enchanting", "enchantinglvl", "enchlvl", "ench", "enchantingxp", "enchxp", "alchemy", "alchemylvl",
-			"alchlvl", "alch", "alchemyxp", "alchxp", "taming", "taminglvl", "tamelvl", "tame", "tamingxp", "tamexp",
-			"carpentry", "carpentrylvl", "carplvl", "carp", "carpentryxp", "carpxp", "runecrafting", "runecraftinglvl",
-			"runelvl", "rune", "runecraftingxp", "runexp", "social", "sociallvl", "soclvl", "soc", "socialxp", "socxp",
-			"hunting", "huntinglvl", "huntlvl", "hunt", "huntingxp", "huntxp", "zombieslayer", "zombieslayerxp", "rev",
-			"revxp", "revslayer", "zombie", "zombiexp", "spiderslayer", "spiderslayerxp", "tara", "taraxp",
-			"taraslayer", "spiderxp", "taralvl", "spiderlvl", "wolfslayer", "wolfslayerxp", "sven", "svenxp",
-			"svenslayer", "wolf", "wolfxp", "endermanslayer", "endermanslayerxp", "eman", "emanxp", "emanslayer",
-			"enderman", "endermanxp", "voidgloom", "voidgloomxp", "blazeslayer", "blazeslayerxp", "blaze", "blazexp",
-			"inferno", "infernoxp", "vampireslayer", "vampireslayerxp", "vamp", "vampxp", "riftstalker",
-			"riftstalkerxp");
+	public static final Set<String> BUILTIN_VARIABLES = Set.of("ans", "pi", "e");
 
 	private static final int MAX_HISTORY = 15;
 

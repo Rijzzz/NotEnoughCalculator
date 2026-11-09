@@ -327,11 +327,12 @@ public class NotEnoughCalculatorClient implements ClientModInitializer {
 							.then(ClientCommands.argument("value", StringArgumentType.greedyString())
 									.executes(CalculatorCommands::executeSet))));
 
-			dispatcher.register(ClientCommands.literal("calchelp").executes(CalculatorCommands::executeHelp)
-					.then(ClientCommands.argument("page", StringArgumentType.word()).suggests((ctx,
-							builder) -> SharedSuggestionProvider.suggest(new String[]{"main", "operators", "functions",
-									"units", "variables", "stats", "market", "tax", "examples", "config"}, builder))
-							.executes(CalculatorCommands::executeHelpPage)));
+			dispatcher
+					.register(ClientCommands.literal("calchelp").executes(CalculatorCommands::executeHelp)
+							.then(ClientCommands.argument("page", StringArgumentType.word()).suggests((ctx,
+									builder) -> SharedSuggestionProvider.suggest(new String[]{"main", "operators",
+											"functions", "units", "variables", "tax", "examples", "config"}, builder))
+									.executes(CalculatorCommands::executeHelpPage)));
 
 			dispatcher.register(ClientCommands.literal("calcconfig").executes(CalculatorCommands::executeConfig)
 					.then(ClientCommands.literal("position").executes(CalculatorCommands::executePosition)));

@@ -86,13 +86,6 @@ public class CalculatorHelpFormatter {
 			case "variables" :
 				showVariablesHelp(ctx);
 				break;
-			case "stats" :
-			case "api" :
-				showStatsHelp(ctx);
-				break;
-			case "market" :
-				showMarketHelp(ctx);
-				break;
 			case "tax" :
 				showTaxHelp(ctx);
 				break;
@@ -120,7 +113,6 @@ public class CalculatorHelpFormatter {
 				"@functions:notenoughcalculator.help.main.page_functions",
 				"@units:notenoughcalculator.help.main.page_units",
 				"@variables:notenoughcalculator.help.main.page_variables",
-				"@stats:notenoughcalculator.help.main.page_stats", "@market:notenoughcalculator.help.main.page_market",
 				"@tax:notenoughcalculator.help.main.page_tax", "@examples:notenoughcalculator.help.main.page_examples",
 				"@config:notenoughcalculator.help.main.page_config", null,
 				"notenoughcalculator.help.main.keyboard_shortcuts",
@@ -169,32 +161,7 @@ public class CalculatorHelpFormatter {
 				"notenoughcalculator.help.functions.huntingxp", "notenoughcalculator.help.functions.runecraftingxp",
 				"notenoughcalculator.help.functions.socialxp", "notenoughcalculator.help.functions.cataxp",
 				"notenoughcalculator.help.functions.slayerxp", "notenoughcalculator.help.functions.emanxp",
-				"notenoughcalculator.help.functions.vampirexp", "notenoughcalculator.help.functions.perk", null,
-				"@main:notenoughcalculator.help.back");
-	}
-
-	public static void showStatsHelp(CommandContext<FabricClientCommandSource> ctx) {
-		sendBlock(ctx, "notenoughcalculator.help.stats.title", null, "notenoughcalculator.help.stats.currency",
-				"notenoughcalculator.help.stats.currency_desc", "notenoughcalculator.help.stats.currency_ex", null,
-				"notenoughcalculator.help.stats.powders", "notenoughcalculator.help.stats.powders_desc",
-				"notenoughcalculator.help.stats.powders_ex", null, "notenoughcalculator.help.stats.essences",
-				"notenoughcalculator.help.stats.essences_desc", "notenoughcalculator.help.stats.essences_ex", null,
-				"notenoughcalculator.help.stats.pets_bestiary", "notenoughcalculator.help.stats.pets_bestiary_desc",
-				"notenoughcalculator.help.stats.pets_bestiary_ex", null, "notenoughcalculator.help.stats.player",
-				"notenoughcalculator.help.stats.player_desc", "notenoughcalculator.help.stats.player_ex", null,
-				"notenoughcalculator.help.stats.skills", "notenoughcalculator.help.stats.skills_desc",
-				"notenoughcalculator.help.stats.slayer_desc", "notenoughcalculator.help.stats.skills_ex", null,
-				"@main:notenoughcalculator.help.back");
-	}
-
-	public static void showMarketHelp(CommandContext<FabricClientCommandSource> ctx) {
-		sendBlock(ctx, "notenoughcalculator.help.market.title", null, "notenoughcalculator.help.market.queries",
-				"notenoughcalculator.help.market.bzb", "notenoughcalculator.help.market.bzs",
-				"notenoughcalculator.help.market.bzm", "notenoughcalculator.help.market.lb",
-				"notenoughcalculator.help.market.lba", "notenoughcalculator.help.market.npc",
-				"notenoughcalculator.help.market.motes", "notenoughcalculator.help.market.price",
-				"notenoughcalculator.help.market.sack", null, "notenoughcalculator.help.market.quotes_note", null,
-				"@main:notenoughcalculator.help.back");
+				"notenoughcalculator.help.functions.vampirexp", null, "@main:notenoughcalculator.help.back");
 	}
 
 	public static void showTaxHelp(CommandContext<FabricClientCommandSource> ctx) {
@@ -224,9 +191,9 @@ public class CalculatorHelpFormatter {
 	public static void showVariablesHelp(CommandContext<FabricClientCommandSource> ctx) {
 		sendBlock(ctx, "notenoughcalculator.help.variables.title", null, "notenoughcalculator.help.variables.builtin",
 				"notenoughcalculator.help.variables.builtin_ans", "notenoughcalculator.help.variables.builtin_pi",
-				"notenoughcalculator.help.variables.builtin_e", "notenoughcalculator.help.variables.builtin_api", null,
-				"notenoughcalculator.help.variables.custom", "notenoughcalculator.help.variables.custom_desc", null,
-				"notenoughcalculator.help.variables.setting", "notenoughcalculator.help.variables.setting_example_1",
+				"notenoughcalculator.help.variables.builtin_e", null, "notenoughcalculator.help.variables.custom",
+				"notenoughcalculator.help.variables.custom_desc", null, "notenoughcalculator.help.variables.setting",
+				"notenoughcalculator.help.variables.setting_example_1",
 				"notenoughcalculator.help.variables.setting_example_2", null,
 				"notenoughcalculator.help.variables.using", "notenoughcalculator.help.variables.using_example_1",
 				"notenoughcalculator.help.variables.using_example_2", null,

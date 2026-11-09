@@ -18,14 +18,10 @@
 
 package com.rijz.notenoughcalculator.core.parser;
 
-import com.rijz.notenoughcalculator.api.provider.HotfDataProvider;
-import com.rijz.notenoughcalculator.api.provider.HotmDataProvider;
 import com.rijz.notenoughcalculator.config.CalculatorConfig;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.EvalException;
 import com.rijz.notenoughcalculator.core.ExpressionEvaluator.RadixMode;
-import com.rijz.notenoughcalculator.core.evaluator.MarketPriceLookup;
-import com.rijz.notenoughcalculator.core.evaluator.PlayerStatLookup;
 import com.rijz.notenoughcalculator.core.skyblock.SkillXpTable;
 import com.rijz.notenoughcalculator.core.skyblock.SkyblockTaxCalculator;
 import com.rijz.notenoughcalculator.core.skyblock.SlayerXpTable;
@@ -374,17 +370,6 @@ public class ExpressionParser {
 				return new ParseResult(variables.get(rawName), pos + 1);
 			}
 
-			BigDecimal apiVal = PlayerStatLookup.lookupPlayerStat(cleanName);
-			if (apiVal != null) {
-				return new ParseResult(apiVal, pos + 1);
-			}
-
-			if (ExpressionEvaluator.BUILTIN_VARIABLES.contains(cleanName)
-					|| ExpressionEvaluator.BUILTIN_VARIABLES.contains(rawName)) {
-				throw new EvalException(
-						ExpressionEvaluator.tr("notenoughcalculator.error.api_data_unavailable", cleanName), tok.pos);
-			}
-
 			throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.undefined_variable", tok.value),
 					tok.pos);
 		}
@@ -396,45 +381,6 @@ public class ExpressionParser {
 			}
 
 			String fnName = tok.value.toLowerCase();
-
-			if (isMarketFunction(fnName)) {
-				int nextPos = pos + 2;
-				if (nextPos < tokens.size() && tokens.get(nextPos).kind == TokenKind.VAR) {
-					String itemId = tokens.get(nextPos).value;
-					int endPos = nextPos + 1;
-					if (endPos < tokens.size() && tokens.get(endPos).kind == TokenKind.RPAREN) {
-						BigDecimal marketPrice = MarketPriceLookup.lookupMarketPrice(fnName, itemId);
-						if (marketPrice != null) {
-							return new ParseResult(marketPrice, endPos + 1);
-						}
-						throw new EvalException(
-								ExpressionEvaluator.tr("notenoughcalculator.error.item_not_found", itemId), tok.pos);
-					}
-				}
-				throw new EvalException(
-						ExpressionEvaluator.tr("notenoughcalculator.error.invalid_market_syntax", fnName), tok.pos);
-			}
-
-			if (fnName.equals("perk") || fnName.equals("hotmperk") || fnName.equals("hperk")) {
-				int nextPos = pos + 2;
-				if (nextPos < tokens.size()
-						&& (tokens.get(nextPos).kind == TokenKind.VAR || tokens.get(nextPos).kind == TokenKind.NUM)) {
-					String perkName = tokens.get(nextPos).value;
-					int endPos = nextPos + 1;
-					if (endPos < tokens.size() && tokens.get(endPos).kind == TokenKind.RPAREN) {
-						BigDecimal level = HotmDataProvider.getPerkLevel(perkName);
-						if (level == null) {
-							level = HotfDataProvider.getPerkLevel(perkName);
-						}
-						if (level != null) {
-							return new ParseResult(level, endPos + 1);
-						}
-						return new ParseResult(BigDecimal.ZERO, endPos + 1);
-					}
-				}
-				throw new EvalException(
-						ExpressionEvaluator.tr("notenoughcalculator.error.expected_parenthesis", tok.value), tok.pos);
-			}
 
 			if (fnName.equals("skillxp") || fnName.equals("skill_xp") || fnName.equals("skilltable")) {
 				ParseResult arg1 = parseExpression(tokens, pos + 2);
@@ -702,10 +648,6 @@ public class ExpressionParser {
 
 		throw new EvalException(ExpressionEvaluator.tr("notenoughcalculator.error.unexpected_token", tok.value),
 				tok.pos);
-	}
-
-	private static boolean isMarketFunction(String name) {
-		return ExpressionEvaluator.MARKET_QUERY_FUNCTIONS.contains(name);
 	}
 
 	private BigDecimal applyBinaryFunction(String func, BigDecimal a, BigDecimal b, int pos) throws EvalException {

@@ -263,8 +263,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Name | Version |
 | :--- | :--- |
-| [Fabric Loader](https://fabricmc.net/) | `0.19.5+` |
-| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.155.3+` |
+| [Fabric Loader](https://fabricmc.net/) | `0.20.1+` |
+| [Fabric API](https://modrinth.com/mod/fabric-api) | `0.165.2+` |
 
 </details>
 
@@ -273,9 +273,9 @@ Type calculations directly in the search bar and get instant results! Works insi
 
 | Name | Version |
 | :--- | :--- |
-| [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.1.819+` |
-| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.23+` |
-| [Mod Menu](https://modrinth.com/mod/modmenu) | `18.0.2+` |
+| [Roughly Enough Items (REI)](https://modrinth.com/mod/rei) | `26.3.824+` |
+| [Skyblock Item List](https://modrinth.com/mod/skyblock-item-list) | `0.0.24+` |
+| [Mod Menu](https://modrinth.com/mod/modmenu) | `21.0.0+` |
 
 </details>
 

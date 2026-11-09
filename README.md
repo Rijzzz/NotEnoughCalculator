@@ -252,8 +252,8 @@ Type calculations directly in the search bar and get instant results! Works insi
 <details>
 <summary>Important Note</summary>
 
-- These dependency versions are for the latest release (v3.0.3). If you are using an older build, check its release notes.
-- Standalone mode was added in v2.7.0. Versions before v2.7.0 need REI installed.
+- These dependency versions are for the latest releases (v3.0.3+). If you are using an older build, please check that specific release for its dependency requirements or launch the game once with the mod installed and a popup window will display all required dependencies.
+- Standalone mode was added in v2.7.0. Versions before v2.7.0 need REI installed. Also versions 3.0.0, 3.0.1, 3.0.2, and 3.1.0 require Fabric Language Kotlin to be installed.
 
 </details>
 

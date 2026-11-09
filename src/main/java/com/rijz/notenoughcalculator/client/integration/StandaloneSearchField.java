@@ -496,7 +496,7 @@ public class StandaloneSearchField implements SearchFieldAdapter {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		CalculatorBounds bounds = getBounds();
 		if (mouseX >= bounds.x && mouseX <= bounds.getMaxX() && mouseY >= bounds.y && mouseY <= bounds.getMaxY()) {
-			focused = true;
+			setFocused(true);
 
 			Minecraft mc = Minecraft.getInstance();
 			if (mc != null && mc.font != null) {

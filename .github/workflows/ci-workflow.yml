@@ -4,9 +4,11 @@ on:
   pull_request:
     branches:
       - '26.2'
+      - '26.3'
   push:
     branches:
       - '26.2'
+      - '26.3'
 
 jobs:
   compile-and-test:
